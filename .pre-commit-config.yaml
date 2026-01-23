@@ -1,0 +1,20 @@
+repos:
+  - repo: https://github.com/zricethezav/gitleaks
+    rev: v8.27.0
+    hooks:
+      - id: gitleaks
+        name: gitleaks (secrets scan)
+        args: ["--pre-commit", "--redact", "--verbose", "--no-banner"]
+
+  - repo: https://github.com/DavidAnson/markdownlint-cli2
+    rev: v0.14.0
+    hooks:
+      - id: markdownlint-cli2
+        name: markdownlint (docs)
+        files: "\\.md$"
+
+  - repo: https://github.com/astro/deadnix
+    rev: v1.2.1
+    hooks:
+      - id: deadnix
+        name: deadnix (nix unused code)

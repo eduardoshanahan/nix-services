@@ -1,0 +1,4 @@
+config:
+  # Allow long lines in Markdown prose. Code blocks are already exempt in practice
+  # due to tooling and readability needs; we don't enforce a global line length.
+  MD013: false
