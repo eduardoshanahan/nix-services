@@ -7,6 +7,8 @@ let
   composeDir = "/etc/${serviceName}";
   dockerBin = "${config.virtualisation.docker.package}/bin/docker";
 
+  tz = if config.time.timeZone != null then config.time.timeZone else "UTC";
+
   uiHostname =
     if cfg.uiHostname != null then cfg.uiHostname else "pihole-${cfg.role}.local";
 
@@ -125,7 +127,7 @@ in
           "PIHOLE_DATA_DIR=${cfg.dataDir}"
           "PIHOLE_ENV_FILE=${cfg.envFile}"
           "PIHOLE_TRAEFIK_NETWORK=${cfg.traefikNetwork}"
-          "TZ=${config.time.timeZone}"
+          "TZ=${tz}"
         ];
 
         ExecStartPre = [
