@@ -1,0 +1,36 @@
+version: "3.9"
+
+services:
+  pihole:
+    image: pihole/pihole:2024.07.0
+    container_name: ${PIHOLE_CONTAINER_NAME}
+    restart: unless-stopped
+
+    networks:
+      - traefik
+
+    env_file:
+      - ${PIHOLE_ENV_FILE}
+
+    environment:
+      TZ: ${TZ}
+
+    volumes:
+      - "${PIHOLE_DATA_DIR}/etc-pihole:/etc/pihole"
+      - "${PIHOLE_DATA_DIR}/etc-dnsmasq.d:/etc/dnsmasq.d"
+
+    expose:
+      - "80"
+      - "53/tcp"
+      - "53/udp"
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.pihole.rule=Host(`${PIHOLE_UI_HOSTNAME}`)"
+      - "traefik.http.routers.pihole.entrypoints=web"
+      - "traefik.http.services.pihole.loadbalancer.server.port=80"
+
+networks:
+  traefik:
+    external: true
+    name: ${PIHOLE_TRAEFIK_NETWORK}
