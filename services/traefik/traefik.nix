@@ -40,6 +40,8 @@ in
     virtualisation.docker.enable = true;
 
     environment.etc."${serviceName}/docker-compose.yml".source = ./docker-compose.yml;
+    environment.etc."traefik/traefik.yml".text = "";
+
 
     systemd.services.${serviceName} = {
       description = "Traefik ingress (Docker Compose)";

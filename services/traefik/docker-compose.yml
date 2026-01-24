@@ -5,7 +5,8 @@ services:
     restart: unless-stopped
 
     command:
-      - "--configFile=/dev/null"
+      - "--configFile=/etc/traefik/traefik.yml"
+
       - "--log.level=INFO"
       - "--accesslog=false"
 
