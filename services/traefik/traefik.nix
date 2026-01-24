@@ -1,44 +1,71 @@
-{ config, pkgs, ... }:
+{ config, lib, pkgs, ... }:
 
 let
+  cfg = config.services.traefik;
+
   serviceName = "traefik";
   composeDir = "/etc/${serviceName}";
-  networkName = "traefik";
   dockerBin = "${config.virtualisation.docker.package}/bin/docker";
 in
 {
-  virtualisation.docker.enable = true;
+  options.services.traefik = {
+    uiHostname = lib.mkOption {
+      type = lib.types.str;
+      default = "traefik.local";
+      description = ''
+        Reserved hostname for future operator-validated UI exposure (not used while API/dashboard are disabled).
+      '';
+    };
 
-  environment.systemPackages = [
-    pkgs.docker-compose
-  ];
+    containerName = lib.mkOption {
+      type = lib.types.str;
+      default = "traefik";
+      description = "Docker container name.";
+    };
 
-  systemd.tmpfiles.rules = [
-    "d /var/lib/${serviceName} 0755 root root -"
-  ];
+    dataDir = lib.mkOption {
+      type = lib.types.str;
+      default = "/var/lib/traefik";
+      description = "Legacy persistent Traefik state directory path (not used; no `/data` mount is configured).";
+    };
 
-  environment.etc."${serviceName}/docker-compose.yml".source = ./docker-compose.yml;
+    network = lib.mkOption {
+      type = lib.types.str;
+      default = "traefik";
+      description = "External Docker network name used by Traefik and downstream services.";
+    };
+  };
 
-  systemd.services.${serviceName} = {
-    description = "Traefik ingress (Docker Compose)";
+  config = {
+    virtualisation.docker.enable = true;
 
-    wantedBy = [ "multi-user.target" ];
-    after = [ "docker.service" "network-online.target" ];
-    wants = [ "network-online.target" ];
+    environment.etc."${serviceName}/docker-compose.yml".source = ./docker-compose.yml;
 
-    serviceConfig = {
-      WorkingDirectory = composeDir;
+    systemd.services.${serviceName} = {
+      description = "Traefik ingress (Docker Compose)";
 
-      ExecStartPre = [
-        "${pkgs.runtimeShell} -c '${dockerBin} network inspect ${networkName} >/dev/null 2>&1 || ${dockerBin} network create ${networkName}'"
-      ];
+      wantedBy = [ "multi-user.target" ];
+      after = [ "docker.service" "network-online.target" ];
+      wants = [ "network-online.target" ];
 
-      ExecStart = "${dockerBin} compose up";
-      ExecStop = "${dockerBin} compose down";
+      serviceConfig = {
+        WorkingDirectory = composeDir;
 
-      Restart = "always";
-      RestartSec = "5s";
+        Environment = [
+          "TRAEFIK_CONTAINER_NAME=${cfg.containerName}"
+          "TRAEFIK_NETWORK=${cfg.network}"
+        ];
+
+        ExecStartPre = [
+          "${pkgs.runtimeShell} -c '${dockerBin} network inspect ${cfg.network} >/dev/null 2>&1 || ${dockerBin} network create ${cfg.network}'"
+        ];
+
+        ExecStart = "${dockerBin} compose up -d";
+        ExecStop = "${dockerBin} compose down";
+
+        Restart = "always";
+        RestartSec = "5s";
+      };
     };
   };
 }
-

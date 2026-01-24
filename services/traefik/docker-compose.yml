@@ -1,25 +1,25 @@
-version: "3.9"
-
 services:
   traefik:
-    image: traefik:v2.11.10
-    container_name: traefik
+    image: traefik:v3.6.7
+    container_name: ${TRAEFIK_CONTAINER_NAME}
     restart: unless-stopped
 
     command:
       - "--log.level=INFO"
       - "--accesslog=false"
 
-      - "--api=true"
-      - "--api.dashboard=true"
+      - "--api=false"
       - "--ping=true"
 
       - "--providers.docker=true"
-      - "--providers.docker.exposedbydefault=false"
-      - "--providers.docker.network=traefik"
+      - "--providers.docker.exposedByDefault=false"
+      - "--providers.docker.network=${TRAEFIK_NETWORK}"
+      - "--providers.file=false"
+      - "--providers.kubernetesIngress=false"
+      - "--providers.kubernetesCRD=false"
 
-      - "--entrypoints.web.address=:80"
-      - "--entrypoints.websecure.address=:443"
+      - "--entryPoints.web.address=:80"
+      - "--entryPoints.websecure.address=:443"
 
     ports:
       - "80:80"
@@ -27,18 +27,11 @@ services:
 
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      - "/var/lib/traefik:/data"
 
     networks:
       - traefik
 
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.traefik.rule=Host(`traefik.local`)"
-      - "traefik.http.routers.traefik.entrypoints=web"
-      - "traefik.http.routers.traefik.service=api@internal"
-
 networks:
   traefik:
     external: true
-
+    name: ${TRAEFIK_NETWORK}

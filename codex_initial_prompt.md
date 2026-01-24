@@ -1,58 +1,87 @@
-Before doing anything else:
+# Codex Initial Prompt — nix-services
 
-1. Read and fully internalize codex_initial_prompt.md.
-2. Confirm you understand that Traefik is already implemented and is a dependency.
-3. Confirm you understand the Flake Interface Contract.
+You are working in the repository `nix-services`.
 
-Task:
+This repository defines **application services and operational policy**
+for NixOS hosts running on ARM64.
+It intentionally contains **no hardware bootstrap logic** and **no secrets**.
 
-Implement the Pi-hole service in nix-services.
+This repository is **execution-ready**.
+All architectural decisions are already made and documented.
 
-The implementation MUST strictly follow:
+---
 
-- Pi-hole Deployment Plan (Traefik + No-DNS → DNS Transition)
-- Standard Service Template (NixOS + Docker Compose)
+## AUTHORITATIVE DOCUMENTS (MANDATORY)
+
+You MUST treat the following documents as authoritative and binding.
+Do not contradict, bypass, or reinterpret them.
+
+- Private vs Public Separation Guidelines
+- Architecture & Implementation Guidelines
+- Repository Boundary & Responsibility Guidelines
+- ARM64-Specific Deployment Considerations
 - Service Deployment Model
+- Traefik-First Deployment Plan (Pre-DNS, Operator-Validated)
+- Pi-hole Deployment Plan (Traefik + No-DNS → DNS Transition)
+- TLS Enablement Plan (Post-DNS, Traefik)
+- Standard Service Template (NixOS + Docker Compose)
+- Monitoring & Metrics Plan (Prometheus + Traefik)
+- Backup & Restore Plan (Volumes + Pi-hole State)
+- Disaster Recovery Drill Checklist
+- Change Management & Upgrade Plan
 
-Scope:
+If a task conflicts with any document, STOP and ask for clarification.
 
-- Create a new service under services/pihole/
-- Provide:
-  - docker-compose.yml
-  - pihole.nix (systemd-supervised Docker Compose)
-- Export the service via:
-  - outputs.nixosModules.pihole
-  - outputs.services.pihole
+---
 
-Mandatory technical requirements:
+## GLOBAL INVARIANTS (NON-NEGOTIABLE)
 
-- Pi-hole MUST run behind Traefik for its web UI.
-- Pi-hole MUST NOT bind host ports 80 or 443.
-- Pi-hole DNS (port 53 TCP/UDP) MUST be defined but MUST NOT assume active usage yet.
-- Pi-hole MUST join the Traefik Docker network.
-- All state MUST be persisted via volumes.
-- No secrets may appear in the repository.
-- Secrets MUST be referenced only via external env files or runtime overlays.
-- Role-specific values (primary vs secondary) MUST be configurable via module options.
+- Assume all target hosts are `aarch64-linux` (ARM64), even if development or testing
+  occurs on other architectures.
+- One service = one directory under `services/`.
+- Docker Compose is owned and supervised by NixOS via systemd.
+- Traefik permanently owns host ports **80 and 443**.
+- No secrets, tokens, passwords, domains, IPs, or credentials
+  may appear in the repository.
+- Private data is injected only via ignored paths or runtime overlays.
+- Operator-validated steps MUST NOT be automated or inferred.
+- Changes must be incremental and isolated.
 
-Forbidden actions:
+---
 
-- Do NOT deploy Pi-hole to any host.
-- Do NOT modify Traefik.
-- Do NOT enable DNS cutover automatically.
-- Do NOT add TLS.
-- Do NOT add monitoring.
-- Do NOT commit example passwords or tokens.
+## FLAKE INTERFACE CONTRACT (MANDATORY)
 
-Deliverables:
+The `nix-services` flake MUST expose services as NixOS modules.
 
-- docker-compose.yml
-- pihole.nix
-- Updated flake exports exposing the Pi-hole service
-- Minimal inline documentation explaining:
-  - Pre-DNS UI access via Traefik + /etc/hosts
-  - Persistence expectations
-  - Manual DNS cutover (documented only)
+Required interface:
 
-Stop when the Pi-hole service is implemented and correctly exported.
-If anything is unclear or conflicts with an authoritative document, STOP and ask.
+- Every service MUST be exported under:
+  - `outputs.nixosModules.<service-name>`
+- A convenience alias MUST exist at:
+  - `outputs.services.<service-name>`
+
+Consumers MUST be able to import services as:
+
+```nix
+nix-services.services.<service-name>
+```
+
+This interface MUST be implemented before any service
+can be considered complete or deployable.
+
+---
+
+## WORKING MODE
+
+- Make the smallest change that moves the plan forward.
+- Do not combine unrelated changes.
+- Do not refactor without explicit instruction.
+- Prefer clarity over cleverness.
+- Treat repository documents as a contract, not guidance.
+- When uncertain, STOP and ask.
+
+---
+
+## Implementation phase
+
+- Follow the instructions in codex_implementation_prompt.md
