@@ -1,105 +1,58 @@
-# Codex Initial Prompt — nix-services
+Before doing anything else:
 
-You are working in the repository `nix-services`.
+1. Read and fully internalize codex_initial_prompt.md.
+2. Confirm you understand that Traefik is already implemented and is a dependency.
+3. Confirm you understand the Flake Interface Contract.
 
-This repository defines **application services and operational policy**
-for NixOS hosts running on ARM64.
-It intentionally contains **no hardware bootstrap logic** and **no secrets**.
+Task:
 
-This repository is **execution-ready**.
-All architectural decisions are already made and documented.
+Implement the Pi-hole service in nix-services.
 
----
+The implementation MUST strictly follow:
 
-## AUTHORITATIVE DOCUMENTS (MANDATORY)
-
-You MUST treat the following documents as authoritative and binding.
-Do not contradict, bypass, or reinterpret them.
-
-- Private vs Public Separation Guidelines
-- Architecture & Implementation Guidelines
-- Repository Boundary & Responsibility Guidelines
-- ARM64-Specific Deployment Considerations
-- Service Deployment Model
-- Traefik-First Deployment Plan (Pre-DNS, Operator-Validated)
 - Pi-hole Deployment Plan (Traefik + No-DNS → DNS Transition)
-- TLS Enablement Plan (Post-DNS, Traefik)
 - Standard Service Template (NixOS + Docker Compose)
-- Monitoring & Metrics Plan (Prometheus + Traefik)
-- Backup & Restore Plan (Volumes + Pi-hole State)
-- Disaster Recovery Drill Checklist
-- Change Management & Upgrade Plan
+- Service Deployment Model
 
-If a task conflicts with any document, STOP and ask for clarification.
+Scope:
 
----
+- Create a new service under services/pihole/
+- Provide:
+  - docker-compose.yml
+  - pihole.nix (systemd-supervised Docker Compose)
+- Export the service via:
+  - outputs.nixosModules.pihole
+  - outputs.services.pihole
 
-## GLOBAL INVARIANTS (NON-NEGOTIABLE)
+Mandatory technical requirements:
 
-- Assume all target hosts are `aarch64-linux` (ARM64), even if development or testing
-  occurs on other architectures.
-- One service = one directory under `services/`.
-- Docker Compose is owned and supervised by NixOS via systemd.
-- Traefik permanently owns host ports **80 and 443**.
-- No secrets, tokens, passwords, domains, IPs, or credentials
-  may appear in the repository.
-- Private data is injected only via ignored paths or runtime overlays.
-- Operator-validated steps MUST NOT be automated or inferred.
-- Changes must be incremental and isolated.
+- Pi-hole MUST run behind Traefik for its web UI.
+- Pi-hole MUST NOT bind host ports 80 or 443.
+- Pi-hole DNS (port 53 TCP/UDP) MUST be defined but MUST NOT assume active usage yet.
+- Pi-hole MUST join the Traefik Docker network.
+- All state MUST be persisted via volumes.
+- No secrets may appear in the repository.
+- Secrets MUST be referenced only via external env files or runtime overlays.
+- Role-specific values (primary vs secondary) MUST be configurable via module options.
 
----
+Forbidden actions:
 
-## FLAKE INTERFACE CONTRACT (MANDATORY)
+- Do NOT deploy Pi-hole to any host.
+- Do NOT modify Traefik.
+- Do NOT enable DNS cutover automatically.
+- Do NOT add TLS.
+- Do NOT add monitoring.
+- Do NOT commit example passwords or tokens.
 
-The `nix-services` flake MUST expose services as NixOS modules.
+Deliverables:
 
-Required interface:
+- docker-compose.yml
+- pihole.nix
+- Updated flake exports exposing the Pi-hole service
+- Minimal inline documentation explaining:
+  - Pre-DNS UI access via Traefik + /etc/hosts
+  - Persistence expectations
+  - Manual DNS cutover (documented only)
 
-- Every service MUST be exported under:
-  - `outputs.nixosModules.<service-name>`
-- A convenience alias MUST exist at:
-  - `outputs.services.<service-name>`
-
-Consumers MUST be able to import services as:
-
-```nix
-nix-services.services.<service-name>
-```
-
-This interface MUST be implemented before any service
-can be considered complete or deployable.
-
----
-
-## WORKING MODE
-
-- Make the smallest change that moves the plan forward.
-- Do not combine unrelated changes.
-- Do not refactor without explicit instruction.
-- Prefer clarity over cleverness.
-- Treat repository documents as a contract, not guidance.
-- When uncertain, STOP and ask.
-
----
-
-## CURRENT PHASE
-
-The project is in **Phase 1: Traefik foundation**.
-
-Your task is:
-
-> Implement Traefik strictly following  
-> **Traefik-First Deployment Plan (Pre-DNS, Operator-Validated)**  
-> using the **Standard Service Template**  
-> and exposing the service according to the **Flake Interface Contract**.
-
-Do NOT:
-
-- Add Pi-hole
-- Add TLS
-- Add monitoring
-- Deploy Traefik to any host
-- Modify host behavior beyond what Traefik requires
-
-Stop once Traefik is implemented and correctly exported.
-Wait for explicit instruction before proceeding past Traefik.
+Stop when the Pi-hole service is implemented and correctly exported.
+If anything is unclear or conflicts with an authoritative document, STOP and ask.
