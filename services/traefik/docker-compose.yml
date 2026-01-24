@@ -5,6 +5,7 @@ services:
     restart: unless-stopped
 
     command:
+      - "--configFile=/dev/null"
       - "--log.level=INFO"
       - "--accesslog=false"
 
