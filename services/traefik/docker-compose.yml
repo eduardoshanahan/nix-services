@@ -14,8 +14,6 @@ services:
       - "--providers.docker=true"
       - "--providers.docker.exposedByDefault=false"
       - "--providers.docker.network=${TRAEFIK_NETWORK}"
-      - "--providers.kubernetesIngress=false"
-      - "--providers.kubernetesCRD=false"
 
       - "--entryPoints.web.address=:80"
       - "--entryPoints.websecure.address=:443"
