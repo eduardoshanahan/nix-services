@@ -49,6 +49,9 @@ in
       wants = [ "network-online.target" ];
 
       serviceConfig = {
+        Type = "oneshot";
+        RemainAfterExit = true;
+
         WorkingDirectory = composeDir;
 
         Environment = [
@@ -62,9 +65,6 @@ in
 
         ExecStart = "${dockerBin} compose up -d";
         ExecStop = "${dockerBin} compose down";
-
-        Restart = "always";
-        RestartSec = "5s";
       };
     };
   };
