@@ -5,8 +5,7 @@
   ...
 }: let
   cfg = config.services.pihole;
-  runtimeSecrets = import ../../lib/runtime-secrets.nix {inherit lib;};
-
+  runtimeSecrets = import ../../lib/runtime-secrets.nix { inherit lib; };
   serviceName = "pihole";
   composeDir = "/etc/${serviceName}";
   dockerBin = "${config.virtualisation.docker.package}/bin/docker";
@@ -41,13 +40,21 @@ in {
       description = ''
         Absolute path to a runtime-provisioned file containing the Pi-hole web UI password.
 
-        This value is passed to the container via `FTLCONF_webserver_api_password__FILE`, so the secret is never embedded in Nix or the environment.
+        The file is read at service start and injected into the container as
+        `FTLCONF_webserver_api_password` via a runtime-generated env file.
       '';
       example = "/run/secrets/pihole-web-password";
     };
+
   };
 
   config = lib.mkIf cfg.enable {
+    assertions = [
+      {
+        assertion = cfg.webPasswordFile != null;
+        message = "services.pihole.webPasswordFile must be set when enabling Pi-hole.";
+      }
+    ];
     virtualisation.docker.enable = true;
 
     environment.etc."${serviceName}/docker-compose.yml".source = ./docker-compose.yml;
@@ -71,15 +78,32 @@ in {
             "PIHOLE_NETWORK=${cfg.network}"
             "PIHOLE_HOSTNAME=${cfg.hostname}"
             "TZ=${cfg.timezone}"
-          ]
-          ++ runtimeSecrets.mkSecretFileEnvVar {
-            envVar = "FTLCONF_webserver_api_password__FILE";
-            secretFile = cfg.webPasswordFile;
-            fallback = "/dev/null";
-          };
+          ];
 
         ExecStartPre = [
           "${pkgs.runtimeShell} -c '${dockerBin} network inspect ${cfg.network} >/dev/null 2>&1 || ${dockerBin} network create ${cfg.network}'"
+
+          (pkgs.writeShellScript "pihole-generate-env" ''
+            set -euo pipefail
+            umask 0077
+
+            secret_file="${cfg.webPasswordFile}"
+
+            if [[ -z "$secret_file" || ! -s "$secret_file" ]]; then
+              echo "pihole: webPasswordFile is not set or empty" >&2
+              exit 1
+            fi
+
+            password="$(cat "$secret_file")"
+            password="''${password%$'\n'}"
+
+            escaped="$password"
+            escaped="''${escaped//\\/\\\\}"
+            escaped="''${escaped//\"/\\\"}"
+
+            install -d -m 0700 /run/secrets
+            printf 'FTLCONF_webserver_api_password="%s"\n' "$escaped" > /run/secrets/pihole.env
+          '')
         ];
 
         ExecStart = "${dockerBin} compose up -d";

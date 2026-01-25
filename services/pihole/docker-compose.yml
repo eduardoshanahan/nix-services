@@ -10,7 +10,9 @@ services:
 
     environment:
       - TZ
-      - FTLCONF_webserver_api_password__FILE
+
+    env_file:
+      - /run/pihole.env
 
     volumes:
       - pihole-etc-pihole:/etc/pihole
