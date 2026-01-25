@@ -12,7 +12,7 @@ services:
       - TZ
 
     env_file:
-      - /run/pihole.env
+      - /run/secrets/pihole.env
 
     volumes:
       - pihole-etc-pihole:/etc/pihole
