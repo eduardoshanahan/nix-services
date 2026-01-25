@@ -42,14 +42,17 @@
     // (
       let
         traefikModule = import ./services/traefik/traefik.nix;
+        piholeModule = import ./services/pihole/pihole.nix;
       in
       {
         nixosModules = {
           traefik = traefikModule;
+          pihole = piholeModule;
         };
 
         services = {
           traefik = traefikModule;
+          pihole = piholeModule;
         };
       }
     );
