@@ -97,6 +97,7 @@ Other services MUST expose HTTP internally and be routed via Traefik.
 Traefik MUST run on a dedicated Docker network.
 
 Reasons:
+
 - Predictable container discovery
 - Reduced cross-service interference
 - More reliable restarts on ARM systems
@@ -218,4 +219,3 @@ Failure to meet these conditions must be addressed before continuing.
 - Traefik is the permanent HTTP entrypoint
 
 These rules ensure reliable operation on Raspberry Pi ARM64 systems and MUST be followed.
-

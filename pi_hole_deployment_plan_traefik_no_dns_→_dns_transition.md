@@ -58,7 +58,7 @@ If any item fails, STOP and fix Traefik first.
 
 Create the Pi-hole service directory:
 
-```
+```text
 services/
   pihole/
     docker-compose.yml
@@ -116,7 +116,7 @@ Until DNS exists, UI access is via client-side `/etc/hosts`.
 
 Client (not committed):
 
-```
+```text
 <BOX_IP> pihole-primary.local
 <BOX_IP> pihole-secondary.local
 ```
@@ -319,4 +319,3 @@ Codex MUST produce:
 8. Transition naming from `/etc/hosts` to DNS (optional)
 
 Codex MUST NOT skip steps.
-

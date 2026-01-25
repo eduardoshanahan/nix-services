@@ -8,6 +8,7 @@
 This document defines the **backup and restore strategy** for stateful services deployed via Docker Compose on NixOS, with special focus on **Pi-hole state** and other persistent volumes.
 
 It builds on:
+
 - *Standard Service Template (NixOS + Docker Compose)*
 - *Pi-hole Deployment Plan (Traefik + No-DNS → DNS Transition)*
 - *Monitoring & Metrics Plan (Prometheus + Traefik)*
@@ -91,7 +92,7 @@ Codex MUST NOT assume one specific tool unless instructed.
 
 All services MUST store persistent data under deterministic paths, e.g.:
 
-```
+```text
 /var/lib/<service-name>/
 ```
 
@@ -103,7 +104,7 @@ This is enforced by the Standard Service Template.
 
 Example backup structure:
 
-```
+```text
 backups/
   host-a/
     pihole/
@@ -222,4 +223,3 @@ No secrets are committed to the repository.
 5. Operator validates service behavior
 
 Codex MUST NOT skip steps or automate operator actions.
-

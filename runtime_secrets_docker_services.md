@@ -229,6 +229,7 @@ of the firewall**, not in isolation.
 ## When to Use UI vs Declarative Config
 
 **Declarative (must):**
+
 - Secrets
 - Ports
 - Users
@@ -236,6 +237,7 @@ of the firewall**, not in isolation.
 - Networking
 
 **UI acceptable (often better):**
+
 - Service-specific operational toggles
 - Runtime policies internal to the service
 - Stateful behavior that the service owns

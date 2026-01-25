@@ -6,6 +6,7 @@
 > Codex MUST use this template as the starting point for **all services** (Pi-hole, draw.io, future apps).
 
 This template is compatible with:
+
 - ARM64 (aarch64-linux)
 - NixOS
 - Docker + Docker Compose
@@ -32,7 +33,7 @@ Any deviation from this template MUST be justified explicitly.
 
 Every service MUST follow this layout:
 
-```
+```text
 services/
   <service-name>/
     docker-compose.yml
@@ -40,6 +41,7 @@ services/
 ```
 
 Rules:
+
 - `<service-name>` is lowercase and generic
 - No service logic may exist outside this directory
 
@@ -111,7 +113,7 @@ The NixOS module MUST:
 - Define a systemd unit to manage the service lifecycle
 - Depend on Docker and networking
 
-### Canonical example
+### Canonical example (service.nix)
 
 ```nix
 { config, lib, pkgs, ... }:
@@ -162,6 +164,7 @@ env_file:
 ```
 
 Secret files are:
+
 - Injected at runtime
 - Or provided by private overlays
 - Or managed by encrypted secret tooling
@@ -196,6 +199,7 @@ Example:
 ```
 
 Hosts MUST NOT:
+
 - Modify Docker Compose
 - Override service internals
 

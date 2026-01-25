@@ -21,13 +21,13 @@ These repositories serve **different purposes** and MUST NOT be merged or blurre
 
 ## 2. Foundation Repository (e.g. `nix-pi`)
 
-### Purpose
+### Purpose (Foundation Repository)
 
 The foundation repository exists to answer exactly one question:
 
 > **How do we reliably boot and provision NixOS on Raspberry Pi hardware?**
 
-### Allowed contents
+### Allowed contents (Foundation Repository)
 
 The foundation repository MAY contain:
 
@@ -37,7 +37,7 @@ The foundation repository MAY contain:
 - Minimal base NixOS profiles
 - Hardware‑specific fixes and workarounds
 
-### Forbidden contents
+### Forbidden contents (Foundation Repository)
 
 The foundation repository MUST NOT contain:
 
@@ -59,13 +59,13 @@ The foundation repo is **infrastructure**, not environment policy.
 
 ## 3. Services Repository (This Repository)
 
-### Purpose
+### Purpose (Services Repository)
 
 The services repository exists to answer a different question:
 
 > **What do we run on our machines, and how is it operated?**
 
-### Allowed contents
+### Allowed contents (Services Repository)
 
 This repository MAY contain:
 
@@ -76,7 +76,7 @@ This repository MAY contain:
 - Orchestration logic via NixOS + systemd
 - Optional private overlays and secret references
 
-### Forbidden contents
+### Forbidden contents (Services Repository)
 
 This repository MUST NOT:
 
@@ -92,7 +92,7 @@ All hardware and image concerns MUST come from the foundation repo.
 
 Dependencies MUST flow in **one direction only**:
 
-```
+```text
 services repo  ──▶  foundation repo (nix‑pi)
 ```
 
@@ -143,6 +143,7 @@ This split is intentional and provides:
 - Reduced risk of secret leakage
 
 Violating this boundary leads to:
+
 - Repository sprawl
 - Policy leakage
 - Confused ownership
@@ -168,4 +169,3 @@ When unsure, **do not add code** and request clarification.
 - No responsibility overlap
 
 This boundary is essential to the long‑term health of the system.
-

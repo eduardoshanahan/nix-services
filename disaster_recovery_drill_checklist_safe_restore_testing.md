@@ -8,6 +8,7 @@
 This checklist validates that the **Backup & Restore Plan** actually works under realistic failure conditions.
 
 It builds on:
+
 - *Backup & Restore Plan (Volumes + Pi-hole State)*
 - *Pi-hole Deployment Plan (Traefik + No-DNS → DNS Transition)*
 - *Traefik-First Deployment Plan (Pre-DNS, Operator-Validated)*
@@ -91,7 +92,7 @@ This simulates the most common real failure.
 5. Deploy services via the repo
 6. **Do NOT restore data yet**
 
-### Validation checkpoint
+### Validation checkpoint (Scenario A — Fresh Rebuild)
 
 - [ ] System boots cleanly
 - [ ] Traefik starts automatically
@@ -103,7 +104,7 @@ If this fails, STOP — backup quality is irrelevant until this works.
 
 ## 5. Drill Scenario B — Data Restore
 
-### Steps
+### Steps (Scenario B — Data Restore)
 
 1. Stop the target service (e.g. Pi-hole)
 2. Restore backed-up directories to:
@@ -126,12 +127,12 @@ If validation fails, STOP and investigate.
 
 ## 6. Drill Scenario C — Reboot & Persistence
 
-### Steps
+### Steps (Scenario C — Reboot & Persistence)
 
 1. Reboot the box
 2. Allow all services to start
 
-### Validation checkpoint
+### Validation checkpoint (Scenario C — Reboot & Persistence)
 
 - [ ] Traefik is running
 - [ ] Pi-hole is running
@@ -143,12 +144,12 @@ If validation fails, STOP and investigate.
 
 If you have primary + secondary Pi-hole:
 
-### Steps
+### Steps (Scenario D — Failover Simulation)
 
 1. Stop Pi-hole on the **primary** box
 2. Temporarily point a test client to the secondary DNS
 
-### Validation checkpoint
+### Validation checkpoint (Scenario D — Failover Simulation)
 
 - [ ] DNS queries still succeed
 - [ ] Secondary Pi-hole logs show activity
@@ -215,4 +216,3 @@ If any condition is not met, the system is **not DR-ready**.
 - Fix the plan when drills reveal gaps
 
 This checklist ensures your backups are trustworthy when you need them most.
-

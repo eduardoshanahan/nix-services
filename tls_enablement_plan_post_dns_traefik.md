@@ -8,6 +8,7 @@
 This document defines the **step-by-step plan** to enable **TLS/HTTPS** on services routed through **Traefik**, **after DNS is active and stable**.
 
 It builds on:
+
 - *Traefik-First Deployment Plan (Pre-DNS, Operator-Validated)*
 - *Pi-hole Deployment Plan (Traefik + No-DNS → DNS Transition)*
 
@@ -65,6 +66,7 @@ Codex MUST NOT choose on behalf of the operator.
 - No external dependencies
 
 Examples:
+
 - mkcert
 - step-ca
 - custom OpenSSL CA
@@ -205,4 +207,3 @@ These require separate plans.
 6. Codex enforces HTTP → HTTPS redirect
 
 Codex MUST NOT skip steps.
-

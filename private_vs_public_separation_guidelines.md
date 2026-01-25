@@ -13,6 +13,7 @@ It is written both for **humans** and for **Codex / AI-assisted development**. C
 This repo is a **blueprint**, not a live configuration dump.
 
 Anything committed here must be safe to:
+
 - Read by strangers
 - Index by search engines
 - Be reused by others
@@ -59,18 +60,21 @@ Codex MUST NOT add or commit:
 
 Private directories MAY exist in the public repo **only as empty placeholders**.
 
-### Allowed contents:
+### Allowed contents
+
 - Empty directories
 - `.gitkeep` files
 - Minimal README explaining intent (no details)
 
-### Forbidden contents:
+### Forbidden contents
+
 - Any values (even dummy ones)
 - Example secrets
 - Example IPs
 - Example hostnames that resemble real ones
 
-### Naming rules:
+### Naming rules
+
 - Use **generic names**
   - `secrets/`
   - `private/`
@@ -101,6 +105,7 @@ imports =
 ```
 
 This ensures:
+
 - The public repo builds cleanly
 - Private overlays are additive
 - No pressure to add placeholders with values
@@ -174,7 +179,7 @@ This separation is a **hard requirement**, not a suggestion.
 - Generic naming only
 
 Following these rules keeps the repository:
+
 - Safe to publish
 - Easy to reason about
 - Ready for real infrastructure deployment
-

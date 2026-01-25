@@ -55,7 +55,7 @@ If any item fails, STOP and resolve it before continuing.
 
 Codex MUST ensure the following structure exists:
 
-```
+```text
 flake.nix
 hosts/
 profiles/
@@ -75,7 +75,7 @@ No Traefik logic may exist outside `services/traefik/`.
 
 Create the following:
 
-```
+```text
 services/traefik/
   docker-compose.yml
   traefik.nix
@@ -107,7 +107,7 @@ Until DNS exists, routing MUST rely on **HTTP Host headers**.
 
 The operator may add temporary `/etc/hosts` entries on a client machine:
 
-```
+```text
 <BOX_IP> traefik.local
 ```
 
@@ -204,4 +204,3 @@ This rule is permanent.
 7. Only then may additional services be added
 
 Codex MUST NOT skip steps.
-

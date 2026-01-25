@@ -8,6 +8,7 @@
 This document defines the **monitoring and metrics architecture** for the homelab, based on **Prometheus** scraping metrics from **Traefik** and selected services.
 
 It builds on:
+
 - *Traefik-First Deployment Plan (Pre-DNS, Operator-Validated)*
 - *TLS Enablement Plan (Post-DNS, Traefik)*
 - *Standard Service Template (NixOS + Docker Compose)*
@@ -108,7 +109,7 @@ Actual port numbers are implementation details and MUST NOT conflict with other 
 
 Create a new service using the standard template:
 
-```
+```text
 services/
   prometheus/
     docker-compose.yml
@@ -221,4 +222,3 @@ Each requires a separate plan.
 5. Operator validates metrics visibility
 
 Codex MUST NOT skip steps.
-

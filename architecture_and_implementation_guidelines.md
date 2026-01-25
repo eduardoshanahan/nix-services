@@ -28,6 +28,7 @@ No alternative architecture (repo-per-host, repo-per-app, imperative Docker usag
 Hosts describe **identity and intent**, not implementation details.
 
 Hosts:
+
 - Import profiles and services
 - Set minimal host-specific values (hostname, role)
 - MUST NOT contain service logic
@@ -54,12 +55,14 @@ A host file should remain readable at a glance.
 Profiles group **cross-cutting concerns** shared by many hosts.
 
 Examples:
+
 - Base OS configuration
 - Docker enablement
 - Common users and SSH settings
 - Logging, time sync, firewall defaults
 
 Profiles:
+
 - MAY enable Docker
 - MUST NOT define application-specific services
 - SHOULD be composable and reusable
@@ -71,16 +74,19 @@ Profiles:
 Services are the **unit of reuse** in this repository.
 
 Each service:
+
 - Lives in its own module (e.g. `services/pihole.nix`)
 - Encapsulates all logic for running that application
 - Can be imported by any host
 
 Services MAY:
+
 - Define Docker Compose stacks
 - Create systemd units
 - Manage volumes and networks
 
 Services MUST NOT:
+
 - Assume a specific host
 - Hardcode secrets
 - Hardcode hostnames, IPs, or domains
@@ -149,7 +155,7 @@ environment:
 
 Each service module SHOULD follow this structure:
 
-```
+```text
 services/
   pihole/
     docker-compose.yml
@@ -194,7 +200,7 @@ Private configuration MUST be optional and additive.
 
 Recommended top-level layout:
 
-```
+```text
 flake.nix
 hosts/
 profiles/
@@ -204,6 +210,7 @@ hosts-private/  # empty placeholder
 ```
 
 Naming rules:
+
 - Use role-based names, not real identities
 - Avoid environment-specific naming (prod, home, office)
 - Prefer clarity over brevity
@@ -242,4 +249,3 @@ When in doubt:
 > **Prefer composability, explicitness, and reversibility.**
 
 These properties are more important than speed or convenience.
-

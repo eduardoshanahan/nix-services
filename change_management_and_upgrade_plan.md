@@ -8,6 +8,7 @@
 This plan governs **NixOS rebuilds**, **Docker image upgrades**, and **service configuration changes** across Raspberry Pi ARM64 boxes.
 
 It builds on:
+
 - *Architecture & Implementation Guidelines*
 - *Standard Service Template (NixOS + Docker Compose)*
 - *Backup & Restore Plan (Volumes + Pi-hole State)*
@@ -40,6 +41,7 @@ All changes MUST be classified before execution.
 ### 1.1 Configuration-only changes
 
 Examples:
+
 - NixOS module edits
 - Traefik routing rules
 - Service enable/disable
@@ -51,6 +53,7 @@ Risk level: **Low**
 ### 1.2 Service version changes
 
 Examples:
+
 - Docker image version bumps
 - Traefik minor upgrades
 - Pi-hole container updates
@@ -62,6 +65,7 @@ Risk level: **Medium**
 ### 1.3 System upgrades
 
 Examples:
+
 - NixOS channel upgrades
 - Kernel changes
 - Docker engine upgrades
@@ -118,6 +122,7 @@ nixos-rebuild switch --flake .#<host>
 ```
 
 Rules:
+
 - Rebuilds are executed manually
 - No unattended upgrades
 
@@ -243,4 +248,3 @@ Git is the system of record.
 - Never upgrade blindly
 
 This plan ensures long-term stability while still allowing evolution.
-
