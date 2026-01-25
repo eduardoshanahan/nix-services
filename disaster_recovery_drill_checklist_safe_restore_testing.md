@@ -216,3 +216,5 @@ If any condition is not met, the system is **not DR-ready**.
 - Fix the plan when drills reveal gaps
 
 This checklist ensures your backups are trustworthy when you need them most.
+
+Refer to [Reflash & Rejoin Node — Operator Runbook](./reflash_rejoin_node_runbook.md)

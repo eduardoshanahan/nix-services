@@ -248,3 +248,5 @@ Git is the system of record.
 - Never upgrade blindly
 
 This plan ensures long-term stability while still allowing evolution.
+
+Refer to [Reflash & Rejoin Node — Operator Runbook](./reflash_rejoin_node_runbook.md).

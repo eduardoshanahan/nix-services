@@ -319,3 +319,5 @@ Codex MUST produce:
 8. Transition naming from `/etc/hosts` to DNS (optional)
 
 Codex MUST NOT skip steps.
+
+Refer to [Zero‑Downtime Pi‑hole DHCP Migration Checklist](./zero_downtime_pi_hole_dhcp_migration_checklist.md).
