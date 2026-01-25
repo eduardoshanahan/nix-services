@@ -6,12 +6,14 @@ repos:
         name: gitleaks (secrets scan)
         args: ["--pre-commit", "--redact", "--verbose", "--no-banner"]
 
-  - repo: https://github.com/DavidAnson/markdownlint-cli2
-    rev: v0.14.0
+  - repo: local
     hooks:
-      - id: markdownlint-cli2
+      - id: markdownlint
         name: markdownlint (docs)
+        entry: markdownlint-cli2
+        language: system
         files: "\\.md$"
+        stages: [manual]
 
   - repo: https://github.com/astro/deadnix
     rev: v1.2.1

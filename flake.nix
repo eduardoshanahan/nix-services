@@ -6,7 +6,11 @@
     flake-utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = { self, nixpkgs, flake-utils }:
+  outputs = {
+    nixpkgs,
+    flake-utils,
+    ...
+  }:
     flake-utils.lib.eachDefaultSystem (system:
         let
           pkgs = import nixpkgs { inherit system; };
@@ -23,6 +27,7 @@
               alejandra
               statix
               deadnix
+              markdownlint-cli2
 
               # --- Service authoring ---
               docker
@@ -30,12 +35,21 @@
 
               # --- Optional helpers ---
               prek
-              just
             ];
 
             shellHook = ''
               echo "Entering nix-services dev shell"
               echo "Architecture: ${system}"
+
+              if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+                repo_root="$(git rev-parse --show-toplevel)"
+                hook="$repo_root/.git/hooks/pre-commit"
+                config="$repo_root/.pre-commit-config.yaml"
+
+                if [[ -f "$config" && ( ! -e "$hook" || "$config" -nt "$hook" ) ]]; then
+                  (cd "$repo_root" && prek install)
+                fi
+              fi
             '';
           };
         })
