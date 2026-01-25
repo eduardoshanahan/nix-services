@@ -4,6 +4,9 @@ services:
     container_name: ${TRAEFIK_CONTAINER_NAME}
     restart: unless-stopped
 
+    env_file:
+      - ${TRAEFIK_ENV_FILE}
+
     command:
       - "--configFile=/etc/traefik/traefik.yml"
 
