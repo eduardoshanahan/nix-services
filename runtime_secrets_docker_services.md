@@ -143,6 +143,12 @@ printf 'SERVICE_ADMIN_PASSWORD="%s"\n' "$password" \
   > /run/secrets/service.env
 ```
 
+In `nix-services`, prefer using the shared helper at `lib/runtime-secret-env.nix`
+instead of inlining this shell logic in each service.
+
+Do **not** use this pattern for services that support `*_FILE` natively; use
+`lib/runtime-secrets.nix` to pass the secret file path directly as an env var.
+
 Key properties:
 
 - Runs **after secrets are materialized**
@@ -262,4 +268,3 @@ stateful services manage **their own internal state**, without compromising:
 
 It should be considered the **default approach** for Dockerized stateful services
 in this homelab.
-

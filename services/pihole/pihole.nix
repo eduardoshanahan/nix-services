@@ -5,7 +5,8 @@
   ...
 }: let
   cfg = config.services.pihole;
-  runtimeSecrets = import ../../lib/runtime-secrets.nix { inherit lib; };
+  runtimeSecrets = import ../../lib/runtime-secrets.nix {inherit lib;};
+  runtimeSecretEnv = import ../../lib/runtime-secret-env.nix {inherit lib pkgs;};
   serviceName = "pihole";
   composeDir = "/etc/${serviceName}";
   dockerBin = "${config.virtualisation.docker.package}/bin/docker";
@@ -45,7 +46,6 @@ in {
       '';
       example = "/run/secrets/pihole-web-password";
     };
-
   };
 
   config = lib.mkIf cfg.enable {
@@ -72,38 +72,21 @@ in {
 
         WorkingDirectory = composeDir;
 
-        Environment =
-          [
-            "PIHOLE_CONTAINER_NAME=${cfg.containerName}"
-            "PIHOLE_NETWORK=${cfg.network}"
-            "PIHOLE_HOSTNAME=${cfg.hostname}"
-            "TZ=${cfg.timezone}"
-          ];
+        Environment = [
+          "PIHOLE_CONTAINER_NAME=${cfg.containerName}"
+          "PIHOLE_NETWORK=${cfg.network}"
+          "PIHOLE_HOSTNAME=${cfg.hostname}"
+          "TZ=${cfg.timezone}"
+        ];
 
         ExecStartPre = [
           "${pkgs.runtimeShell} -c '${dockerBin} network inspect ${cfg.network} >/dev/null 2>&1 || ${dockerBin} network create ${cfg.network}'"
 
-          (pkgs.writeShellScript "pihole-generate-env" ''
-            set -euo pipefail
-            umask 0077
-
-            secret_file="${cfg.webPasswordFile}"
-
-            if [[ -z "$secret_file" || ! -s "$secret_file" ]]; then
-              echo "pihole: webPasswordFile is not set or empty" >&2
-              exit 1
-            fi
-
-            password="$(cat "$secret_file")"
-            password="''${password%$'\n'}"
-
-            escaped="$password"
-            escaped="''${escaped//\\/\\\\}"
-            escaped="''${escaped//\"/\\\"}"
-
-            install -d -m 0700 /run/secrets
-            printf 'FTLCONF_webserver_api_password="%s"\n' "$escaped" > /run/secrets/pihole.env
-          '')
+          (runtimeSecretEnv.mkRuntimeSecretEnvExecStartPre {
+            name = serviceName;
+            secretFile = cfg.webPasswordFile;
+            envVar = "FTLCONF_webserver_api_password";
+          })
         ];
 
         ExecStart = "${dockerBin} compose up -d";
@@ -112,4 +95,3 @@ in {
     };
   };
 }
-
