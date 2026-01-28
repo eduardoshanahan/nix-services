@@ -44,6 +44,7 @@ Before starting, verify:
 3. Insert SD card and power the node on
 
 At this point:
+
 - The node has **no static IP**
 - DHCP is enabled by default
 
@@ -73,6 +74,7 @@ ssh <user>@<temporary-ip>
 ```
 
 Confirm:
+
 - SSH access works
 - You are on the expected node
 
@@ -91,6 +93,7 @@ nixos-rebuild switch \
 ```
 
 During activation:
+
 - Static networking is applied (if configured)
 - The node drops its DHCP lease
 - Network restarts
@@ -105,11 +108,12 @@ After convergence:
 
 1. Reconnect using the **final static IP**:
 
-```bash
-ssh <user>@<final-ip>
-```
+   ```bash
+   ssh <user>@<final-ip>
+   ```
 
 2. Verify:
+
    - Hostname is correct
    - Services are running
    - Network is stable
@@ -165,4 +169,3 @@ This procedure guarantees:
 - No hidden state
 
 It represents the **supported and recommended** way to rejoin nodes in the `nix-services` architecture.
-
