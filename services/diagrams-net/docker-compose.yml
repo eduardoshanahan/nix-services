@@ -1,0 +1,24 @@
+services:
+  diagrams-net:
+    image: jgraph/drawio:29.0.3
+    container_name: ${DIAGRAMS_NET_CONTAINER_NAME}
+    restart: unless-stopped
+
+    environment:
+      - TZ
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=${DIAGRAMS_NET_NETWORK}"
+      - "traefik.http.routers.diagrams-net.rule=Host(`${DIAGRAMS_NET_HOSTNAME}`)"
+      - "traefik.http.services.diagrams-net.loadbalancer.server.port=8080"
+      - "traefik.http.routers.diagrams-net.entrypoints=web"
+      # - "traefik.http.routers.diagrams-net.tls=true"
+
+    networks:
+      - traefik
+
+networks:
+  traefik:
+    external: true
+    name: ${DIAGRAMS_NET_NETWORK}

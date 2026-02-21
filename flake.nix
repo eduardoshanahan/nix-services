@@ -69,16 +69,19 @@
       let
         traefikModule = import ./services/traefik/traefik.nix;
         piholeModule = import ./services/pihole/pihole.nix;
+        diagramsNetModule = import ./services/diagrams-net/diagrams-net.nix;
       in
       {
         nixosModules = {
           traefik = traefikModule;
           pihole = piholeModule;
+          diagramsNet = diagramsNetModule;
         };
 
         services = {
           traefik = traefikModule;
           pihole = piholeModule;
+          diagramsNet = diagramsNetModule;
         };
       }
     );
