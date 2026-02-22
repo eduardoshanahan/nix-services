@@ -9,6 +9,30 @@
   composeDir = "/etc/${serviceName}";
   dockerBin = "${config.virtualisation.docker.package}/bin/docker";
   portType = lib.types.ints.between 1 65535;
+  backupScript = pkgs.writeShellScript "loki-backup" ''
+    set -euo pipefail
+
+    src=${lib.escapeShellArg cfg.dataDir}
+    dst=${lib.escapeShellArg cfg.backup.targetDir}
+    keep_days=${toString cfg.backup.keepDays}
+
+    if [[ ! -d "$src" ]]; then
+      echo "loki-backup: source directory not found: $src" >&2
+      exit 1
+    fi
+
+    install -d -m 0750 "$dst"
+
+    stamp="$(${pkgs.coreutils}/bin/date -u +%Y%m%dT%H%M%SZ)"
+    archive="$dst/loki-$stamp.tar.zst"
+
+    ${pkgs.gnutar}/bin/tar \
+      --use-compress-program="${pkgs.zstd}/bin/zstd -T0 -19" \
+      -cf "$archive" \
+      -C "$src" .
+
+    ${pkgs.findutils}/bin/find "$dst" -maxdepth 1 -type f -name 'loki-*.tar.zst' -mtime "+$keep_days" -delete
+  '';
 in {
   options.services.lokiCompose = {
     enable = lib.mkEnableOption "Loki log aggregation service (Docker Compose)";
@@ -29,6 +53,15 @@ in {
       type = portType;
       default = 3100;
       description = "Host TCP port published for Loki HTTP API.";
+    };
+
+    listenAddress = lib.mkOption {
+      type = lib.types.str;
+      default = "0.0.0.0";
+      description = ''
+        Host IP address used for the published Loki port binding.
+        Set this to a LAN IP (for example `192.168.1.10`) to avoid broad exposure.
+      '';
     };
 
     retentionPeriod = lib.mkOption {
@@ -59,6 +92,28 @@ in {
         '';
       };
     };
+
+    backup = {
+      enable = lib.mkEnableOption "periodic Loki data backups";
+
+      targetDir = lib.mkOption {
+        type = lib.types.str;
+        default = "/var/backups/loki";
+        description = "Directory where compressed Loki backup archives are written.";
+      };
+
+      schedule = lib.mkOption {
+        type = lib.types.str;
+        default = "daily";
+        description = "Systemd OnCalendar expression for Loki backups.";
+      };
+
+      keepDays = lib.mkOption {
+        type = lib.types.ints.positive;
+        default = 14;
+        description = "How many days of backup archives to keep.";
+      };
+    };
   };
 
   config = lib.mkIf cfg.enable {
@@ -78,6 +133,14 @@ in {
       {
         assertion = lib.hasPrefix "/" cfg.dataDir;
         message = "services.lokiCompose.dataDir must be an absolute path.";
+      }
+      {
+        assertion = lib.hasPrefix "/" cfg.backup.targetDir;
+        message = "services.lokiCompose.backup.targetDir must be an absolute path.";
+      }
+      {
+        assertion = !cfg.backup.enable || (!lib.hasPrefix "${cfg.dataDir}/" cfg.backup.targetDir && cfg.backup.targetDir != cfg.dataDir);
+        message = "services.lokiCompose.backup.targetDir must not be inside services.lokiCompose.dataDir.";
       }
     ];
 
@@ -146,6 +209,7 @@ in {
           "LOKI_CONTAINER_NAME=${cfg.containerName}"
           "LOKI_IMAGE_REPOSITORY=${cfg.image.repository}"
           "LOKI_IMAGE_TAG=${cfg.image.tag}"
+          "LOKI_LISTEN_ADDRESS=${cfg.listenAddress}"
           "LOKI_HTTP_PORT=${toString cfg.httpPort}"
           "LOKI_DATA_DIR=${cfg.dataDir}"
         ];
@@ -160,6 +224,27 @@ in {
 
         ExecStart = "${dockerBin} compose up -d";
         ExecStop = "${dockerBin} compose down";
+      };
+    };
+
+    systemd.services."${serviceName}-backup" = lib.mkIf cfg.backup.enable {
+      description = "Backup Loki data";
+      after = [ "${serviceName}.service" ];
+      requires = [ "${serviceName}.service" ];
+
+      serviceConfig = {
+        Type = "oneshot";
+        ExecStart = backupScript;
+      };
+    };
+
+    systemd.timers."${serviceName}-backup" = lib.mkIf cfg.backup.enable {
+      description = "Periodic Loki backup";
+      wantedBy = [ "timers.target" ];
+      timerConfig = {
+        OnCalendar = cfg.backup.schedule;
+        Persistent = true;
+        Unit = "${serviceName}-backup.service";
       };
     };
   };

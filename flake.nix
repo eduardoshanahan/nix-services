@@ -72,6 +72,7 @@
         diagramsNetModule = import ./services/diagrams-net/diagrams-net.nix;
         excalidrawModule = import ./services/excalidraw/excalidraw.nix;
         lokiModule = import ./services/loki/loki.nix;
+        promtailModule = import ./services/promtail/promtail.nix;
       in
       {
         nixosModules = {
@@ -80,6 +81,7 @@
           diagramsNet = diagramsNetModule;
           excalidraw = excalidrawModule;
           loki = lokiModule;
+          promtail = promtailModule;
         };
 
         services = {
@@ -88,6 +90,7 @@
           diagramsNet = diagramsNetModule;
           excalidraw = excalidrawModule;
           loki = lokiModule;
+          promtail = promtailModule;
         };
       }
     );
