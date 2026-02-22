@@ -70,18 +70,21 @@
         traefikModule = import ./services/traefik/traefik.nix;
         piholeModule = import ./services/pihole/pihole.nix;
         diagramsNetModule = import ./services/diagrams-net/diagrams-net.nix;
+        excalidrawModule = import ./services/excalidraw/excalidraw.nix;
       in
       {
         nixosModules = {
           traefik = traefikModule;
           pihole = piholeModule;
           diagramsNet = diagramsNetModule;
+          excalidraw = excalidrawModule;
         };
 
         services = {
           traefik = traefikModule;
           pihole = piholeModule;
           diagramsNet = diagramsNetModule;
+          excalidraw = excalidrawModule;
         };
       }
     );

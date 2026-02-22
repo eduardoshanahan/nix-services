@@ -1,0 +1,53 @@
+services:
+  excalidraw:
+    image: ${EXCALIDRAW_IMAGE_REPOSITORY}:${EXCALIDRAW_IMAGE_TAG}
+    container_name: ${EXCALIDRAW_CONTAINER_NAME}
+    restart: unless-stopped
+    init: true
+
+    user: "1000:1000"
+    read_only: true
+    security_opt:
+      - "no-new-privileges:true"
+    cap_drop:
+      - ALL
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=64m
+    mem_limit: 512m
+    pids_limit: 256
+    cpus: "1.0"
+
+    expose:
+      - "80"
+
+    environment:
+      - TZ
+
+    healthcheck:
+      test: ["CMD-SHELL", "wget --spider -q http://127.0.0.1:80/ || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 8
+      start_period: 20s
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=${EXCALIDRAW_NETWORK}"
+      - "traefik.http.routers.excalidraw.rule=Host(`${EXCALIDRAW_HOSTNAME}`)"
+      - "traefik.http.services.excalidraw.loadbalancer.server.port=80"
+      - "traefik.http.routers.excalidraw.entrypoints=${EXCALIDRAW_ENTRYPOINTS}"
+      - "traefik.http.routers.excalidraw.tls=${EXCALIDRAW_TLS}"
+
+    networks:
+      - traefik
+
+networks:
+  traefik:
+    external: true
+    name: ${EXCALIDRAW_NETWORK}
