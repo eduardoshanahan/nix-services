@@ -13,7 +13,7 @@
   tlsEnabled = cfg.tls.enable;
   httpToHttpsRedirectEnabled = cfg.httpToHttpsRedirect;
   redirectEntryPointFlags = lib.optionalString httpToHttpsRedirectEnabled
-    "\n      - \"--entryPoints.web.http.redirections.entryPoint.to=websecure\"\n      - \"--entryPoints.web.http.redirections.entryPoint.scheme=https\"\n      - \"--entryPoints.web.http.redirections.entryPoint.permanent=true\"";
+    "\n            - \"--entryPoints.web.http.redirections.entryPoint.to=websecure\"\n            - \"--entryPoints.web.http.redirections.entryPoint.scheme=https\"\n            - \"--entryPoints.web.http.redirections.entryPoint.permanent=true\"";
   tlsCertFile =
     if cfg.tls.certFile == null
     then ""
