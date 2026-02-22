@@ -3,6 +3,19 @@ services:
     image: jgraph/drawio:29.0.3
     container_name: ${DIAGRAMS_NET_CONTAINER_NAME}
     restart: unless-stopped
+    user: ${DIAGRAMS_NET_USER}
+    read_only: ${DIAGRAMS_NET_READ_ONLY}
+    security_opt:
+      - "no-new-privileges:${DIAGRAMS_NET_NO_NEW_PRIVILEGES}"
+    cap_drop:
+      - ALL
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=64m
+    mem_limit: ${DIAGRAMS_NET_MEMORY_LIMIT}
+    pids_limit: ${DIAGRAMS_NET_PIDS_LIMIT}
+    cpus: "${DIAGRAMS_NET_CPUS}"
+    expose:
+      - "8080"
 
     environment:
       - TZ

@@ -70,10 +70,83 @@ in {
       description = "External Docker network name used by Traefik and downstream services.";
     };
 
+    enforceTraefikNetwork = lib.mkOption {
+      type = lib.types.bool;
+      default = true;
+      description = "Require `services.diagramsNet.network` to stay on `traefik`.";
+    };
+
+    nonRoot = lib.mkOption {
+      type = lib.types.bool;
+      default = true;
+      description = "Run container as non-root UID/GID when true.";
+    };
+
+    uid = lib.mkOption {
+      type = lib.types.int;
+      default = 1000;
+      description = "Container runtime UID used when `services.diagramsNet.nonRoot = true`.";
+    };
+
+    gid = lib.mkOption {
+      type = lib.types.int;
+      default = 1000;
+      description = "Container runtime GID used when `services.diagramsNet.nonRoot = true`.";
+    };
+
+    readOnlyRootFilesystem = lib.mkOption {
+      type = lib.types.bool;
+      default = true;
+      description = "Mount container root filesystem as read-only.";
+    };
+
+    noNewPrivileges = lib.mkOption {
+      type = lib.types.bool;
+      default = true;
+      description = "Set Docker security option `no-new-privileges`.";
+    };
+
+    memoryLimit = lib.mkOption {
+      type = lib.types.str;
+      default = "512m";
+      description = "Container memory limit passed to Docker Compose.";
+    };
+
+    pidsLimit = lib.mkOption {
+      type = lib.types.int;
+      default = 256;
+      description = "Container PID limit passed to Docker Compose.";
+    };
+
+    cpus = lib.mkOption {
+      type = lib.types.str;
+      default = "1.0";
+      description = "Container CPU limit passed to Docker Compose.";
+    };
+
     tls = lib.mkEnableOption "TLS on the diagrams.net Traefik router";
   };
 
   config = lib.mkIf cfg.enable {
+    assertions = [
+      {
+        assertion = !cfg.enforceTraefikNetwork || cfg.network == "traefik";
+        message = "services.diagramsNet.network must be `traefik` when services.diagramsNet.enforceTraefikNetwork = true.";
+      }
+      {
+        assertion = !cfg.nonRoot || cfg.uid > 0;
+        message = "services.diagramsNet.uid must be > 0 when services.diagramsNet.nonRoot = true.";
+      }
+      {
+        assertion = !cfg.nonRoot || cfg.gid > 0;
+        message = "services.diagramsNet.gid must be > 0 when services.diagramsNet.nonRoot = true.";
+      }
+      {
+        assertion = cfg.pidsLimit > 0;
+        message = "services.diagramsNet.pidsLimit must be > 0.";
+      }
+    ];
+
     virtualisation.docker.enable = true;
 
     environment.etc."${serviceName}/docker-compose.yml".source = ./docker-compose.yml;
@@ -105,6 +178,12 @@ in {
           "DIAGRAMS_NET_NETWORK=${cfg.network}"
           "DIAGRAMS_NET_ENTRYPOINTS=${if cfg.tls then "websecure" else "web"}"
           "DIAGRAMS_NET_TLS=${if cfg.tls then "true" else "false"}"
+          "DIAGRAMS_NET_USER=${if cfg.nonRoot then "${toString cfg.uid}:${toString cfg.gid}" else "0:0"}"
+          "DIAGRAMS_NET_READ_ONLY=${if cfg.readOnlyRootFilesystem then "true" else "false"}"
+          "DIAGRAMS_NET_NO_NEW_PRIVILEGES=${if cfg.noNewPrivileges then "true" else "false"}"
+          "DIAGRAMS_NET_MEMORY_LIMIT=${cfg.memoryLimit}"
+          "DIAGRAMS_NET_PIDS_LIMIT=${toString cfg.pidsLimit}"
+          "DIAGRAMS_NET_CPUS=${cfg.cpus}"
           "TZ=${cfg.timezone}"
         ];
 
