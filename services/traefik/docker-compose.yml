@@ -29,7 +29,7 @@ services:
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
       - "/etc/traefik/tls.yml:/etc/traefik/tls.yml:ro"
-      - "/run/secrets/traefik:/run/secrets/traefik:ro"
+      - "/run/secrets:/run/secrets:ro"
 
     networks:
       - traefik
