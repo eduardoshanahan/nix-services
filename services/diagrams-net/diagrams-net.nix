@@ -8,6 +8,41 @@
   serviceName = "diagrams-net";
   composeDir = "/etc/${serviceName}";
   dockerBin = "${config.virtualisation.docker.package}/bin/docker";
+  waitForHealthy = pkgs.writeShellScript "diagrams-net-wait-healthy" ''
+    set -euo pipefail
+
+    container_name=${cfg.containerName}
+    timeout_seconds=120
+    deadline=$((SECONDS + timeout_seconds))
+
+    while true; do
+      status="$(${dockerBin} inspect --format '{{if .State.Health}}{{.State.Health.Status}}{{else}}none{{end}}' "$container_name" 2>/dev/null || true)"
+
+      case "$status" in
+        healthy)
+          exit 0
+          ;;
+        unhealthy)
+          echo "diagrams-net: container became unhealthy" >&2
+          ${dockerBin} ps --filter "name=^/$container_name$" --format 'table {{.Names}}\t{{.Status}}' >&2 || true
+          exit 1
+          ;;
+        starting|none|"")
+          ;;
+        *)
+          echo "diagrams-net: unexpected health status: $status" >&2
+          ;;
+      esac
+
+      if [ "$SECONDS" -ge "$deadline" ]; then
+        echo "diagrams-net: timed out waiting for a healthy container (${timeout_seconds}s)" >&2
+        ${dockerBin} ps --filter "name=^/$container_name$" --format 'table {{.Names}}\t{{.Status}}' >&2 || true
+        exit 1
+      fi
+
+      sleep 2
+    done
+  '';
 in {
   options.services.diagramsNet = {
     enable = lib.mkEnableOption "diagrams.net service (Docker Compose)";
@@ -47,12 +82,21 @@ in {
       description = "diagrams.net (Docker Compose)";
 
       wantedBy = ["multi-user.target"];
+      requires = ["docker.service"];
       after = ["docker.service" "network-online.target"];
       wants = ["network-online.target"];
+      restartTriggers = [
+        config.environment.etc."${serviceName}/docker-compose.yml".source
+      ];
+      startLimitBurst = 3;
+      startLimitIntervalSec = 300;
 
       serviceConfig = {
         Type = "oneshot";
         RemainAfterExit = true;
+        TimeoutStartSec = 180;
+        Restart = "on-failure";
+        RestartSec = 10;
         WorkingDirectory = composeDir;
 
         Environment = [
@@ -65,10 +109,13 @@ in {
         ];
 
         ExecStartPre = [
+          "${pkgs.runtimeShell} -c 'test -s ${composeDir}/docker-compose.yml'"
+          "${pkgs.runtimeShell} -c 'for i in $(seq 1 30); do ${dockerBin} info >/dev/null 2>&1 && exit 0; sleep 1; done; echo \"diagrams-net: docker daemon is not ready\" >&2; exit 1'"
           "${pkgs.runtimeShell} -c '${dockerBin} network inspect ${cfg.network} >/dev/null 2>&1 || ${dockerBin} network create ${cfg.network}'"
         ];
 
         ExecStart = "${dockerBin} compose up -d";
+        ExecStartPost = waitForHealthy;
         ExecStop = "${dockerBin} compose down";
       };
     };
