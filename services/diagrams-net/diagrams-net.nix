@@ -35,7 +35,7 @@
       esac
 
       if [ "$SECONDS" -ge "$deadline" ]; then
-        echo "diagrams-net: timed out waiting for a healthy container (${timeout_seconds}s)" >&2
+        echo "diagrams-net: timed out waiting for a healthy container (''${timeout_seconds}s)" >&2
         ${dockerBin} ps --filter "name=^/$container_name$" --format 'table {{.Names}}\t{{.Status}}' >&2 || true
         exit 1
       fi
