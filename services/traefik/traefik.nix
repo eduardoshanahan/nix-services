@@ -122,6 +122,10 @@ in {
       wantedBy = ["multi-user.target"];
       after = ["docker.service" "network-online.target"];
       wants = ["network-online.target"];
+      restartTriggers = [
+        config.environment.etc."${serviceName}/docker-compose.yml".source
+        config.environment.etc."traefik/tls.yml".source
+      ];
 
       serviceConfig = {
         Type = "oneshot";
