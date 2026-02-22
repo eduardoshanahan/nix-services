@@ -4,15 +4,6 @@ services:
     container_name: ${EXCALIDRAW_CONTAINER_NAME}
     restart: unless-stopped
     init: true
-
-    user: "1000:1000"
-    read_only: true
-    security_opt:
-      - "no-new-privileges:true"
-    cap_drop:
-      - ALL
-    tmpfs:
-      - /tmp:rw,noexec,nosuid,size=64m
     mem_limit: 512m
     pids_limit: 256
     cpus: "1.0"
