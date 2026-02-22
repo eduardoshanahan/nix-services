@@ -1,0 +1,28 @@
+services:
+  loki:
+    image: ${LOKI_IMAGE_REPOSITORY}:${LOKI_IMAGE_TAG}
+    container_name: ${LOKI_CONTAINER_NAME}
+    restart: unless-stopped
+    init: true
+
+    command: ["-config.file=/etc/loki/config.yaml"]
+
+    ports:
+      - "${LOKI_HTTP_PORT}:3100"
+
+    volumes:
+      - "/etc/loki/config.yaml:/etc/loki/config.yaml:ro"
+      - "${LOKI_DATA_DIR}:/loki"
+
+    healthcheck:
+      test: ["CMD-SHELL", "wget --spider -q http://127.0.0.1:3100/ready || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 8
+      start_period: 20s
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"

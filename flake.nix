@@ -71,6 +71,7 @@
         piholeModule = import ./services/pihole/pihole.nix;
         diagramsNetModule = import ./services/diagrams-net/diagrams-net.nix;
         excalidrawModule = import ./services/excalidraw/excalidraw.nix;
+        lokiModule = import ./services/loki/loki.nix;
       in
       {
         nixosModules = {
@@ -78,6 +79,7 @@
           pihole = piholeModule;
           diagramsNet = diagramsNetModule;
           excalidraw = excalidrawModule;
+          loki = lokiModule;
         };
 
         services = {
@@ -85,6 +87,7 @@
           pihole = piholeModule;
           diagramsNet = diagramsNetModule;
           excalidraw = excalidrawModule;
+          loki = lokiModule;
         };
       }
     );
