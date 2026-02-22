@@ -112,7 +112,55 @@ in {
 
     virtualisation.docker.enable = true;
 
-    environment.etc."${serviceName}/docker-compose.yml".source = ./docker-compose.yml;
+    environment.etc."${serviceName}/docker-compose.yml".text = ''
+      services:
+        traefik:
+          image: traefik:v3.6.7
+          container_name: ''${TRAEFIK_CONTAINER_NAME}
+          restart: unless-stopped
+
+          env_file:
+            - ''${TRAEFIK_ENV_FILE}
+
+          command:
+            - "--log.level=INFO"
+            - "--accesslog=false"
+
+            - "--api=false"
+            - "--ping=true"
+
+            - "--providers.docker=true"
+            - "--providers.docker.exposedByDefault=false"
+            - "--providers.docker.network=''${TRAEFIK_NETWORK}"
+            - "--providers.file.filename=/etc/traefik/tls.yml"
+
+            - "--entryPoints.web.address=:80"
+            - "--entryPoints.websecure.address=:443"
+      ${if httpToHttpsRedirectEnabled
+      then ''
+            - "--entryPoints.web.http.redirections.entryPoint.to=websecure"
+            - "--entryPoints.web.http.redirections.entryPoint.scheme=https"
+            - "--entryPoints.web.http.redirections.entryPoint.permanent=true"
+      ''
+      else ""}
+
+          ports:
+            - "80:80"
+            - "443:443"
+
+          volumes:
+            - "/var/run/docker.sock:/var/run/docker.sock:ro"
+            - "/etc/traefik/tls.yml:/etc/traefik/tls.yml:ro"
+            - "/run/secrets:/run/secrets:ro"
+
+          networks:
+            - traefik
+
+      networks:
+        traefik:
+          external: true
+          name: ''${TRAEFIK_NETWORK}
+    '';
     environment.etc."traefik/tls.yml".text = ''
       ${if tlsEnabled
       then ''
@@ -122,25 +170,6 @@ in {
               keyFile: ${tlsKeyFile}
       ''
       else "tls: {}"}
-
-      ${if httpToHttpsRedirectEnabled
-      then ''
-        http:
-          routers:
-            redirect-to-https:
-              entryPoints:
-                - web
-              rule: HostRegexp(`{host:.+}`)
-              middlewares:
-                - redirect-to-https
-              service: noop@internal
-          middlewares:
-            redirect-to-https:
-              redirectScheme:
-                scheme: https
-                permanent: true
-      ''
-      else "http: {}"}
     '';
 
     systemd.services.${serviceName} = {
