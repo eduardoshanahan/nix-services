@@ -27,6 +27,9 @@ The `diagrams-net` service uses a Docker healthcheck and a systemd post-start
 health gate (`ExecStartPost`) that waits until the container reports `healthy`
 or fails startup on timeout/unhealthy state.
 
+Module-specific options and persistence guidance:
+`services/diagrams-net/README.md`.
+
 ## Runtime Secrets (Consumption Only)
 
 `nix-pi` owns secret provisioning (e.g. via `sops-nix`) and materializes decrypted files at activation time under runtime paths like `/run/secrets/...` (tmpfs).

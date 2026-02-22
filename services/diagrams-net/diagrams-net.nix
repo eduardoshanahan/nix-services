@@ -8,6 +8,89 @@
   serviceName = "diagrams-net";
   composeDir = "/etc/${serviceName}";
   dockerBin = "${config.virtualisation.docker.package}/bin/docker";
+  hostnameRegex = "^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)(\\.([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?))*$";
+  networkRegex = "^[a-zA-Z0-9][a-zA-Z0-9_.-]*$";
+  envKeyRegex = "^[A-Za-z_][A-Za-z0-9_]*$";
+  labelKeyRegex = "^[A-Za-z0-9][A-Za-z0-9._/-]*$";
+  cpuRegex = "^[0-9]+(\\.[0-9]+)?$";
+  reservedLabelKeys = [
+    "traefik.enable"
+    "traefik.docker.network"
+    "traefik.http.routers.diagrams-net.rule"
+    "traefik.http.services.diagrams-net.loadbalancer.server.port"
+    "traefik.http.routers.diagrams-net.entrypoints"
+    "traefik.http.routers.diagrams-net.tls"
+  ];
+  escapeYaml = s:
+    lib.replaceStrings ["\\" "\""] ["\\\\" "\\\""] s;
+  baseEnv = {
+    TZ = cfg.timezone;
+  };
+  envLines = lib.concatMapStrings (name: let
+    value = cfg.extraEnv.${name};
+  in
+    "      - \"${escapeYaml name}=${escapeYaml value}\"\n") (lib.attrNames cfg.extraEnv);
+  labels = {
+      "traefik.enable" = "true";
+      "traefik.docker.network" = cfg.network;
+      "traefik.http.routers.diagrams-net.rule" = "Host(`${cfg.hostname}`)";
+      "traefik.http.services.diagrams-net.loadbalancer.server.port" = "8080";
+      "traefik.http.routers.diagrams-net.entrypoints" = if cfg.tls then "websecure" else "web";
+      "traefik.http.routers.diagrams-net.tls" = if cfg.tls then "true" else "false";
+    }
+    // cfg.extraLabels;
+  labelLines = lib.concatMapStrings (name: let
+    value = labels.${name};
+  in
+    "      - \"${escapeYaml name}=${escapeYaml value}\"\n") (lib.attrNames labels);
+  volumeSection = lib.optionalString cfg.persistence.enable ''
+        volumes:
+          - "${cfg.persistence.hostPath}:${cfg.persistence.containerPath}:rw"
+  '';
+  composeText = ''
+    services:
+      diagrams-net:
+        image: ${cfg.image.repository}:${cfg.image.tag}
+        container_name: ${cfg.containerName}
+        restart: unless-stopped
+        user: ${if cfg.nonRoot then "${toString cfg.uid}:${toString cfg.gid}" else "0:0"}
+        read_only: ${if cfg.readOnlyRootFilesystem then "true" else "false"}
+        security_opt:
+          - "no-new-privileges:${if cfg.noNewPrivileges then "true" else "false"}"
+        cap_drop:
+          - ALL
+        tmpfs:
+          - /tmp:rw,noexec,nosuid,size=64m
+        mem_limit: ${cfg.memoryLimit}
+        pids_limit: ${toString cfg.pidsLimit}
+        cpus: "${cfg.cpus}"
+        expose:
+          - "8080"
+
+        environment:
+          - "TZ=${baseEnv.TZ}"
+${envLines}
+
+        healthcheck:
+          test: ["CMD-SHELL", "wget --spider -q http://127.0.0.1:8080/ || exit 1"]
+          interval: 15s
+          timeout: 5s
+          retries: 8
+          start_period: 20s
+
+        labels:
+${labelLines}
+
+${volumeSection}
+
+        networks:
+          - traefik
+
+    networks:
+      traefik:
+        external: true
+        name: ${cfg.network}
+  '';
   waitForHealthy = pkgs.writeShellScript "diagrams-net-wait-healthy" ''
     set -euo pipefail
 
@@ -70,6 +153,61 @@ in {
       description = "External Docker network name used by Traefik and downstream services.";
     };
 
+    image = {
+      repository = lib.mkOption {
+        type = lib.types.str;
+        default = "jgraph/drawio";
+        description = "Container image repository.";
+      };
+
+      tag = lib.mkOption {
+        type = lib.types.str;
+        default = "29.0.3";
+        description = "Container image tag.";
+      };
+    };
+
+    extraEnv = lib.mkOption {
+      type = lib.types.attrsOf lib.types.str;
+      default = {};
+      example = {
+        DRAWIO_BASE_URL = "https://diagramsnet.example.com";
+      };
+      description = "Additional container environment variables appended to the Compose `environment` list.";
+    };
+
+    extraLabels = lib.mkOption {
+      type = lib.types.attrsOf lib.types.str;
+      default = {};
+      example = {
+        "traefik.http.routers.diagrams-net.middlewares" = "default-headers@file";
+      };
+      description = "Additional Docker labels merged on top of the default Traefik labels.";
+    };
+
+    persistence = {
+      enable = lib.mkOption {
+        type = lib.types.bool;
+        default = false;
+        description = ''
+          Persist diagrams.net data to a host path. Disabled by default to keep
+          the service stateless.
+        '';
+      };
+
+      hostPath = lib.mkOption {
+        type = lib.types.str;
+        default = "/var/lib/diagrams-net";
+        description = "Absolute host path mounted into the container when persistence is enabled.";
+      };
+
+      containerPath = lib.mkOption {
+        type = lib.types.str;
+        default = "/data";
+        description = "Container path used as the persistence mountpoint.";
+      };
+    };
+
     enforceTraefikNetwork = lib.mkOption {
       type = lib.types.bool;
       default = true;
@@ -130,8 +268,24 @@ in {
   config = lib.mkIf cfg.enable {
     assertions = [
       {
+        assertion = builtins.match hostnameRegex cfg.hostname != null;
+        message = "services.diagramsNet.hostname must be a valid DNS hostname.";
+      }
+      {
+        assertion = builtins.match networkRegex cfg.network != null;
+        message = "services.diagramsNet.network may only contain letters, numbers, `.`, `_`, and `-`.";
+      }
+      {
         assertion = !cfg.enforceTraefikNetwork || cfg.network == "traefik";
         message = "services.diagramsNet.network must be `traefik` when services.diagramsNet.enforceTraefikNetwork = true.";
+      }
+      {
+        assertion = builtins.match "^\\S+$" cfg.image.repository != null;
+        message = "services.diagramsNet.image.repository must not contain whitespace.";
+      }
+      {
+        assertion = builtins.match "^\\S+$" cfg.image.tag != null;
+        message = "services.diagramsNet.image.tag must not contain whitespace.";
       }
       {
         assertion = !cfg.nonRoot || cfg.uid > 0;
@@ -145,11 +299,44 @@ in {
         assertion = cfg.pidsLimit > 0;
         message = "services.diagramsNet.pidsLimit must be > 0.";
       }
+      {
+        assertion = builtins.match cpuRegex cfg.cpus != null;
+        message = "services.diagramsNet.cpus must be numeric (for example `0.50` or `1.0`).";
+      }
+      {
+        assertion = builtins.match "^[0-9]+[kKmMgG]?$" cfg.memoryLimit != null;
+        message = "services.diagramsNet.memoryLimit must use Docker format like `512m`, `1g`, or bytes.";
+      }
+      {
+        assertion = !cfg.persistence.enable || lib.hasPrefix "/" cfg.persistence.hostPath;
+        message = "services.diagramsNet.persistence.hostPath must be absolute when persistence is enabled.";
+      }
+      {
+        assertion = !cfg.persistence.enable || lib.hasPrefix "/" cfg.persistence.containerPath;
+        message = "services.diagramsNet.persistence.containerPath must be absolute when persistence is enabled.";
+      }
+      {
+        assertion = lib.all (name: builtins.match envKeyRegex name != null) (lib.attrNames cfg.extraEnv);
+        message = "services.diagramsNet.extraEnv keys must match `[A-Za-z_][A-Za-z0-9_]*`.";
+      }
+      {
+        assertion = lib.all (name: builtins.match labelKeyRegex name != null) (lib.attrNames cfg.extraLabels);
+        message = "services.diagramsNet.extraLabels keys must match `[A-Za-z0-9][A-Za-z0-9._/-]*`.";
+      }
+      {
+        assertion = lib.all (name: !(lib.elem name reservedLabelKeys)) (lib.attrNames cfg.extraLabels);
+        message = "services.diagramsNet.extraLabels cannot override reserved Traefik routing labels.";
+      }
     ];
 
     virtualisation.docker.enable = true;
 
-    environment.etc."${serviceName}/docker-compose.yml".source = ./docker-compose.yml;
+    systemd.tmpfiles.rules =
+      lib.optionals cfg.persistence.enable [
+        "d ${cfg.persistence.hostPath} 0750 ${if cfg.nonRoot then toString cfg.uid else "root"} ${if cfg.nonRoot then toString cfg.gid else "root"} -"
+      ];
+
+    environment.etc."${serviceName}/docker-compose.yml".text = composeText;
 
     systemd.services.${serviceName} = {
       description = "diagrams.net (Docker Compose)";
@@ -171,21 +358,6 @@ in {
         Restart = "on-failure";
         RestartSec = 10;
         WorkingDirectory = composeDir;
-
-        Environment = [
-          "DIAGRAMS_NET_CONTAINER_NAME=${cfg.containerName}"
-          "DIAGRAMS_NET_HOSTNAME=${cfg.hostname}"
-          "DIAGRAMS_NET_NETWORK=${cfg.network}"
-          "DIAGRAMS_NET_ENTRYPOINTS=${if cfg.tls then "websecure" else "web"}"
-          "DIAGRAMS_NET_TLS=${if cfg.tls then "true" else "false"}"
-          "DIAGRAMS_NET_USER=${if cfg.nonRoot then "${toString cfg.uid}:${toString cfg.gid}" else "0:0"}"
-          "DIAGRAMS_NET_READ_ONLY=${if cfg.readOnlyRootFilesystem then "true" else "false"}"
-          "DIAGRAMS_NET_NO_NEW_PRIVILEGES=${if cfg.noNewPrivileges then "true" else "false"}"
-          "DIAGRAMS_NET_MEMORY_LIMIT=${cfg.memoryLimit}"
-          "DIAGRAMS_NET_PIDS_LIMIT=${toString cfg.pidsLimit}"
-          "DIAGRAMS_NET_CPUS=${cfg.cpus}"
-          "TZ=${cfg.timezone}"
-        ];
 
         ExecStartPre = [
           "${pkgs.runtimeShell} -c 'test -s ${composeDir}/docker-compose.yml'"
