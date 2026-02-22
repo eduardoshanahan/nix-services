@@ -46,6 +46,8 @@ in {
       '';
       example = "/run/secrets/pihole-web-password";
     };
+
+    tls = lib.mkEnableOption "TLS on the Pi-hole Traefik router";
   };
 
   config = lib.mkIf cfg.enable {
@@ -76,6 +78,8 @@ in {
           "PIHOLE_CONTAINER_NAME=${cfg.containerName}"
           "PIHOLE_NETWORK=${cfg.network}"
           "PIHOLE_HOSTNAME=${cfg.hostname}"
+          "PIHOLE_ENTRYPOINTS=${if cfg.tls then "websecure" else "web"}"
+          "PIHOLE_TLS=${if cfg.tls then "true" else "false"}"
           "TZ=${cfg.timezone}"
         ];
 

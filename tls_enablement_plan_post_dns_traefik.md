@@ -93,6 +93,15 @@ Certificates and keys:
 
 Codex MUST reference **paths only**, never values.
 
+Recommended declarative pattern:
+
+- `nix-pi` provisions cert and key with `sops-nix` to:
+  - `/run/secrets/traefik/tls.crt`
+  - `/run/secrets/traefik/tls.key`
+- `nix-services` consumes those runtime paths via:
+  - `services.traefik.tls.certFile`
+  - `services.traefik.tls.keyFile`
+
 ---
 
 ### 3.2 Traefik static TLS configuration

@@ -12,8 +12,8 @@ services:
       - "traefik.docker.network=${DIAGRAMS_NET_NETWORK}"
       - "traefik.http.routers.diagrams-net.rule=Host(`${DIAGRAMS_NET_HOSTNAME}`)"
       - "traefik.http.services.diagrams-net.loadbalancer.server.port=8080"
-      - "traefik.http.routers.diagrams-net.entrypoints=web"
-      # - "traefik.http.routers.diagrams-net.tls=true"
+      - "traefik.http.routers.diagrams-net.entrypoints=${DIAGRAMS_NET_ENTRYPOINTS}"
+      - "traefik.http.routers.diagrams-net.tls=${DIAGRAMS_NET_TLS}"
 
     networks:
       - traefik

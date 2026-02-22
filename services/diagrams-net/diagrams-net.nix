@@ -34,6 +34,8 @@ in {
       default = "traefik";
       description = "External Docker network name used by Traefik and downstream services.";
     };
+
+    tls = lib.mkEnableOption "TLS on the diagrams.net Traefik router";
   };
 
   config = lib.mkIf cfg.enable {
@@ -57,6 +59,8 @@ in {
           "DIAGRAMS_NET_CONTAINER_NAME=${cfg.containerName}"
           "DIAGRAMS_NET_HOSTNAME=${cfg.hostname}"
           "DIAGRAMS_NET_NETWORK=${cfg.network}"
+          "DIAGRAMS_NET_ENTRYPOINTS=${if cfg.tls then "websecure" else "web"}"
+          "DIAGRAMS_NET_TLS=${if cfg.tls then "true" else "false"}"
           "TZ=${cfg.timezone}"
         ];
 

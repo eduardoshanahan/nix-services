@@ -23,8 +23,8 @@ services:
       - "traefik.docker.network=${PIHOLE_NETWORK}"
       - "traefik.http.routers.pihole.rule=Host(`${PIHOLE_HOSTNAME}`)"
       - "traefik.http.services.pihole.loadbalancer.server.port=80"
-      - "traefik.http.routers.pihole.entrypoints=web"
-      # - "traefik.http.routers.pihole.tls=true"
+      - "traefik.http.routers.pihole.entrypoints=${PIHOLE_ENTRYPOINTS}"
+      - "traefik.http.routers.pihole.tls=${PIHOLE_TLS}"
 
 
     networks:
@@ -38,4 +38,3 @@ networks:
   traefik:
     external: true
     name: ${PIHOLE_NETWORK}
-

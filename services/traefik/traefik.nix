@@ -10,6 +10,31 @@
   serviceName = "traefik";
   composeDir = "/etc/${serviceName}";
   dockerBin = "${config.virtualisation.docker.package}/bin/docker";
+  tlsEnabled = cfg.tls.enable;
+  tlsCertFile =
+    if cfg.tls.certFile == null
+    then ""
+    else toString cfg.tls.certFile;
+  tlsKeyFile =
+    if cfg.tls.keyFile == null
+    then ""
+    else toString cfg.tls.keyFile;
+  tlsFilesCheck = pkgs.writeShellScript "traefik-tls-files-check" ''
+    set -euo pipefail
+
+    cert_file=${lib.escapeShellArg tlsCertFile}
+    key_file=${lib.escapeShellArg tlsKeyFile}
+
+    if [[ ! -s "$cert_file" ]]; then
+      echo "traefik: missing TLS cert file: $cert_file" >&2
+      exit 1
+    fi
+
+    if [[ ! -s "$key_file" ]]; then
+      echo "traefik: missing TLS key file: $key_file" >&2
+      exit 1
+    fi
+  '';
 in {
   options.services.traefik = {
     uiHostname = lib.mkOption {
@@ -46,13 +71,50 @@ in {
       '';
       example = "/run/secrets/traefik.env";
     };
+
+    tls = {
+      enable = lib.mkEnableOption "TLS termination in Traefik for routed services";
+
+      certFile = runtimeSecrets.mkSecretFileOption {
+        description = ''
+          Absolute path to a runtime-provisioned TLS certificate file for Traefik.
+        '';
+        example = "/run/secrets/traefik/tls.crt";
+      };
+
+      keyFile = runtimeSecrets.mkSecretFileOption {
+        description = ''
+          Absolute path to a runtime-provisioned TLS private key file for Traefik.
+        '';
+        example = "/run/secrets/traefik/tls.key";
+      };
+    };
   };
 
   config = {
+    assertions = [
+      {
+        assertion = !tlsEnabled || cfg.tls.certFile != null;
+        message = "services.traefik.tls.certFile must be set when TLS is enabled.";
+      }
+      {
+        assertion = !tlsEnabled || cfg.tls.keyFile != null;
+        message = "services.traefik.tls.keyFile must be set when TLS is enabled.";
+      }
+    ];
+
     virtualisation.docker.enable = true;
 
     environment.etc."${serviceName}/docker-compose.yml".source = ./docker-compose.yml;
-    environment.etc."traefik/traefik.yml".text = "";
+    environment.etc."traefik/tls.yml".text =
+      if tlsEnabled
+      then ''
+        tls:
+          certificates:
+            - certFile: ${tlsCertFile}
+              keyFile: ${tlsKeyFile}
+      ''
+      else "tls: {}\n";
 
     systemd.services.${serviceName} = {
       description = "Traefik ingress (Docker Compose)";
@@ -80,6 +142,9 @@ in {
 
         ExecStartPre = [
           "${pkgs.runtimeShell} -c '${dockerBin} network inspect ${cfg.network} >/dev/null 2>&1 || ${dockerBin} network create ${cfg.network}'"
+        ]
+        ++ lib.optionals tlsEnabled [
+          tlsFilesCheck
         ];
 
         ExecStart = "${dockerBin} compose up -d";

@@ -8,8 +8,6 @@ services:
       - ${TRAEFIK_ENV_FILE}
 
     command:
-      - "--configFile=/etc/traefik/traefik.yml"
-
       - "--log.level=INFO"
       - "--accesslog=false"
 
@@ -19,6 +17,7 @@ services:
       - "--providers.docker=true"
       - "--providers.docker.exposedByDefault=false"
       - "--providers.docker.network=${TRAEFIK_NETWORK}"
+      - "--providers.file.filename=/etc/traefik/tls.yml"
 
       - "--entryPoints.web.address=:80"
       - "--entryPoints.websecure.address=:443"
@@ -29,6 +28,7 @@ services:
 
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "/run/secrets/traefik:/run/secrets/traefik:ro"
 
     networks:
       - traefik
