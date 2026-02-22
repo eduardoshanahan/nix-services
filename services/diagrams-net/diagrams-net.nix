@@ -13,6 +13,7 @@
   envKeyRegex = "^[A-Za-z_][A-Za-z0-9_]*$";
   labelKeyRegex = "^[A-Za-z0-9][A-Za-z0-9._/-]*$";
   cpuRegex = "^[0-9]+(\\.[0-9]+)?$";
+  positiveMemoryRegex = "^[1-9][0-9]*([kKmMgG])?$";
   reservedLabelKeys = [
     "traefik.enable"
     "traefik.docker.network"
@@ -165,6 +166,15 @@ in {
         default = "29.0.3";
         description = "Container image tag.";
       };
+
+      allowMutableTag = lib.mkOption {
+        type = lib.types.bool;
+        default = false;
+        description = ''
+          Allow mutable tags such as `latest`. Keep disabled to enforce pinned
+          image tags by default.
+        '';
+      };
     };
 
     extraEnv = lib.mkOption {
@@ -288,6 +298,10 @@ in {
         message = "services.diagramsNet.image.tag must not contain whitespace.";
       }
       {
+        assertion = cfg.image.allowMutableTag || cfg.image.tag != "latest";
+        message = "services.diagramsNet.image.tag must be pinned (not `latest`) unless services.diagramsNet.image.allowMutableTag = true.";
+      }
+      {
         assertion = !cfg.nonRoot || cfg.uid > 0;
         message = "services.diagramsNet.uid must be > 0 when services.diagramsNet.nonRoot = true.";
       }
@@ -304,7 +318,7 @@ in {
         message = "services.diagramsNet.cpus must be numeric (for example `0.50` or `1.0`).";
       }
       {
-        assertion = builtins.match "^[0-9]+[kKmMgG]?$" cfg.memoryLimit != null;
+        assertion = builtins.match positiveMemoryRegex cfg.memoryLimit != null;
         message = "services.diagramsNet.memoryLimit must use Docker format like `512m`, `1g`, or bytes.";
       }
       {
@@ -362,6 +376,7 @@ in {
         ExecStartPre = [
           "${pkgs.runtimeShell} -c 'test -s ${composeDir}/docker-compose.yml'"
           "${pkgs.runtimeShell} -c 'for i in $(seq 1 30); do ${dockerBin} info >/dev/null 2>&1 && exit 0; sleep 1; done; echo \"diagrams-net: docker daemon is not ready\" >&2; exit 1'"
+          "${pkgs.runtimeShell} -c '${dockerBin} compose config >/dev/null'"
           "${pkgs.runtimeShell} -c '${dockerBin} network inspect ${cfg.network} >/dev/null 2>&1 || ${dockerBin} network create ${cfg.network}'"
         ];
 
