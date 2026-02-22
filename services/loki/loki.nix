@@ -4,13 +4,13 @@
   pkgs,
   ...
 }: let
-  cfg = config.services.loki;
+  cfg = config.services.lokiCompose;
   serviceName = "loki";
   composeDir = "/etc/${serviceName}";
   dockerBin = "${config.virtualisation.docker.package}/bin/docker";
   portType = lib.types.ints.between 1 65535;
 in {
-  options.services.loki = {
+  options.services.lokiCompose = {
     enable = lib.mkEnableOption "Loki log aggregation service (Docker Compose)";
 
     containerName = lib.mkOption {
@@ -65,19 +65,19 @@ in {
     assertions = [
       {
         assertion = builtins.match "^[^[:space:]]+$" cfg.image.repository != null;
-        message = "services.loki.image.repository must not contain whitespace.";
+        message = "services.lokiCompose.image.repository must not contain whitespace.";
       }
       {
         assertion = builtins.match "^[^[:space:]]+$" cfg.image.tag != null;
-        message = "services.loki.image.tag must not contain whitespace.";
+        message = "services.lokiCompose.image.tag must not contain whitespace.";
       }
       {
         assertion = cfg.image.allowMutableTag || cfg.image.tag != "latest";
-        message = "services.loki.image.tag must be pinned (not `latest`) unless services.loki.image.allowMutableTag = true.";
+        message = "services.lokiCompose.image.tag must be pinned (not `latest`) unless services.lokiCompose.image.allowMutableTag = true.";
       }
       {
         assertion = lib.hasPrefix "/" cfg.dataDir;
-        message = "services.loki.dataDir must be an absolute path.";
+        message = "services.lokiCompose.dataDir must be an absolute path.";
       }
     ];
 
