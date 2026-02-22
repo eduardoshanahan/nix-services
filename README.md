@@ -14,6 +14,13 @@ It intentionally contains:
 If you are looking for Raspberry Pi bootstrapping and image creation,
 see the `nix-pi` repository.
 
+## Repository Relationship
+
+`nix-pi` (foundation/host repo) imports `nix-services` as a flake input and
+consumes exported NixOS modules from this repo.
+
+`nix-services` must remain service-focused and must not depend on `nix-pi`.
+
 ## Runtime Secrets (Consumption Only)
 
 `nix-pi` owns secret provisioning (e.g. via `sops-nix`) and materializes decrypted files at activation time under runtime paths like `/run/secrets/...` (tmpfs).

@@ -93,20 +93,20 @@ All hardware and image concerns MUST come from the foundation repo.
 Dependencies MUST flow in **one direction only**:
 
 ```text
-services repo  ──▶  foundation repo (nix‑pi)
+foundation repo (`nix-pi`)  ──▶  services repo (`nix-services`)
 ```
 
 Rules:
 
-- The services repo MAY import the foundation repo as a flake input
-- The foundation repo MUST NOT depend on the services repo
+- The foundation repo MAY import the services repo as a flake input
+- The services repo MUST NOT depend on the foundation repo
 - Circular dependencies are forbidden
 
 Example:
 
 ```nix
 inputs = {
-  nix-pi.url = "github:eduardoshanahan/nix-pi";
+  nix-services.url = "github:eduardoshanahan/nix-services";
 };
 ```
 
