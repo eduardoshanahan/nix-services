@@ -15,6 +15,24 @@
     if cfg.image.digest == null
     then "${cfg.image.repository}:${cfg.image.tag}"
     else "${cfg.image.repository}@${cfg.image.digest}";
+  healthcheckScript = pkgs.writeShellScript "excalidraw-healthcheck" ''
+    set -euo pipefail
+
+    service_name=${serviceName}
+    container_name=${cfg.containerName}
+
+    if ! systemctl is-active --quiet "$service_name"; then
+      echo "excalidraw-healthcheck: systemd service $service_name is not active" >&2
+      exit 1
+    fi
+
+    status="$(${dockerBin} inspect --format '{{if .State.Health}}{{.State.Health.Status}}{{else}}none{{end}}' "$container_name" 2>/dev/null || true)"
+    if [ "$status" != "healthy" ]; then
+      echo "excalidraw-healthcheck: container health is '$status' (expected 'healthy')" >&2
+      ${dockerBin} ps --filter "name=^/$container_name$" --format 'table {{.Names}}\t{{.Status}}' >&2 || true
+      exit 1
+    fi
+  '';
 
   waitForHealthy = pkgs.writeShellScript "excalidraw-wait-healthy" ''
     set -euo pipefail
@@ -112,6 +130,20 @@ in {
     };
 
     tls = lib.mkEnableOption "TLS on the Excalidraw Traefik router";
+
+    monitoring = {
+      enable = lib.mkOption {
+        type = lib.types.bool;
+        default = true;
+        description = "Enable periodic service/container health checks via systemd timer.";
+      };
+
+      interval = lib.mkOption {
+        type = lib.types.str;
+        default = "5m";
+        description = "How often to run the Excalidraw healthcheck (for example `5m`).";
+      };
+    };
   };
 
   config = lib.mkIf cfg.enable {
@@ -187,6 +219,27 @@ in {
         ExecStart = "${dockerBin} compose up -d";
         ExecStartPost = waitForHealthy;
         ExecStop = "${dockerBin} compose down";
+      };
+    };
+
+    systemd.services."${serviceName}-healthcheck" = lib.mkIf cfg.monitoring.enable {
+      description = "Excalidraw periodic healthcheck";
+      after = ["${serviceName}.service"];
+      requires = ["${serviceName}.service"];
+
+      serviceConfig = {
+        Type = "oneshot";
+        ExecStart = healthcheckScript;
+      };
+    };
+
+    systemd.timers."${serviceName}-healthcheck" = lib.mkIf cfg.monitoring.enable {
+      description = "Run Excalidraw periodic healthcheck";
+      wantedBy = ["timers.target"];
+      timerConfig = {
+        OnBootSec = "2m";
+        OnUnitActiveSec = cfg.monitoring.interval;
+        Unit = "${serviceName}-healthcheck.service";
       };
     };
   };

@@ -7,6 +7,8 @@ This module deploys Excalidraw behind Traefik using a checked-in Docker Compose 
 - Compose file is versioned at `services/excalidraw/docker-compose.yml`.
 - NixOS injects runtime environment variables (hostname, TLS mode, network, image/tag, timezone).
 - systemd runs `docker compose up -d` / `docker compose down` and waits for container health after startup.
+- Traefik security headers middleware is enabled for Excalidraw routes (HSTS, frame deny, content-type nosniff, CSP).
+- A periodic systemd timer can monitor service and container health.
 
 ## Exposed options
 
@@ -20,6 +22,8 @@ This module deploys Excalidraw behind Traefik using a checked-in Docker Compose 
 - `services.excalidraw.image.digest`
 - `services.excalidraw.image.allowMutableTag`
 - `services.excalidraw.tls`
+- `services.excalidraw.monitoring.enable`
+- `services.excalidraw.monitoring.interval`
 
 ## Image pinning
 
@@ -39,5 +43,21 @@ services.excalidraw = {
     repository = "excalidraw/excalidraw";
     digest = "sha256:...";
   };
+
+  monitoring = {
+    enable = true;
+    interval = "5m";
+  };
 };
 ```
+
+## Healthcheck units
+
+- Service: `excalidraw-healthcheck.service`
+- Timer: `excalidraw-healthcheck.timer`
+
+Useful checks:
+
+- `systemctl status excalidraw`
+- `systemctl status excalidraw-healthcheck.timer`
+- `journalctl -u excalidraw-healthcheck -n 50 --no-pager`
