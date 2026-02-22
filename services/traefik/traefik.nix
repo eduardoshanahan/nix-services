@@ -12,6 +12,8 @@
   dockerBin = "${config.virtualisation.docker.package}/bin/docker";
   tlsEnabled = cfg.tls.enable;
   httpToHttpsRedirectEnabled = cfg.httpToHttpsRedirect;
+  redirectEntryPointFlags = lib.optionalString httpToHttpsRedirectEnabled
+    "\n            - \"--entryPoints.web.http.redirections.entryPoint.to=websecure\"\n            - \"--entryPoints.web.http.redirections.entryPoint.scheme=https\"\n            - \"--entryPoints.web.http.redirections.entryPoint.permanent=true\"";
   tlsCertFile =
     if cfg.tls.certFile == null
     then ""
@@ -136,13 +138,7 @@ in {
 
             - "--entryPoints.web.address=:80"
             - "--entryPoints.websecure.address=:443"
-      ${if httpToHttpsRedirectEnabled
-      then ''
-            - "--entryPoints.web.http.redirections.entryPoint.to=websecure"
-            - "--entryPoints.web.http.redirections.entryPoint.scheme=https"
-            - "--entryPoints.web.http.redirections.entryPoint.permanent=true"
-      ''
-      else ""}
+            ${redirectEntryPointFlags}
 
           ports:
             - "80:80"
