@@ -29,7 +29,7 @@
   envLines = lib.concatMapStrings (name: let
     value = cfg.extraEnv.${name};
   in
-    "      - \"${escapeYaml name}=${escapeYaml value}\"\n") (lib.attrNames cfg.extraEnv);
+    "          - \"${escapeYaml name}=${escapeYaml value}\"\n") (lib.attrNames cfg.extraEnv);
   labels = {
       "traefik.enable" = "true";
       "traefik.docker.network" = cfg.network;
@@ -42,7 +42,7 @@
   labelLines = lib.concatMapStrings (name: let
     value = labels.${name};
   in
-    "      - \"${escapeYaml name}=${escapeYaml value}\"\n") (lib.attrNames labels);
+    "          - \"${escapeYaml name}=${escapeYaml value}\"\n") (lib.attrNames labels);
   volumeSection = lib.optionalString cfg.persistence.enable ''
         volumes:
           - "${cfg.persistence.hostPath}:${cfg.persistence.containerPath}:rw"
