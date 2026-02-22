@@ -280,11 +280,11 @@ in {
         message = "services.diagramsNet.network must be `traefik` when services.diagramsNet.enforceTraefikNetwork = true.";
       }
       {
-        assertion = builtins.match "^\\S+$" cfg.image.repository != null;
+        assertion = builtins.match "^[^[:space:]]+$" cfg.image.repository != null;
         message = "services.diagramsNet.image.repository must not contain whitespace.";
       }
       {
-        assertion = builtins.match "^\\S+$" cfg.image.tag != null;
+        assertion = builtins.match "^[^[:space:]]+$" cfg.image.tag != null;
         message = "services.diagramsNet.image.tag must not contain whitespace.";
       }
       {
