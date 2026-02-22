@@ -11,6 +11,7 @@
   composeDir = "/etc/${serviceName}";
   dockerBin = "${config.virtualisation.docker.package}/bin/docker";
   tlsEnabled = cfg.tls.enable;
+  httpToHttpsRedirectEnabled = cfg.httpToHttpsRedirect;
   tlsCertFile =
     if cfg.tls.certFile == null
     then ""
@@ -89,6 +90,8 @@ in {
         example = "/run/secrets/traefik/tls.key";
       };
     };
+
+    httpToHttpsRedirect = lib.mkEnableOption "global HTTP to HTTPS redirection on Traefik entrypoint `web`";
   };
 
   config = {
@@ -101,20 +104,44 @@ in {
         assertion = !tlsEnabled || cfg.tls.keyFile != null;
         message = "services.traefik.tls.keyFile must be set when TLS is enabled.";
       }
+      {
+        assertion = !httpToHttpsRedirectEnabled || tlsEnabled;
+        message = "services.traefik.httpToHttpsRedirect requires services.traefik.tls.enable = true.";
+      }
     ];
 
     virtualisation.docker.enable = true;
 
     environment.etc."${serviceName}/docker-compose.yml".source = ./docker-compose.yml;
-    environment.etc."traefik/tls.yml".text =
-      if tlsEnabled
+    environment.etc."traefik/tls.yml".text = ''
+      ${if tlsEnabled
       then ''
         tls:
           certificates:
             - certFile: ${tlsCertFile}
               keyFile: ${tlsKeyFile}
       ''
-      else "tls: {}\n";
+      else "tls: {}"}
+
+      ${if httpToHttpsRedirectEnabled
+      then ''
+        http:
+          routers:
+            redirect-to-https:
+              entryPoints:
+                - web
+              rule: HostRegexp(`{host:.+}`)
+              middlewares:
+                - redirect-to-https
+              service: noop@internal
+          middlewares:
+            redirect-to-https:
+              redirectScheme:
+                scheme: https
+                permanent: true
+      ''
+      else "http: {}"}
+    '';
 
     systemd.services.${serviceName} = {
       description = "Traefik ingress (Docker Compose)";
