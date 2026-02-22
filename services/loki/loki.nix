@@ -118,6 +118,7 @@ in {
       compactor:
         working_directory: /loki/compactor
         retention_enabled: true
+        delete_request_store: filesystem
     '';
 
     systemd.services.${serviceName} = {
