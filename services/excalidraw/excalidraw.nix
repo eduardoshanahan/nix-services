@@ -10,6 +10,11 @@
   dockerBin = "${config.virtualisation.docker.package}/bin/docker";
   hostnameRegex = "^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)(\\.([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?))*$";
   networkRegex = "^[a-zA-Z0-9][a-zA-Z0-9_.-]*$";
+  digestRegex = "^sha256:[0-9a-f]{64}$";
+  imageRef =
+    if cfg.image.digest == null
+    then "${cfg.image.repository}:${cfg.image.tag}"
+    else "${cfg.image.repository}@${cfg.image.digest}";
 
   waitForHealthy = pkgs.writeShellScript "excalidraw-wait-healthy" ''
     set -euo pipefail
@@ -85,6 +90,25 @@ in {
         default = "latest";
         description = "Container image tag.";
       };
+
+      digest = lib.mkOption {
+        type = lib.types.nullOr lib.types.str;
+        default = null;
+        description = ''
+          Optional immutable digest pin (for example `sha256:...`). When set,
+          the module uses `repository@digest` form and
+          ignores `services.excalidraw.image.tag`.
+        '';
+      };
+
+      allowMutableTag = lib.mkOption {
+        type = lib.types.bool;
+        default = false;
+        description = ''
+          Allow mutable tags such as `latest` when using tag mode.
+          Keep disabled to enforce pinned tags by default.
+        '';
+      };
     };
 
     tls = lib.mkEnableOption "TLS on the Excalidraw Traefik router";
@@ -107,6 +131,14 @@ in {
       {
         assertion = builtins.match "^[^[:space:]]+$" cfg.image.tag != null;
         message = "services.excalidraw.image.tag must not contain whitespace.";
+      }
+      {
+        assertion = cfg.image.digest == null || builtins.match digestRegex cfg.image.digest != null;
+        message = "services.excalidraw.image.digest must match `sha256:<64 lowercase hex characters>` when set.";
+      }
+      {
+        assertion = cfg.image.digest != null || cfg.image.allowMutableTag || cfg.image.tag != "latest";
+        message = "services.excalidraw.image.tag must be pinned (not `latest`) unless services.excalidraw.image.allowMutableTag = true.";
       }
     ];
 
@@ -137,8 +169,7 @@ in {
 
         Environment = [
           "EXCALIDRAW_CONTAINER_NAME=${cfg.containerName}"
-          "EXCALIDRAW_IMAGE_REPOSITORY=${cfg.image.repository}"
-          "EXCALIDRAW_IMAGE_TAG=${cfg.image.tag}"
+          "EXCALIDRAW_IMAGE=${imageRef}"
           "EXCALIDRAW_NETWORK=${cfg.network}"
           "EXCALIDRAW_HOSTNAME=${cfg.hostname}"
           "EXCALIDRAW_ENTRYPOINTS=${if cfg.tls then "websecure" else "web"}"

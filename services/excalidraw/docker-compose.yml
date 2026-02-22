@@ -1,6 +1,6 @@
 services:
   excalidraw:
-    image: ${EXCALIDRAW_IMAGE_REPOSITORY}:${EXCALIDRAW_IMAGE_TAG}
+    image: ${EXCALIDRAW_IMAGE}
     container_name: ${EXCALIDRAW_CONTAINER_NAME}
     restart: unless-stopped
     init: true

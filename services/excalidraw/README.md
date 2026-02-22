@@ -17,7 +17,15 @@ This module deploys Excalidraw behind Traefik using a checked-in Docker Compose 
 - `services.excalidraw.network`
 - `services.excalidraw.image.repository`
 - `services.excalidraw.image.tag`
+- `services.excalidraw.image.digest`
+- `services.excalidraw.image.allowMutableTag`
 - `services.excalidraw.tls`
+
+## Image pinning
+
+- Preferred: set `services.excalidraw.image.digest` to an immutable digest.
+- If using tags, keep `services.excalidraw.image.allowMutableTag = false` and use a fixed tag.
+- `latest` is blocked unless `services.excalidraw.image.allowMutableTag = true`.
 
 ## Example
 
@@ -26,5 +34,10 @@ services.excalidraw = {
   enable = true;
   hostname = "excalidraw.${config.lab.domain}";
   tls = true;
+
+  image = {
+    repository = "excalidraw/excalidraw";
+    digest = "sha256:...";
+  };
 };
 ```
