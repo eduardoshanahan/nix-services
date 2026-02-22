@@ -33,13 +33,13 @@ This module deploys Loki (single-node) using a checked-in Docker Compose file.
 services.lokiCompose = {
   enable = true;
   listenAddress = "192.168.1.10";
-  dataDir = "/srv/loki";
+  dataDir = "/srv/loki/data";
   httpPort = 3100;
   retentionPeriod = "30d";
 
   backup = {
     enable = true;
-    targetDir = "/srv/loki-backups";
+    targetDir = "/srv/loki/backups";
     schedule = "daily";
     keepDays = 14;
   };
