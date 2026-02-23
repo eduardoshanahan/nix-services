@@ -526,6 +526,17 @@ These files are publication-safe templates and must be copied/adapted in private
 - GitLab container is healthy and login is confirmed.
 - GitLab is exposed via DSM reverse proxy at:
   - `https://gitlab.<homelab-domain>`
+- Git SSH validation completed:
+  - Remote `ssh://git@gitlab.<homelab-domain>:2222/eduardo/local-test.git`
+  - `git push -u origin main` succeeded from workstation
+
+### Immediate hardening follow-ups
+
+- Keep `root` as break-glass account only; use personal admin account for normal operations.
+- Rotate bootstrap credentials:
+  - Grafana admin password
+  - GitLab root/admin passwords
+- Decide whether SSH port `2222` should remain broadly reachable or be restricted to trusted LAN source ranges.
 
 ## Validation Checklist
 
