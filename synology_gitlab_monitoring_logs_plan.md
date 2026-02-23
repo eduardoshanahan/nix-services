@@ -443,6 +443,39 @@ Create private DNS records in your internal DNS system:
 7. Configure Grafana datasources (Prometheus + Loki).
 8. Validate dashboards, alerts, and Git operations.
 
+## Session Decisions
+
+### 2026-02-23
+
+- Decision: start without Traefik on Synology.
+- Rationale: Synology host ports `80/443` are already used by DSM, so initial rollout uses host-local published ports plus DSM reverse proxy later.
+- Decision: use `/volume1/docker/homelab` as the Synology base directory for this stack.
+
+## Current Implementation State
+
+### Synology scaffold created
+
+The following were created on Synology under `/volume1/docker/homelab`:
+
+- `monitoring/compose.yaml`
+- `monitoring/prometheus/prometheus.yml`
+- `monitoring/prometheus/alert.rules.yml`
+- `monitoring/alertmanager/alertmanager.yml`
+- `monitoring/grafana.env`
+- `gitlab/compose.yaml`
+
+Compose validation was executed with:
+
+- `docker compose -f /volume1/docker/homelab/monitoring/compose.yaml config`
+- `docker compose -f /volume1/docker/homelab/gitlab/compose.yaml config`
+
+Both validations passed.
+
+### Important pre-start note
+
+- `monitoring/grafana.env` currently contains `GF_SECURITY_ADMIN_PASSWORD=REPLACE_BEFORE_START`.
+- Replace this value in Synology private storage before starting the monitoring stack.
+
 ## Validation Checklist
 
 ### Monitoring
