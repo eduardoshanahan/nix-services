@@ -1,0 +1,20 @@
+services:
+  gitlab:
+    image: gitlab/gitlab-ce:17.5.2-ce.0
+    container_name: gitlab
+    restart: unless-stopped
+    hostname: ${GITLAB_FQDN:-gitlab.internal}
+    environment:
+      GITLAB_OMNIBUS_CONFIG: |
+        external_url "http://localhost:8929"
+        gitlab_rails['gitlab_shell_ssh_port'] = 2222
+        nginx['listen_port'] = 8929
+        nginx['listen_https'] = false
+    ports:
+      - "127.0.0.1:8929:8929"
+      - "2222:22"
+    volumes:
+      - ./config:/etc/gitlab
+      - ./logs:/var/log/gitlab
+      - ./data:/var/opt/gitlab
+    shm_size: "256m"
