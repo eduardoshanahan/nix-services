@@ -509,8 +509,9 @@ These files are publication-safe templates and must be copied/adapted in private
 - Low-memory profile applied for small-user deployment:
   - `puma["worker_processes"] = 1`
   - `sidekiq["max_concurrency"] = 5`
-  - disabled bundled monitoring and optional components not needed in this setup (`prometheus`, `alertmanager`, `grafana`, exporters, `registry`, `pages`, `kas`, `mattermost`, `letsencrypt`).
+- disabled optional components not needed in this setup (`prometheus`, `registry`, `pages`, `kas`, `mattermost`, `letsencrypt`).
 - Use quoted hash keys in Omnibus config (`["..."]`) to avoid startup parse errors.
+- Compatibility note (GitLab CE 17.5.2): keys such as `grafana[...]`, `alertmanager[...]`, and some exporter stanzas are unsupported in this image and must not be set in `GITLAB_OMNIBUS_CONFIG`.
 
 ### Current status checkpoint (2026-02-23 end-of-session)
 
