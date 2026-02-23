@@ -489,6 +489,17 @@ These files are publication-safe templates and must be copied/adapted in private
 - `monitoring/grafana.env` currently contains `GF_SECURITY_ADMIN_PASSWORD=REPLACE_BEFORE_START`.
 - Replace this value in Synology private storage before starting the monitoring stack.
 
+### Observed runtime fixes (2026-02-23)
+
+- Symptom: `prometheus` restart loop with `permission denied` writing `/prometheus/queries.active`.
+- Symptom: `grafana` restart loop with `GF_PATHS_DATA='/var/lib/grafana' is not writable`.
+- Cause: Synology bind-mounted data directories had incompatible ownership for container users.
+- Fix applied on Synology:
+  - `chown -R 65534:65534 prometheus-data alertmanager-data`
+  - `chown -R 472:472 grafana-data`
+  - `chmod -R u+rwX,g+rX,o-rwx prometheus-data alertmanager-data grafana-data`
+- Additional finding: `grafana.env` had an empty `GF_SECURITY_ADMIN_PASSWORD`, which is not acceptable for ongoing operation.
+
 ## Validation Checklist
 
 ### Monitoring
