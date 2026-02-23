@@ -471,6 +471,19 @@ Compose validation was executed with:
 
 Both validations passed.
 
+### Git-tracked template copy
+
+To support future sessions and reproducible handoff, a sanitized template copy is now tracked in this repository under:
+
+- `synology-services/monitoring/compose.yaml`
+- `synology-services/monitoring/prometheus/prometheus.yml`
+- `synology-services/monitoring/prometheus/alert.rules.yml`
+- `synology-services/monitoring/alertmanager/alertmanager.yml`
+- `synology-services/monitoring/grafana.env.example`
+- `synology-services/gitlab/compose.yaml`
+
+These files are publication-safe templates and must be copied/adapted in private Synology storage before deployment.
+
 ### Important pre-start note
 
 - `monitoring/grafana.env` currently contains `GF_SECURITY_ADMIN_PASSWORD=REPLACE_BEFORE_START`.
