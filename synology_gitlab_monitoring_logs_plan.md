@@ -451,6 +451,7 @@ Create private DNS records in your internal DNS system:
 - Rationale: Synology host ports `80/443` are already used by DSM, so initial rollout uses host-local published ports plus DSM reverse proxy later.
 - Decision: use `/volume1/docker/homelab` as the Synology base directory for this stack.
 - Decision: expose Grafana on LAN port `3000` during bootstrap to simplify operator onboarding; tighten access later behind DSM reverse proxy.
+- Decision: after DSM reverse proxy validation, Grafana bind was tightened back to `127.0.0.1:3000` and external access is via `https://grafana.hhlab.home.arpa`.
 
 ## Current Implementation State
 
@@ -490,6 +491,7 @@ These files are publication-safe templates and must be copied/adapted in private
 - `monitoring/grafana.env` currently contains `GF_SECURITY_ADMIN_PASSWORD=REPLACE_BEFORE_START`.
 - Replace this value in Synology private storage before starting the monitoring stack.
 - During bootstrap, Grafana may be temporarily published as `3000:3000` for direct LAN browser access.
+- After DSM reverse proxy is validated, revert Grafana publish to `127.0.0.1:3000:3000`.
 
 ### Observed runtime fixes (2026-02-23)
 
