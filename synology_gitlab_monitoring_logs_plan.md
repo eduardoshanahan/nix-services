@@ -59,7 +59,7 @@ Runs in containers:
 
 - Loki (single-node)
 
-### Pi/NixOS nodes
+### Pi/NixOS nodes checklist
 
 Run agents:
 
@@ -124,7 +124,7 @@ Create a deterministic layout in your private environment, for example:
 
 Use reverse proxy for internal service URLs and centralized TLS.
 
-### Files to create privately
+### Monitoring files to create privately
 
 - `<nas-docker-root>/proxy/compose.yaml`
 - `<nas-docker-root>/proxy/dynamic/tls.yaml`
