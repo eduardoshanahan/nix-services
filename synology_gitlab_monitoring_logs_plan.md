@@ -501,6 +501,7 @@ These files are publication-safe templates and must be copied/adapted in private
   - `chown -R 472:472 grafana-data`
   - `chmod -R u+rwX,g+rX,o-rwx prometheus-data alertmanager-data grafana-data`
 - Additional finding: `grafana.env` had an empty `GF_SECURITY_ADMIN_PASSWORD`, which is not acceptable for ongoing operation.
+- Additional finding: Prometheus container DNS path did not resolve Pi hostnames reliably; bootstrap scrape targets were switched to fixed LAN IPs (`192.168.1.58`, `192.168.1.59`, `192.168.1.10`).
 
 ## Validation Checklist
 
