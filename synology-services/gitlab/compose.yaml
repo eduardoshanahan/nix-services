@@ -15,12 +15,6 @@ services:
         sidekiq["max_concurrency"] = 5
 
         prometheus["enable"] = false
-        alertmanager["enable"] = false
-        grafana["enable"] = false
-        node_exporter["enable"] = false
-        redis_exporter["enable"] = false
-        postgres_exporter["enable"] = false
-
         registry["enable"] = false
         gitlab_rails["registry_enabled"] = false
         gitlab_pages["enable"] = false
