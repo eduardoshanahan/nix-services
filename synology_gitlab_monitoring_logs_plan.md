@@ -506,6 +506,11 @@ These files are publication-safe templates and must be copied/adapted in private
 - Additional finding: Prometheus container DNS path did not resolve Pi hostnames reliably during bootstrap; scrape targets were temporarily switched to fixed LAN IPs.
 - Follow-up: after Synology DNS was pointed to Pi-hole and local DNS entries were created, Prometheus scrape targets were switched back to FQDNs.
 - Additional finding: GitLab Omnibus keys in `GITLAB_OMNIBUS_CONFIG` must keep quoted hash keys (for example `gitlab_rails['gitlab_shell_ssh_port']`). Unquoted forms fail startup with `UnknownConfigOptionError`.
+- Low-memory profile applied for small-user deployment:
+  - `puma["worker_processes"] = 1`
+  - `sidekiq["max_concurrency"] = 5`
+  - disabled bundled monitoring and optional components not needed in this setup (`prometheus`, `alertmanager`, `grafana`, exporters, `registry`, `pages`, `kas`, `mattermost`, `letsencrypt`).
+- Use quoted hash keys in Omnibus config (`["..."]`) to avoid startup parse errors.
 
 ### Current status checkpoint (2026-02-23 end-of-session)
 
