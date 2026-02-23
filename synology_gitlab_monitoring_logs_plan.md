@@ -507,6 +507,26 @@ These files are publication-safe templates and must be copied/adapted in private
 - Follow-up: after Synology DNS was pointed to Pi-hole and local DNS entries were created, Prometheus scrape targets were switched back to FQDNs.
 - Additional finding: GitLab Omnibus keys in `GITLAB_OMNIBUS_CONFIG` must keep quoted hash keys (for example `gitlab_rails['gitlab_shell_ssh_port']`). Unquoted forms fail startup with `UnknownConfigOptionError`.
 
+### Current status checkpoint (2026-02-23 end-of-session)
+
+- Monitoring stack is running on Synology and healthy:
+  - Prometheus ready
+  - Grafana health endpoint reports database OK
+  - Alertmanager running
+  - Uptime Kuma running
+- Prometheus scrape targets are all `up` using DNS names:
+  - `rpi-box-01.<homelab-domain>:9100`
+  - `rpi-box-02.<homelab-domain>:9100`
+  - `rpi-box-03.<homelab-domain>:9100`
+  - `loki.<homelab-domain>:3100`
+- Grafana is exposed via DSM reverse proxy at:
+  - `https://grafana.<homelab-domain>`
+- Grafana container bind was tightened to loopback only:
+  - `127.0.0.1:3000:3000`
+- GitLab container is healthy and login is confirmed.
+- GitLab is exposed via DSM reverse proxy at:
+  - `https://gitlab.<homelab-domain>`
+
 ## Validation Checklist
 
 ### Monitoring
