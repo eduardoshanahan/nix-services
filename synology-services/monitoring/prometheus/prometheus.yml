@@ -18,10 +18,10 @@ scrape_configs:
   - job_name: "nodes"
     static_configs:
       - targets:
-          - "192.168.1.58:9100"
-          - "192.168.1.59:9100"
-          - "192.168.1.10:9100"
+          - "rpi-box-01.<internal-domain>:9100"
+          - "rpi-box-02.<internal-domain>:9100"
+          - "rpi-box-03.<internal-domain>:9100"
 
   - job_name: "loki"
     static_configs:
-      - targets: ["192.168.1.10:3100"]
+      - targets: ["loki.<internal-domain>:3100"]
