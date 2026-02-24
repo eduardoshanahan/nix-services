@@ -12,6 +12,153 @@
   dockerBin = "${config.virtualisation.docker.package}/bin/docker";
   hostnameRegex = "^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)(\\.([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?))*$";
   networkRegex = "^[a-zA-Z0-9][a-zA-Z0-9_.-]*$";
+  datasourcesYaml = ''
+    apiVersion: 1
+    datasources:
+      - name: Prometheus
+        type: prometheus
+        access: proxy
+        url: ${cfg.provisioning.datasources.prometheus.url}
+        isDefault: true
+        editable: false
+        jsonData:
+          timeInterval: 15s
+  ''
+  + lib.optionalString (cfg.provisioning.datasources.loki.url != null) ''
+      - name: Loki
+        type: loki
+        access: proxy
+        url: ${cfg.provisioning.datasources.loki.url}
+        editable: false
+    '';
+  dashboardsProviderYaml = ''
+    apiVersion: 1
+    providers:
+      - name: Homelab
+        orgId: 1
+        folder: Homelab
+        type: file
+        disableDeletion: false
+        editable: true
+        options:
+          path: /etc/grafana/provisioning/dashboards
+  '';
+  starterDashboardJson = builtins.toJSON {
+    id = null;
+    uid = "homelab-overview";
+    title = "Homelab Overview";
+    tags = [ "homelab" "starter" ];
+    timezone = "browser";
+    schemaVersion = 39;
+    version = 1;
+    refresh = "30s";
+    time = {
+      from = "now-6h";
+      to = "now";
+    };
+    editable = true;
+    panels = [
+      {
+        id = 1;
+        type = "stat";
+        title = "Targets Up";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 6;
+          x = 0;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          justifyMode = "auto";
+          orientation = "auto";
+          reduceOptions = {
+            calcs = [ "lastNotNull" ];
+            fields = "";
+            values = false;
+          };
+          textMode = "auto";
+        };
+        targets = [
+          {
+            expr = "sum(up)";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 2;
+        type = "timeseries";
+        title = "HTTP 5xx Rate (Traefik)";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 9;
+          w = 18;
+          x = 6;
+          y = 0;
+        };
+        targets = [
+          {
+            expr = "sum(rate(traefik_service_requests_total{code=~\"5..\"}[5m])) by (code)";
+            legendFormat = "{{code}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 3;
+        type = "timeseries";
+        title = "CPU Usage % (Nodes)";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 9;
+          w = 12;
+          x = 0;
+          y = 6;
+        };
+        targets = [
+          {
+            expr = "100 - (avg by (instance) (rate(node_cpu_seconds_total{mode=\"idle\"}[5m])) * 100)";
+            legendFormat = "{{instance}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 4;
+        type = "timeseries";
+        title = "Memory Available % (Nodes)";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 9;
+          w = 12;
+          x = 12;
+          y = 9;
+        };
+        targets = [
+          {
+            expr = "(node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) * 100";
+            legendFormat = "{{instance}}";
+            refId = "A";
+          }
+        ];
+      }
+    ];
+  };
   healthcheckScript = pkgs.writeShellScript "grafana-healthcheck" ''
     set -euo pipefail
 
@@ -144,6 +291,41 @@ in {
         description = "How often to run the Grafana healthcheck (for example `5m`).";
       };
     };
+
+    provisioning = {
+      enable = lib.mkOption {
+        type = lib.types.bool;
+        default = true;
+        description = "Enable declarative provisioning for Grafana datasources and starter dashboards.";
+      };
+
+      datasources = {
+        prometheus = {
+          url = lib.mkOption {
+            type = lib.types.str;
+            default = "http://prometheus:9090";
+            description = "Prometheus URL used by provisioned Grafana datasource.";
+          };
+        };
+
+        loki = {
+          url = lib.mkOption {
+            type = lib.types.nullOr lib.types.str;
+            default = null;
+            example = "http://loki.hhlab.home.arpa:3100";
+            description = "Optional Loki URL for a provisioned Grafana datasource.";
+          };
+        };
+      };
+
+      dashboards = {
+        enableStarter = lib.mkOption {
+          type = lib.types.bool;
+          default = true;
+          description = "Provision a starter Homelab overview dashboard.";
+        };
+      };
+    };
   };
 
   config = lib.mkIf cfg.enable {
@@ -181,6 +363,18 @@ in {
     virtualisation.docker.enable = true;
 
     environment.etc."${serviceName}/docker-compose.yml".source = ./docker-compose.yml;
+    environment.etc."${serviceName}/provisioning/datasources/datasources.yml" = lib.mkIf cfg.provisioning.enable {
+      text = datasourcesYaml;
+      mode = "0444";
+    };
+    environment.etc."${serviceName}/provisioning/dashboards/providers.yml" = lib.mkIf cfg.provisioning.enable {
+      text = dashboardsProviderYaml;
+      mode = "0444";
+    };
+    environment.etc."${serviceName}/provisioning/dashboards/homelab-overview.json" = lib.mkIf (cfg.provisioning.enable && cfg.provisioning.dashboards.enableStarter) {
+      text = starterDashboardJson;
+      mode = "0444";
+    };
 
     systemd.services.${serviceName} = {
       description = "Grafana (Docker Compose)";
@@ -189,7 +383,12 @@ in {
       requires = ["docker.service"];
       after = ["docker.service" "network-online.target"];
       wants = ["network-online.target"];
-      restartTriggers = [
+      restartTriggers = lib.optionals cfg.provisioning.enable [
+        config.environment.etc."${serviceName}/provisioning/datasources/datasources.yml".source
+        config.environment.etc."${serviceName}/provisioning/dashboards/providers.yml".source
+      ] ++ lib.optionals (cfg.provisioning.enable && cfg.provisioning.dashboards.enableStarter) [
+        config.environment.etc."${serviceName}/provisioning/dashboards/homelab-overview.json".source
+      ] ++ [
         config.environment.etc."${serviceName}/docker-compose.yml".source
       ];
       startLimitBurst = 3;
@@ -218,6 +417,12 @@ in {
         ExecStartPre = [
           "${pkgs.runtimeShell} -c 'mkdir -p ${cfg.dataDir} && chown 472:472 ${cfg.dataDir} && chmod 0750 ${cfg.dataDir}'"
           "${pkgs.runtimeShell} -c 'test -s ${composeDir}/docker-compose.yml'"
+        ] ++ lib.optionals cfg.provisioning.enable [
+          "${pkgs.runtimeShell} -c 'test -s ${composeDir}/provisioning/datasources/datasources.yml'"
+          "${pkgs.runtimeShell} -c 'test -s ${composeDir}/provisioning/dashboards/providers.yml'"
+        ] ++ lib.optionals (cfg.provisioning.enable && cfg.provisioning.dashboards.enableStarter) [
+          "${pkgs.runtimeShell} -c 'test -s ${composeDir}/provisioning/dashboards/homelab-overview.json'"
+        ] ++ [
           "${pkgs.runtimeShell} -c 'for i in $(seq 1 30); do ${dockerBin} info >/dev/null 2>&1 && exit 0; sleep 1; done; echo \"grafana: docker daemon is not ready\" >&2; exit 1'"
           (runtimeSecretEnv.mkRuntimeSecretEnvExecStartPre {
             name = serviceName;

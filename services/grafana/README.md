@@ -7,6 +7,7 @@ This module deploys Grafana behind Traefik using a checked-in Docker Compose fil
 - Compose file is versioned at `services/grafana/docker-compose.yml`.
 - NixOS injects runtime environment variables (container name, image/tag, network, hostname, TLS mode, timezone, data path).
 - Grafana admin password is injected at runtime from `services.grafanaCompose.adminPasswordFile` into `/run/secrets/grafana.env`.
+- Grafana provisioning files are generated declaratively under `/etc/grafana/provisioning` (datasources + dashboard provider + optional starter dashboard).
 - systemd runs `docker compose up -d` / `docker compose down` and waits for container health after startup.
 - Data persists under `services.grafanaCompose.dataDir` (default `/var/lib/grafana`).
 - A periodic systemd timer can monitor service and container health.
@@ -26,6 +27,10 @@ This module deploys Grafana behind Traefik using a checked-in Docker Compose fil
 - `services.grafanaCompose.tls`
 - `services.grafanaCompose.monitoring.enable`
 - `services.grafanaCompose.monitoring.interval`
+- `services.grafanaCompose.provisioning.enable`
+- `services.grafanaCompose.provisioning.datasources.prometheus.url`
+- `services.grafanaCompose.provisioning.datasources.loki.url`
+- `services.grafanaCompose.provisioning.dashboards.enableStarter`
 
 ## Image pinning strategy
 
@@ -47,6 +52,15 @@ services.grafanaCompose = {
   monitoring = {
     enable = true;
     interval = "5m";
+  };
+
+  provisioning = {
+    enable = true;
+    datasources = {
+      prometheus.url = "http://prometheus:9090";
+      loki.url = "http://loki.hhlab.home.arpa:3100";
+    };
+    dashboards.enableStarter = true;
   };
 };
 ```

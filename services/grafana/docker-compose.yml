@@ -16,6 +16,7 @@ services:
 
     volumes:
       - "${GRAFANA_DATA_DIR}:/var/lib/grafana"
+      - "/etc/grafana/provisioning:/etc/grafana/provisioning:ro"
 
     healthcheck:
       test: ["CMD-SHELL", "wget --spider -q http://127.0.0.1:3000/api/health || exit 1"]
