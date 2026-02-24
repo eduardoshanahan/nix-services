@@ -15,7 +15,13 @@ services:
       - "${UPTIME_KUMA_DATA_DIR}:/app/data"
 
     healthcheck:
-      test: ["CMD-SHELL", "wget --spider -q http://127.0.0.1:3001/ || exit 1"]
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "require('http').get('http://127.0.0.1:3001/', (r) => process.exit(r.statusCode < 500 ? 0 : 1)).on('error', () => process.exit(1));",
+        ]
       interval: 15s
       timeout: 5s
       retries: 8
