@@ -15,13 +15,8 @@
   metricsEnabled = cfg.metrics.enable;
   redirectEntryPointFlags = lib.optionalString httpToHttpsRedirectEnabled
     "\n            - \"--entryPoints.web.http.redirections.entryPoint.to=websecure\"\n            - \"--entryPoints.web.http.redirections.entryPoint.scheme=https\"\n            - \"--entryPoints.web.http.redirections.entryPoint.permanent=true\"";
-  metricsFlags = lib.optionalString metricsEnabled ''
-            - "--entryPoints.metrics.address=:${toString cfg.metrics.port}"
-            - "--metrics.prometheus=true"
-            - "--metrics.prometheus.entryPoint=metrics"
-            - "--metrics.prometheus.addEntryPointsLabels=true"
-            - "--metrics.prometheus.addRoutersLabels=true"
-            - "--metrics.prometheus.addServicesLabels=true"'';
+  metricsFlags = lib.optionalString metricsEnabled
+    "\n            - \"--entryPoints.metrics.address=:${toString cfg.metrics.port}\"\n            - \"--metrics.prometheus=true\"\n            - \"--metrics.prometheus.entryPoint=metrics\"\n            - \"--metrics.prometheus.addEntryPointsLabels=true\"\n            - \"--metrics.prometheus.addRoutersLabels=true\"\n            - \"--metrics.prometheus.addServicesLabels=true\"";
   tlsCertFile =
     if cfg.tls.certFile == null
     then ""
