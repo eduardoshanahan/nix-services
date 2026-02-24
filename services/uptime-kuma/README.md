@@ -1,0 +1,41 @@
+# Uptime Kuma Service Module
+
+This module deploys Uptime Kuma behind Traefik using a checked-in Docker Compose file.
+
+## Deployment model
+
+- Compose file is versioned at `services/uptime-kuma/docker-compose.yml`.
+- NixOS injects runtime environment variables (container name, image/tag, network, hostname, TLS mode, timezone, data path).
+- systemd runs `docker compose up -d` / `docker compose down` and waits for container health after startup.
+- Data persists under `services.uptimeKuma.dataDir` (default `/var/lib/uptime-kuma`).
+
+## Exposed options
+
+- `services.uptimeKuma.enable`
+- `services.uptimeKuma.containerName`
+- `services.uptimeKuma.hostname`
+- `services.uptimeKuma.timezone`
+- `services.uptimeKuma.network`
+- `services.uptimeKuma.dataDir`
+- `services.uptimeKuma.image.repository`
+- `services.uptimeKuma.image.tag`
+- `services.uptimeKuma.image.allowMutableTag`
+- `services.uptimeKuma.tls`
+
+## Image pinning strategy
+
+- Default policy is pinned tags only.
+- Default image is `louislam/uptime-kuma:2.1.3`.
+- Mutable tags like `latest` are blocked unless
+  `services.uptimeKuma.image.allowMutableTag = true`.
+
+## Example
+
+```nix
+services.uptimeKuma = {
+  enable = true;
+  hostname = "kuma.${config.lab.domain}";
+  dataDir = "/var/lib/uptime-kuma";
+  tls = true;
+};
+```

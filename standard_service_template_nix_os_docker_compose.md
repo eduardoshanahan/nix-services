@@ -74,7 +74,7 @@ services:
       - traefik
 
     volumes:
-      - app-data:/var/lib/app
+      - ${APP_DATA_DIR}:/var/lib/app
 
     environment:
       TZ: UTC
@@ -83,9 +83,6 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.app.rule=Host(`app.local`)"
       - "traefik.http.services.app.loadbalancer.server.port=8080"
-
-volumes:
-  app-data:
 
 networks:
   traefik:
@@ -139,7 +136,8 @@ in
 
     serviceConfig = {
       WorkingDirectory = "/etc/${serviceName}";
-      ExecStart = "${docker}/bin/docker compose up";
+      Environment = [ "APP_DATA_DIR=${serviceDir}" ];
+      ExecStart = "${docker}/bin/docker compose up -d";
       ExecStop = "${docker}/bin/docker compose down";
       Restart = "always";
       RestartSec = "5s";
@@ -168,6 +166,22 @@ Secret files are:
 - Injected at runtime
 - Or provided by private overlays
 - Or managed by encrypted secret tooling
+
+---
+
+## 4.1 Persistent Data Path Policy (MANDATORY)
+
+For new stateful services, use host bind mounts by default, not Docker named volumes.
+
+Pattern:
+
+- Module option (for example `dataDir`) with an absolute path
+- Default path `/var/lib/<service>`
+- Optional override to `/srv/...` for dedicated storage hosts
+
+Rationale and policy details:
+
+- `storage_persistence_policy_bind_mounts.md`
 
 ---
 

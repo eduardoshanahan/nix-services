@@ -10,14 +10,10 @@ This directory is intentionally safe for publication:
 
 ## Layout
 
-- `monitoring/compose.yaml`
-- `monitoring/prometheus/prometheus.yml`
-- `monitoring/prometheus/alert.rules.yml`
-- `monitoring/alertmanager/alertmanager.yml`
-- `monitoring/grafana.env.example`
+- `monitoring/compose.yaml` (currently empty baseline)
 
 ## Usage
 
 1. Copy this directory (or selected files) to Synology private storage.
-2. Replace placeholders and local defaults with your private values.
-3. Keep secret values in private files only (for example `grafana.env`).
+2. Add only the services you currently want to run.
+3. Keep secret values in private files only.
