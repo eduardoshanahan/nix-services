@@ -23,13 +23,13 @@
   }:
     lib.optionals (targets != []) (
       [
-        "- job_name: \"${name}\""
-        "  static_configs:"
-        "    - targets:"
+        "  - job_name: \"${name}\""
+        "    static_configs:"
+        "      - targets:"
       ]
       ++ (mkTargetLines {
         inherit targets;
-        indent = "      ";
+        indent = "        ";
       })
       ++ [""]
     );
