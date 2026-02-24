@@ -18,6 +18,7 @@
         "apiVersion: 1"
         "datasources:"
         "  - name: Prometheus"
+        "    uid: prometheus"
         "    type: prometheus"
         "    access: proxy"
         "    url: ${cfg.provisioning.datasources.prometheus.url}"
@@ -28,6 +29,7 @@
       ]
       ++ lib.optionals (cfg.provisioning.datasources.loki.url != null) [
         "  - name: Loki"
+        "    uid: loki"
         "    type: loki"
         "    access: proxy"
         "    url: ${cfg.provisioning.datasources.loki.url}"
