@@ -12,25 +12,29 @@
   dockerBin = "${config.virtualisation.docker.package}/bin/docker";
   hostnameRegex = "^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)(\\.([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?))*$";
   networkRegex = "^[a-zA-Z0-9][a-zA-Z0-9_.-]*$";
-  datasourcesYaml = ''
-    apiVersion: 1
-    datasources:
-      - name: Prometheus
-        type: prometheus
-        access: proxy
-        url: ${cfg.provisioning.datasources.prometheus.url}
-        isDefault: true
-        editable: false
-        jsonData:
-          timeInterval: 15s
-  ''
-  + lib.optionalString (cfg.provisioning.datasources.loki.url != null) ''
-      - name: Loki
-        type: loki
-        access: proxy
-        url: ${cfg.provisioning.datasources.loki.url}
-        editable: false
-    '';
+  datasourcesYaml =
+    lib.concatStringsSep "\n" (
+      [
+        "apiVersion: 1"
+        "datasources:"
+        "  - name: Prometheus"
+        "    type: prometheus"
+        "    access: proxy"
+        "    url: ${cfg.provisioning.datasources.prometheus.url}"
+        "    isDefault: true"
+        "    editable: false"
+        "    jsonData:"
+        "      timeInterval: 15s"
+      ]
+      ++ lib.optionals (cfg.provisioning.datasources.loki.url != null) [
+        "  - name: Loki"
+        "    type: loki"
+        "    access: proxy"
+        "    url: ${cfg.provisioning.datasources.loki.url}"
+        "    editable: false"
+      ]
+    )
+    + "\n";
   dashboardsProviderYaml = ''
     apiVersion: 1
     providers:
