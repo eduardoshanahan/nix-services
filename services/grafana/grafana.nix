@@ -12,6 +12,60 @@
   dockerBin = "${config.virtualisation.docker.package}/bin/docker";
   hostnameRegex = "^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)(\\.([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?))*$";
   networkRegex = "^[a-zA-Z0-9][a-zA-Z0-9_.-]*$";
+  healthcheckScript = pkgs.writeShellScript "grafana-healthcheck" ''
+    set -euo pipefail
+
+    service_name=${serviceName}
+    container_name=${cfg.containerName}
+
+    if ! systemctl is-active --quiet "$service_name"; then
+      echo "grafana-healthcheck: systemd service $service_name is not active" >&2
+      exit 1
+    fi
+
+    status="$(${dockerBin} inspect --format '{{if .State.Health}}{{.State.Health.Status}}{{else}}none{{end}}' "$container_name" 2>/dev/null || true)"
+    if [ "$status" != "healthy" ]; then
+      echo "grafana-healthcheck: container health is '$status' (expected 'healthy')" >&2
+      ${dockerBin} ps --filter "name=^/$container_name$" --format 'table {{.Names}}\t{{.Status}}' >&2 || true
+      exit 1
+    fi
+  '';
+
+  waitForHealthy = pkgs.writeShellScript "grafana-wait-healthy" ''
+    set -euo pipefail
+
+    container_name=${cfg.containerName}
+    timeout_seconds=120
+    deadline=$((SECONDS + timeout_seconds))
+
+    while true; do
+      status="$(${dockerBin} inspect --format '{{if .State.Health}}{{.State.Health.Status}}{{else}}none{{end}}' "$container_name" 2>/dev/null || true)"
+
+      case "$status" in
+        healthy)
+          exit 0
+          ;;
+        unhealthy)
+          echo "grafana: container became unhealthy" >&2
+          ${dockerBin} ps --filter "name=^/$container_name$" --format 'table {{.Names}}\t{{.Status}}' >&2 || true
+          exit 1
+          ;;
+        starting|none|"")
+          ;;
+        *)
+          echo "grafana: unexpected health status: $status" >&2
+          ;;
+      esac
+
+      if [ "$SECONDS" -ge "$deadline" ]; then
+        echo "grafana: timed out waiting for a healthy container (''${timeout_seconds}s)" >&2
+        ${dockerBin} ps --filter "name=^/$container_name$" --format 'table {{.Names}}\t{{.Status}}' >&2 || true
+        exit 1
+      fi
+
+      sleep 2
+    done
+  '';
 in {
   options.services.grafanaCompose = {
     enable = lib.mkEnableOption "Grafana service (Docker Compose)";
@@ -76,6 +130,20 @@ in {
     };
 
     tls = lib.mkEnableOption "TLS on the Grafana Traefik router";
+
+    monitoring = {
+      enable = lib.mkOption {
+        type = lib.types.bool;
+        default = true;
+        description = "Enable periodic service/container health checks via systemd timer.";
+      };
+
+      interval = lib.mkOption {
+        type = lib.types.str;
+        default = "5m";
+        description = "How often to run the Grafana healthcheck (for example `5m`).";
+      };
+    };
   };
 
   config = lib.mkIf cfg.enable {
@@ -161,7 +229,29 @@ in {
         ];
 
         ExecStart = "${dockerBin} compose up -d";
+        ExecStartPost = waitForHealthy;
         ExecStop = "${dockerBin} compose down";
+      };
+    };
+
+    systemd.services."${serviceName}-healthcheck" = lib.mkIf cfg.monitoring.enable {
+      description = "Grafana periodic healthcheck";
+      after = ["${serviceName}.service"];
+      requires = ["${serviceName}.service"];
+
+      serviceConfig = {
+        Type = "oneshot";
+        ExecStart = healthcheckScript;
+      };
+    };
+
+    systemd.timers."${serviceName}-healthcheck" = lib.mkIf cfg.monitoring.enable {
+      description = "Run Grafana periodic healthcheck";
+      wantedBy = ["timers.target"];
+      timerConfig = {
+        OnBootSec = "2m";
+        OnUnitActiveSec = cfg.monitoring.interval;
+        Unit = "${serviceName}-healthcheck.service";
       };
     };
   };
