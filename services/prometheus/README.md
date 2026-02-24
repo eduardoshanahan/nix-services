@@ -11,6 +11,16 @@ This module deploys Prometheus behind Traefik using a checked-in Docker Compose 
 - systemd runs `docker compose up -d` / `docker compose down`.
 - Data persists under `services.prometheusCompose.dataDir` (default `/var/lib/prometheus`).
 
+## Default alert rules
+
+The module ships a baseline `homelab-core` rule group:
+
+- `TargetDown`: any scrape target with `up == 0` for 2 minutes.
+- `PrometheusConfigReloadFailed`: config reload failures.
+- `NodeHighCpuUsage`: node CPU usage above 85% for 10 minutes.
+- `NodeLowMemory`: available memory below 10% for 10 minutes.
+- `NodeLowDiskRoot`: root filesystem free space below 15% for 15 minutes.
+
 ## Exposed options
 
 - `services.prometheusCompose.enable`
