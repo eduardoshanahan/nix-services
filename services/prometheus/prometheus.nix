@@ -11,18 +11,36 @@
   hostnameRegex = "^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)(\\.([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?))*$";
   networkRegex = "^[a-zA-Z0-9][a-zA-Z0-9_.-]*$";
 
-  mkTargetLines = targets:
-    lib.concatMapStringsSep "\n" (target: "          - \"${target}\"") targets;
+  mkTargetLines = {
+    targets,
+    indent,
+  }:
+    lib.concatMapStringsSep "\n" (target: "${indent}- \"${target}\"") targets;
 
   optionalJob = {
     name,
     targets,
   }:
     lib.optionalString (targets != []) ''
-      - job_name: "${name}"
-        static_configs:
-          - targets:
-${mkTargetLines targets}
+- job_name: "${name}"
+  static_configs:
+    - targets:
+${mkTargetLines {
+  inherit targets;
+  indent = "      ";
+}}
+    '';
+
+  alertingBlock = targets:
+    lib.optionalString (targets != []) ''
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+${mkTargetLines {
+  inherit targets;
+  indent = "          ";
+}}
     '';
 in {
   options.services.prometheusCompose = {
@@ -165,28 +183,22 @@ in {
       rule_files:
         - /etc/prometheus/alert.rules.yml
 
-      ${lib.optionalString (cfg.alerting.enable && cfg.alerting.targets != []) ''
-        alerting:
-          alertmanagers:
-            - static_configs:
-                - targets:
-      ${mkTargetLines cfg.alerting.targets}
-      ''}
+      ${lib.optionalString cfg.alerting.enable (alertingBlock cfg.alerting.targets)}
 
       scrape_configs:
         - job_name: "prometheus"
           static_configs:
             - targets: ["127.0.0.1:9090"]
 
-      ${optionalJob {
+${optionalJob {
         name = "nodes";
         targets = cfg.scrape.nodeTargets;
       }}
-      ${optionalJob {
+${optionalJob {
         name = "loki";
         targets = cfg.scrape.lokiTargets;
       }}
-      ${optionalJob {
+${optionalJob {
         name = "alertmanager";
         targets = cfg.scrape.alertmanagerTargets;
       }}
