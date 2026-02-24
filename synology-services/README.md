@@ -15,7 +15,6 @@ This directory is intentionally safe for publication:
 - `monitoring/prometheus/alert.rules.yml`
 - `monitoring/alertmanager/alertmanager.yml`
 - `monitoring/grafana.env.example`
-- `gitlab/compose.yaml`
 
 ## Usage
 
