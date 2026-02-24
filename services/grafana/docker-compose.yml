@@ -1,0 +1,40 @@
+services:
+  grafana:
+    image: ${GRAFANA_IMAGE_REPOSITORY}:${GRAFANA_IMAGE_TAG}
+    container_name: ${GRAFANA_CONTAINER_NAME}
+    restart: unless-stopped
+    init: true
+
+    expose:
+      - "3000"
+
+    environment:
+      - TZ
+
+    env_file:
+      - /run/secrets/grafana.env
+
+    volumes:
+      - "${GRAFANA_DATA_DIR}:/var/lib/grafana"
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=${GRAFANA_NETWORK}"
+      - "traefik.http.routers.grafana.rule=Host(`${GRAFANA_HOSTNAME}`)"
+      - "traefik.http.services.grafana.loadbalancer.server.port=3000"
+      - "traefik.http.routers.grafana.entrypoints=${GRAFANA_ENTRYPOINTS}"
+      - "traefik.http.routers.grafana.tls=${GRAFANA_TLS}"
+
+    networks:
+      - traefik
+
+networks:
+  traefik:
+    external: true
+    name: ${GRAFANA_NETWORK}

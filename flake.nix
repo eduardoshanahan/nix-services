@@ -74,6 +74,7 @@
         diagramsNetModule = import ./services/diagrams-net/diagrams-net.nix;
         excalidrawModule = import ./services/excalidraw/excalidraw.nix;
         uptimeKumaModule = import ./services/uptime-kuma/uptime-kuma.nix;
+        grafanaModule = import ./services/grafana/grafana.nix;
         prometheusModule = import ./services/prometheus/prometheus.nix;
         lokiModule = import ./services/loki/loki.nix;
         promtailModule = import ./services/promtail/promtail.nix;
@@ -87,6 +88,7 @@
           diagramsNet = diagramsNetModule;
           excalidraw = excalidrawModule;
           uptimeKuma = uptimeKumaModule;
+          grafana = grafanaModule;
           prometheus = prometheusModule;
           loki = lokiModule;
           promtail = promtailModule;
@@ -100,6 +102,7 @@
           diagramsNet = diagramsNetModule;
           excalidraw = excalidrawModule;
           uptimeKuma = uptimeKumaModule;
+          grafana = grafanaModule;
           prometheus = prometheusModule;
           loki = lokiModule;
           promtail = promtailModule;
