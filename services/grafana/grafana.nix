@@ -12,6 +12,30 @@
   dockerBin = "${config.virtualisation.docker.package}/bin/docker";
   hostnameRegex = "^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)(\\.([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?))*$";
   networkRegex = "^[a-zA-Z0-9][a-zA-Z0-9_.-]*$";
+  backupScript = pkgs.writeShellScript "grafana-backup" ''
+    set -euo pipefail
+
+    src=${lib.escapeShellArg cfg.dataDir}
+    dst=${lib.escapeShellArg cfg.backup.targetDir}
+    keep_days=${toString cfg.backup.keepDays}
+
+    if [[ ! -d "$src" ]]; then
+      echo "grafana-backup: source directory not found: $src" >&2
+      exit 1
+    fi
+
+    install -d -m 0750 "$dst"
+
+    stamp="$(${pkgs.coreutils}/bin/date -u +%Y%m%dT%H%M%SZ)"
+    archive="$dst/grafana-$stamp.tar.zst"
+
+    ${pkgs.gnutar}/bin/tar \
+      --use-compress-program="${pkgs.zstd}/bin/zstd -T0 -19" \
+      -cf "$archive" \
+      -C "$src" .
+
+    ${pkgs.findutils}/bin/find "$dst" -maxdepth 1 -type f -name 'grafana-*.tar.zst' -mtime "+$keep_days" -delete
+  '';
   datasourcesYaml =
     lib.concatStringsSep "\n" (
       [
@@ -298,6 +322,28 @@ in {
       };
     };
 
+    backup = {
+      enable = lib.mkEnableOption "periodic Grafana data backups";
+
+      targetDir = lib.mkOption {
+        type = lib.types.str;
+        default = "/var/backups/grafana";
+        description = "Directory where compressed Grafana backup archives are written.";
+      };
+
+      schedule = lib.mkOption {
+        type = lib.types.str;
+        default = "daily";
+        description = "Systemd OnCalendar expression for Grafana backups.";
+      };
+
+      keepDays = lib.mkOption {
+        type = lib.types.ints.positive;
+        default = 14;
+        description = "How many days of backup archives to keep.";
+      };
+    };
+
     provisioning = {
       enable = lib.mkOption {
         type = lib.types.bool;
@@ -363,6 +409,14 @@ in {
       {
         assertion = cfg.adminPasswordFile != null;
         message = "services.grafanaCompose.adminPasswordFile must be set when enabling Grafana.";
+      }
+      {
+        assertion = lib.hasPrefix "/" cfg.backup.targetDir;
+        message = "services.grafanaCompose.backup.targetDir must be an absolute path.";
+      }
+      {
+        assertion = !cfg.backup.enable || (!lib.hasPrefix "${cfg.dataDir}/" cfg.backup.targetDir && cfg.backup.targetDir != cfg.dataDir);
+        message = "services.grafanaCompose.backup.targetDir must not be inside services.grafanaCompose.dataDir.";
       }
     ];
 
@@ -463,6 +517,27 @@ in {
         OnBootSec = "2m";
         OnUnitActiveSec = cfg.monitoring.interval;
         Unit = "${serviceName}-healthcheck.service";
+      };
+    };
+
+    systemd.services."${serviceName}-backup" = lib.mkIf cfg.backup.enable {
+      description = "Backup Grafana data";
+      after = [ "${serviceName}.service" ];
+      requires = [ "${serviceName}.service" ];
+
+      serviceConfig = {
+        Type = "oneshot";
+        ExecStart = backupScript;
+      };
+    };
+
+    systemd.timers."${serviceName}-backup" = lib.mkIf cfg.backup.enable {
+      description = "Periodic Grafana backup";
+      wantedBy = [ "timers.target" ];
+      timerConfig = {
+        OnCalendar = cfg.backup.schedule;
+        Persistent = true;
+        Unit = "${serviceName}-backup.service";
       };
     };
   };

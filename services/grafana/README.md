@@ -12,6 +12,7 @@ This module deploys Grafana behind Traefik using a checked-in Docker Compose fil
 - systemd runs `docker compose up -d` / `docker compose down` and waits for container health after startup.
 - Data persists under `services.grafanaCompose.dataDir` (default `/var/lib/grafana`).
 - A periodic systemd timer can monitor service and container health.
+- Optional periodic backups can be enabled via `services.grafanaCompose.backup.*`.
 
 ## Exposed options
 
@@ -28,6 +29,10 @@ This module deploys Grafana behind Traefik using a checked-in Docker Compose fil
 - `services.grafanaCompose.tls`
 - `services.grafanaCompose.monitoring.enable`
 - `services.grafanaCompose.monitoring.interval`
+- `services.grafanaCompose.backup.enable`
+- `services.grafanaCompose.backup.targetDir`
+- `services.grafanaCompose.backup.schedule`
+- `services.grafanaCompose.backup.keepDays`
 - `services.grafanaCompose.provisioning.enable`
 - `services.grafanaCompose.provisioning.datasources.prometheus.url`
 - `services.grafanaCompose.provisioning.datasources.loki.url`
@@ -55,6 +60,13 @@ services.grafanaCompose = {
     interval = "5m";
   };
 
+  backup = {
+    enable = true;
+    targetDir = "/var/backups/grafana";
+    schedule = "daily";
+    keepDays = 14;
+  };
+
   provisioning = {
     enable = true;
     datasources = {
@@ -70,6 +82,11 @@ services.grafanaCompose = {
 
 - Service: `grafana-healthcheck.service`
 - Timer: `grafana-healthcheck.timer`
+
+## Backup units
+
+- Service: `grafana-backup.service`
+- Timer: `grafana-backup.timer`
 
 ## Admin Password Behavior
 
