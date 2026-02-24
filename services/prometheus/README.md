@@ -20,6 +20,7 @@ The module ships a baseline `homelab-core` rule group:
 - `NodeHighCpuUsage`: node CPU usage above 85% for 10 minutes.
 - `NodeLowMemory`: available memory below 10% for 10 minutes.
 - `NodeLowDiskRoot`: root filesystem free space below 15% for 15 minutes.
+- `TraefikHigh5xxRate`: sustained Traefik 5xx responses above 0.1/sec for 10 minutes.
 
 ## Exposed options
 
@@ -35,7 +36,9 @@ The module ships a baseline `homelab-core` rule group:
 - `services.prometheusCompose.image.allowMutableTag`
 - `services.prometheusCompose.scrape.nodeTargets`
 - `services.prometheusCompose.scrape.lokiTargets`
+- `services.prometheusCompose.scrape.traefikTargets`
 - `services.prometheusCompose.scrape.promtailTargets`
+- `services.prometheusCompose.scrape.piholeExporterTargets`
 - `services.prometheusCompose.scrape.alertmanagerTargets`
 - `services.prometheusCompose.alerting.enable`
 - `services.prometheusCompose.alerting.targets`
@@ -64,10 +67,18 @@ services.prometheusCompose = {
       "rpi-box-03.hhlab.home.arpa:9100"
     ];
     lokiTargets = [ "loki.hhlab.home.arpa:3100" ];
+    traefikTargets = [
+      "rpi-box-01-metrics.hhlab.home.arpa:8082"
+      "rpi-box-02-metrics.hhlab.home.arpa:8082"
+      "rpi-box-03-metrics.hhlab.home.arpa:8082"
+    ];
     promtailTargets = [
       "rpi-box-01.hhlab.home.arpa:9080"
       "rpi-box-02.hhlab.home.arpa:9080"
       "rpi-box-03.hhlab.home.arpa:9080"
+    ];
+    piholeExporterTargets = [
+      "rpi-box-01-metrics.hhlab.home.arpa:9617"
     ];
   };
 

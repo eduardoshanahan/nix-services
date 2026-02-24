@@ -77,8 +77,16 @@
         targets = cfg.scrape.lokiTargets;
       })
       ++ (optionalJobLines {
+        name = "traefik";
+        targets = cfg.scrape.traefikTargets;
+      })
+      ++ (optionalJobLines {
         name = "promtail";
         targets = cfg.scrape.promtailTargets;
+      })
+      ++ (optionalJobLines {
+        name = "pihole-exporter";
+        targets = cfg.scrape.piholeExporterTargets;
       })
       ++ (optionalJobLines {
         name = "alertmanager";
@@ -136,6 +144,15 @@
       "        annotations:"
       "          summary: \"Low root disk space on {{ $labels.instance }}\""
       "          description: \"Root filesystem free space is below 15% for 15 minutes.\""
+      ""
+      "      - alert: TraefikHigh5xxRate"
+      "        expr: sum by (instance) (rate(traefik_service_requests_total{code=~\"5..\"}[5m])) > 0.1"
+      "        for: 10m"
+      "        labels:"
+      "          severity: warning"
+      "        annotations:"
+      "          summary: \"Traefik high 5xx rate on {{ $labels.instance }}\""
+      "          description: \"Traefik is returning more than 0.1 5xx responses/second for 10 minutes.\""
     ]
     + "\n";
 in {
@@ -215,11 +232,25 @@ in {
         description = "Loki targets (`host:port`) to scrape.";
       };
 
+      traefikTargets = lib.mkOption {
+        type = lib.types.listOf lib.types.str;
+        default = [];
+        example = [ "rpi-box-01-metrics.hhlab.home.arpa:8082" "rpi-box-02-metrics.hhlab.home.arpa:8082" ];
+        description = "Traefik metrics targets (`host:port`) to scrape.";
+      };
+
       promtailTargets = lib.mkOption {
         type = lib.types.listOf lib.types.str;
         default = [];
         example = [ "rpi-box-01.hhlab.home.arpa:9080" "rpi-box-02.hhlab.home.arpa:9080" ];
         description = "Promtail targets (`host:port`) to scrape.";
+      };
+
+      piholeExporterTargets = lib.mkOption {
+        type = lib.types.listOf lib.types.str;
+        default = [];
+        example = [ "rpi-box-01-metrics.hhlab.home.arpa:9617" ];
+        description = "Pi-hole exporter targets (`host:port`) to scrape.";
       };
 
       alertmanagerTargets = lib.mkOption {
