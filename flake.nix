@@ -69,6 +69,7 @@
       let
         traefikModule = import ./services/traefik/traefik.nix;
         piholeModule = import ./services/pihole/pihole.nix;
+        alertmanagerModule = import ./services/alertmanager/alertmanager.nix;
         diagramsNetModule = import ./services/diagrams-net/diagrams-net.nix;
         excalidrawModule = import ./services/excalidraw/excalidraw.nix;
         uptimeKumaModule = import ./services/uptime-kuma/uptime-kuma.nix;
@@ -79,6 +80,7 @@
         nixosModules = {
           traefik = traefikModule;
           pihole = piholeModule;
+          alertmanager = alertmanagerModule;
           diagramsNet = diagramsNetModule;
           excalidraw = excalidrawModule;
           uptimeKuma = uptimeKumaModule;
@@ -89,6 +91,7 @@
         services = {
           traefik = traefikModule;
           pihole = piholeModule;
+          alertmanager = alertmanagerModule;
           diagramsNet = diagramsNetModule;
           excalidraw = excalidrawModule;
           uptimeKuma = uptimeKumaModule;
