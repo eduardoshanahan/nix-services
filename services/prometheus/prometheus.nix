@@ -85,6 +85,10 @@
         targets = cfg.scrape.promtailTargets;
       })
       ++ (optionalJobLines {
+        name = "grafana";
+        targets = cfg.scrape.grafanaTargets;
+      })
+      ++ (optionalJobLines {
         name = "pihole-exporter";
         targets = cfg.scrape.piholeExporterTargets;
       })
@@ -251,6 +255,13 @@ in {
         default = [];
         example = [ "rpi-box-01-metrics.hhlab.home.arpa:9617" ];
         description = "Pi-hole exporter targets (`host:port`) to scrape.";
+      };
+
+      grafanaTargets = lib.mkOption {
+        type = lib.types.listOf lib.types.str;
+        default = [];
+        example = [ "grafana:3000" ];
+        description = "Grafana metrics targets (`host:port`) to scrape.";
       };
 
       alertmanagerTargets = lib.mkOption {

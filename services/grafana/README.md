@@ -8,6 +8,7 @@ This module deploys Grafana behind Traefik using a checked-in Docker Compose fil
 - NixOS injects runtime environment variables (container name, image/tag, network, hostname, TLS mode, timezone, data path).
 - Grafana admin password is injected at runtime from `services.grafanaCompose.adminPasswordFile` into `/run/secrets/grafana.env`.
 - Grafana provisioning files are generated declaratively under `/etc/grafana/provisioning` (datasources + dashboard provider + optional starter dashboard).
+- Grafana self-metrics are enabled (`/metrics`) for Prometheus scraping.
 - systemd runs `docker compose up -d` / `docker compose down` and waits for container health after startup.
 - Data persists under `services.grafanaCompose.dataDir` (default `/var/lib/grafana`).
 - A periodic systemd timer can monitor service and container health.
@@ -69,3 +70,16 @@ services.grafanaCompose = {
 
 - Service: `grafana-healthcheck.service`
 - Timer: `grafana-healthcheck.timer`
+
+## Admin Password Behavior
+
+- `GF_SECURITY_ADMIN_PASSWORD` is used for initial admin creation on first startup
+  (fresh `/var/lib/grafana`).
+- On an existing Grafana database, changing the secret file does not
+  automatically rotate the admin password.
+- To rotate without recreating data, reset it explicitly:
+
+```bash
+pw="$(docker exec grafana printenv GF_SECURITY_ADMIN_PASSWORD)"
+docker exec grafana grafana cli admin reset-admin-password "$pw"
+```

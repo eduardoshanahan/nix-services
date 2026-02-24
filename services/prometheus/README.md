@@ -39,6 +39,7 @@ The module ships a baseline `homelab-core` rule group:
 - `services.prometheusCompose.scrape.traefikTargets`
 - `services.prometheusCompose.scrape.promtailTargets`
 - `services.prometheusCompose.scrape.piholeExporterTargets`
+- `services.prometheusCompose.scrape.grafanaTargets`
 - `services.prometheusCompose.scrape.alertmanagerTargets`
 - `services.prometheusCompose.alerting.enable`
 - `services.prometheusCompose.alerting.targets`
@@ -76,6 +77,9 @@ services.prometheusCompose = {
       "rpi-box-01.hhlab.home.arpa:9080"
       "rpi-box-02.hhlab.home.arpa:9080"
       "rpi-box-03.hhlab.home.arpa:9080"
+    ];
+    grafanaTargets = [
+      "grafana:3000"
     ];
     piholeExporterTargets = [
       "rpi-box-01-metrics.hhlab.home.arpa:9617"

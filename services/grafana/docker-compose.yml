@@ -10,6 +10,8 @@ services:
 
     environment:
       - TZ
+      - GF_METRICS_ENABLED=true
+      - GF_METRICS_DISABLE_TOTAL_STATS=false
 
     env_file:
       - /run/secrets/grafana.env
