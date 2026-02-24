@@ -15,33 +15,73 @@
     targets,
     indent,
   }:
-    lib.concatMapStringsSep "\n" (target: "${indent}- \"${target}\"") targets;
+    map (target: "${indent}- \"${target}\"") targets;
 
-  optionalJob = {
+  optionalJobLines = {
     name,
     targets,
   }:
-    lib.optionalString (targets != []) ''
-- job_name: "${name}"
-  static_configs:
-    - targets:
-${mkTargetLines {
-  inherit targets;
-  indent = "      ";
-}}
-    '';
+    lib.optionals (targets != []) (
+      [
+        "- job_name: \"${name}\""
+        "  static_configs:"
+        "    - targets:"
+      ]
+      ++ (mkTargetLines {
+        inherit targets;
+        indent = "      ";
+      })
+      ++ [""]
+    );
 
-  alertingBlock = targets:
-    lib.optionalString (targets != []) ''
-alerting:
-  alertmanagers:
-    - static_configs:
-        - targets:
-${mkTargetLines {
-  inherit targets;
-  indent = "          ";
-}}
-    '';
+  alertingLines = targets:
+    lib.optionals (targets != []) (
+      [
+        "alerting:"
+        "  alertmanagers:"
+        "    - static_configs:"
+        "        - targets:"
+      ]
+      ++ (mkTargetLines {
+        inherit targets;
+        indent = "          ";
+      })
+      ++ [""]
+    );
+
+  prometheusConfigText =
+    lib.concatStringsSep "\n" (
+      [
+        "global:"
+        "  scrape_interval: 15s"
+        "  evaluation_interval: 15s"
+        ""
+        "rule_files:"
+        "  - /etc/prometheus/alert.rules.yml"
+        ""
+      ]
+      ++ lib.optionals cfg.alerting.enable (alertingLines cfg.alerting.targets)
+      ++ [
+        "scrape_configs:"
+        "  - job_name: \"prometheus\""
+        "    static_configs:"
+        "      - targets: [\"127.0.0.1:9090\"]"
+        ""
+      ]
+      ++ (optionalJobLines {
+        name = "nodes";
+        targets = cfg.scrape.nodeTargets;
+      })
+      ++ (optionalJobLines {
+        name = "loki";
+        targets = cfg.scrape.lokiTargets;
+      })
+      ++ (optionalJobLines {
+        name = "alertmanager";
+        targets = cfg.scrape.alertmanagerTargets;
+      })
+    )
+    + "\n";
 in {
   options.services.prometheusCompose = {
     enable = lib.mkEnableOption "Prometheus service (Docker Compose)";
@@ -175,34 +215,7 @@ in {
 
     environment.etc."${serviceName}/docker-compose.yml".source = ./docker-compose.yml;
 
-    environment.etc."${serviceName}/prometheus.yml".text = ''
-      global:
-        scrape_interval: 15s
-        evaluation_interval: 15s
-
-      rule_files:
-        - /etc/prometheus/alert.rules.yml
-
-      ${lib.optionalString cfg.alerting.enable (alertingBlock cfg.alerting.targets)}
-
-      scrape_configs:
-        - job_name: "prometheus"
-          static_configs:
-            - targets: ["127.0.0.1:9090"]
-
-${optionalJob {
-        name = "nodes";
-        targets = cfg.scrape.nodeTargets;
-      }}
-${optionalJob {
-        name = "loki";
-        targets = cfg.scrape.lokiTargets;
-      }}
-${optionalJob {
-        name = "alertmanager";
-        targets = cfg.scrape.alertmanagerTargets;
-      }}
-    '';
+    environment.etc."${serviceName}/prometheus.yml".text = prometheusConfigText;
 
     environment.etc."${serviceName}/alert.rules.yml".text = ''
       groups: []
