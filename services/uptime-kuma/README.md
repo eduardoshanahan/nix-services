@@ -39,3 +39,12 @@ services.uptimeKuma = {
   tls = true;
 };
 ```
+
+## Monitoring note (internal TLS)
+
+When Uptime Kuma itself monitors internal HTTPS services using a private CA or
+self-signed certificates, monitor checks can fail with certificate verification
+errors.
+
+In that case, set `ignoreTls = true` in the monitor definition in the Kuma UI
+for affected monitors, or ensure the container trusts your internal CA.
