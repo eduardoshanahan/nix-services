@@ -17,6 +17,13 @@ services:
     volumes:
       - "${GRAFANA_DATA_DIR}:/var/lib/grafana"
 
+    healthcheck:
+      test: ["CMD-SHELL", "wget --spider -q http://127.0.0.1:3000/api/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 8
+      start_period: 30s
+
     logging:
       driver: "json-file"
       options:
