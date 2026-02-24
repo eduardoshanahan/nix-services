@@ -82,6 +82,58 @@
       })
     )
     + "\n";
+
+  alertRulesText =
+    lib.concatStringsSep "\n" [
+      "groups:"
+      "  - name: homelab-core"
+      "    rules:"
+      "      - alert: TargetDown"
+      "        expr: up == 0"
+      "        for: 2m"
+      "        labels:"
+      "          severity: critical"
+      "        annotations:"
+      "          summary: \"Target down ({{ $labels.job }})\""
+      "          description: \"Scrape target {{ $labels.instance }} has been down for more than 2 minutes.\""
+      ""
+      "      - alert: PrometheusConfigReloadFailed"
+      "        expr: prometheus_config_last_reload_successful == 0"
+      "        for: 5m"
+      "        labels:"
+      "          severity: warning"
+      "        annotations:"
+      "          summary: \"Prometheus config reload failed\""
+      "          description: \"Prometheus failed to reload its configuration on {{ $labels.instance }}.\""
+      ""
+      "      - alert: NodeHighCpuUsage"
+      "        expr: (100 - (avg by (instance) (rate(node_cpu_seconds_total{mode=\"idle\"}[5m])) * 100)) > 85"
+      "        for: 10m"
+      "        labels:"
+      "          severity: warning"
+      "        annotations:"
+      "          summary: \"High CPU usage on {{ $labels.instance }}\""
+      "          description: \"CPU usage has been above 85% for 10 minutes.\""
+      ""
+      "      - alert: NodeLowMemory"
+      "        expr: ((node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) * 100) < 10"
+      "        for: 10m"
+      "        labels:"
+      "          severity: warning"
+      "        annotations:"
+      "          summary: \"Low memory on {{ $labels.instance }}\""
+      "          description: \"Available memory is below 10% for 10 minutes.\""
+      ""
+      "      - alert: NodeLowDiskRoot"
+      "        expr: ((node_filesystem_avail_bytes{mountpoint=\"/\",fstype!~\"tmpfs|overlay\"} / node_filesystem_size_bytes{mountpoint=\"/\",fstype!~\"tmpfs|overlay\"}) * 100) < 15"
+      "        for: 15m"
+      "        labels:"
+      "          severity: warning"
+      "        annotations:"
+      "          summary: \"Low root disk space on {{ $labels.instance }}\""
+      "          description: \"Root filesystem free space is below 15% for 15 minutes.\""
+    ]
+    + "\n";
 in {
   options.services.prometheusCompose = {
     enable = lib.mkEnableOption "Prometheus service (Docker Compose)";
@@ -217,9 +269,7 @@ in {
 
     environment.etc."${serviceName}/prometheus.yml".text = prometheusConfigText;
 
-    environment.etc."${serviceName}/alert.rules.yml".text = ''
-      groups: []
-    '';
+    environment.etc."${serviceName}/alert.rules.yml".text = alertRulesText;
 
     systemd.services.${serviceName} = {
       description = "Prometheus (Docker Compose)";
