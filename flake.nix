@@ -69,6 +69,7 @@
       let
         traefikModule = import ./services/traefik/traefik.nix;
         piholeModule = import ./services/pihole/pihole.nix;
+        piholeExporterModule = import ./services/pihole-exporter/pihole-exporter.nix;
         alertmanagerModule = import ./services/alertmanager/alertmanager.nix;
         diagramsNetModule = import ./services/diagrams-net/diagrams-net.nix;
         excalidrawModule = import ./services/excalidraw/excalidraw.nix;
@@ -81,6 +82,7 @@
         nixosModules = {
           traefik = traefikModule;
           pihole = piholeModule;
+          piholeExporter = piholeExporterModule;
           alertmanager = alertmanagerModule;
           diagramsNet = diagramsNetModule;
           excalidraw = excalidrawModule;
@@ -93,6 +95,7 @@
         services = {
           traefik = traefikModule;
           pihole = piholeModule;
+          piholeExporter = piholeExporterModule;
           alertmanager = alertmanagerModule;
           diagramsNet = diagramsNetModule;
           excalidraw = excalidrawModule;

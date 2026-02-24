@@ -12,8 +12,16 @@
   dockerBin = "${config.virtualisation.docker.package}/bin/docker";
   tlsEnabled = cfg.tls.enable;
   httpToHttpsRedirectEnabled = cfg.httpToHttpsRedirect;
+  metricsEnabled = cfg.metrics.enable;
   redirectEntryPointFlags = lib.optionalString httpToHttpsRedirectEnabled
     "\n            - \"--entryPoints.web.http.redirections.entryPoint.to=websecure\"\n            - \"--entryPoints.web.http.redirections.entryPoint.scheme=https\"\n            - \"--entryPoints.web.http.redirections.entryPoint.permanent=true\"";
+  metricsFlags = lib.optionalString metricsEnabled ''
+            - "--entryPoints.metrics.address=:${toString cfg.metrics.port}"
+            - "--metrics.prometheus=true"
+            - "--metrics.prometheus.entryPoint=metrics"
+            - "--metrics.prometheus.addEntryPointsLabels=true"
+            - "--metrics.prometheus.addRoutersLabels=true"
+            - "--metrics.prometheus.addServicesLabels=true"'';
   tlsCertFile =
     if cfg.tls.certFile == null
     then ""
@@ -94,6 +102,16 @@ in {
     };
 
     httpToHttpsRedirect = lib.mkEnableOption "global HTTP to HTTPS redirection on Traefik entrypoint `web`";
+
+    metrics = {
+      enable = lib.mkEnableOption "Prometheus metrics endpoint on Traefik";
+
+      port = lib.mkOption {
+        type = lib.types.port;
+        default = 8082;
+        description = "Host/container TCP port used by Traefik Prometheus metrics entrypoint.";
+      };
+    };
   };
 
   config = {
@@ -139,10 +157,12 @@ in {
             - "--entryPoints.web.address=:80"
             - "--entryPoints.websecure.address=:443"
 ${redirectEntryPointFlags}
+${metricsFlags}
 
           ports:
             - "80:80"
             - "443:443"
+${lib.optionalString metricsEnabled "            - \"${toString cfg.metrics.port}:${toString cfg.metrics.port}\""}
 
           volumes:
             - "/var/run/docker.sock:/var/run/docker.sock:ro"

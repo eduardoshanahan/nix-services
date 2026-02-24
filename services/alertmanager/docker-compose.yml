@@ -16,7 +16,7 @@ services:
       - TZ
 
     volumes:
-      - "/etc/alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro"
+      - "${ALERTMANAGER_CONFIG_FILE}:/etc/alertmanager/alertmanager.yml:ro"
       - "${ALERTMANAGER_DATA_DIR}:/alertmanager"
 
     logging:
