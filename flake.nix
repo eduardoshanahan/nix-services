@@ -71,6 +71,7 @@
         piholeModule = import ./services/pihole/pihole.nix;
         diagramsNetModule = import ./services/diagrams-net/diagrams-net.nix;
         excalidrawModule = import ./services/excalidraw/excalidraw.nix;
+        uptimeKumaModule = import ./services/uptime-kuma/uptime-kuma.nix;
         lokiModule = import ./services/loki/loki.nix;
         promtailModule = import ./services/promtail/promtail.nix;
       in
@@ -80,6 +81,7 @@
           pihole = piholeModule;
           diagramsNet = diagramsNetModule;
           excalidraw = excalidrawModule;
+          uptimeKuma = uptimeKumaModule;
           loki = lokiModule;
           promtail = promtailModule;
         };
@@ -89,6 +91,7 @@
           pihole = piholeModule;
           diagramsNet = diagramsNetModule;
           excalidraw = excalidrawModule;
+          uptimeKuma = uptimeKumaModule;
           loki = lokiModule;
           promtail = promtailModule;
         };

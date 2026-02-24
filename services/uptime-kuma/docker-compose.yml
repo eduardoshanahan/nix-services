@@ -1,0 +1,44 @@
+services:
+  uptime-kuma:
+    image: ${UPTIME_KUMA_IMAGE_REPOSITORY}:${UPTIME_KUMA_IMAGE_TAG}
+    container_name: ${UPTIME_KUMA_CONTAINER_NAME}
+    restart: unless-stopped
+    init: true
+
+    expose:
+      - "3001"
+
+    environment:
+      - TZ
+
+    volumes:
+      - "${UPTIME_KUMA_DATA_DIR}:/app/data"
+
+    healthcheck:
+      test: ["CMD-SHELL", "wget --spider -q http://127.0.0.1:3001/ || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 8
+      start_period: 20s
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=${UPTIME_KUMA_NETWORK}"
+      - "traefik.http.routers.uptime-kuma.rule=Host(`${UPTIME_KUMA_HOSTNAME}`)"
+      - "traefik.http.services.uptime-kuma.loadbalancer.server.port=3001"
+      - "traefik.http.routers.uptime-kuma.entrypoints=${UPTIME_KUMA_ENTRYPOINTS}"
+      - "traefik.http.routers.uptime-kuma.tls=${UPTIME_KUMA_TLS}"
+
+    networks:
+      - traefik
+
+networks:
+  traefik:
+    external: true
+    name: ${UPTIME_KUMA_NETWORK}
