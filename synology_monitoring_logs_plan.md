@@ -147,12 +147,12 @@ rule_files:
 alerting:
   alertmanagers:
     - static_configs:
-        - targets: ["alertmanager:9093"]
+        - targets: ["127.0.0.1:9093"]
 
 scrape_configs:
   - job_name: "prometheus"
     static_configs:
-      - targets: ["prometheus:9090"]
+      - targets: ["127.0.0.1:9090"]
 
   - job_name: "nodes"
     static_configs:
@@ -243,6 +243,7 @@ The following were created on Synology under `/volume1/docker/homelab`:
 - `monitoring/prometheus/alert.rules.yml`
 - `monitoring/alertmanager/alertmanager.yml`
 - `monitoring/grafana.env`
+- Prometheus runs with `network_mode: host` to avoid Synology container DNS resolution issues for LAN FQDN scrape targets.
 
 ### Git-tracked template copy
 

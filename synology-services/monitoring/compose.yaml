@@ -7,13 +7,10 @@ services:
       - --config.file=/etc/prometheus/prometheus.yml
       - --storage.tsdb.path=/prometheus
       - --storage.tsdb.retention.time=30d
-    ports:
-      - "127.0.0.1:9090:9090"
+    network_mode: host
     volumes:
       - ./prometheus:/etc/prometheus:ro
       - ./prometheus-data:/prometheus
-    networks:
-      - internal
 
   alertmanager:
     image: prom/alertmanager:v0.27.0
