@@ -18,7 +18,7 @@
     set -euo pipefail
     umask 0077
 
-    mkdir -p /run/alertmanager
+    install -d -m 0755 /run/alertmanager
     cp ${composeDir}/alertmanager.yml.tmpl /run/alertmanager/alertmanager.yml
 
     escape_sed() {
