@@ -35,6 +35,7 @@ The module ships a baseline `homelab-core` rule group:
 - `services.prometheusCompose.image.allowMutableTag`
 - `services.prometheusCompose.scrape.nodeTargets`
 - `services.prometheusCompose.scrape.lokiTargets`
+- `services.prometheusCompose.scrape.promtailTargets`
 - `services.prometheusCompose.scrape.alertmanagerTargets`
 - `services.prometheusCompose.alerting.enable`
 - `services.prometheusCompose.alerting.targets`
@@ -63,6 +64,11 @@ services.prometheusCompose = {
       "rpi-box-03.<homelab-domain>:9100"
     ];
     lokiTargets = [ "loki.<homelab-domain>:3100" ];
+    promtailTargets = [
+      "rpi-box-01.<homelab-domain>:9080"
+      "rpi-box-02.<homelab-domain>:9080"
+      "rpi-box-03.<homelab-domain>:9080"
+    ];
   };
 
   tls = true;
