@@ -56,4 +56,5 @@ services:
 
 networks:
   internal:
+    external: true
     name: monitoring-internal
