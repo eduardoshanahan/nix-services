@@ -77,6 +77,10 @@
         targets = cfg.scrape.lokiTargets;
       })
       ++ (optionalJobLines {
+        name = "promtail";
+        targets = cfg.scrape.promtailTargets;
+      })
+      ++ (optionalJobLines {
         name = "alertmanager";
         targets = cfg.scrape.alertmanagerTargets;
       })
@@ -209,6 +213,13 @@ in {
         default = [];
         example = [ "loki.hhlab.home.arpa:3100" ];
         description = "Loki targets (`host:port`) to scrape.";
+      };
+
+      promtailTargets = lib.mkOption {
+        type = lib.types.listOf lib.types.str;
+        default = [];
+        example = [ "rpi-box-01.hhlab.home.arpa:9080" "rpi-box-02.hhlab.home.arpa:9080" ];
+        description = "Promtail targets (`host:port`) to scrape.";
       };
 
       alertmanagerTargets = lib.mkOption {
