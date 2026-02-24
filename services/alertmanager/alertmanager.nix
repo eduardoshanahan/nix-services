@@ -43,7 +43,7 @@
       sed -i "s/__TELEGRAM_BOT_TOKEN__/$(escape_sed "$telegram_token")/g" /run/alertmanager/alertmanager.yml
     ''}
 
-    chmod 0600 /run/alertmanager/alertmanager.yml
+    chmod 0644 /run/alertmanager/alertmanager.yml
   '';
 
   alertmanagerConfigTemplate = ''
