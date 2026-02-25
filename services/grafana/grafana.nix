@@ -560,6 +560,55 @@
           }
         ];
       }
+      {
+        id = 9;
+        type = "timeseries";
+        title = "Pi Storage Used % (rpi-box-02/03)";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 0;
+          y = 32;
+        };
+        targets = [
+          {
+            expr = "100 * (1 - (node_filesystem_avail_bytes{instance=~\"rpi-box-0[23].*\",mountpoint=\"/\",fstype!~\"tmpfs|overlay\"} / node_filesystem_size_bytes{instance=~\"rpi-box-0[23].*\",mountpoint=\"/\",fstype!~\"tmpfs|overlay\"}))";
+            legendFormat = "{{instance}} /";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 10;
+        type = "timeseries";
+        title = "Pi Disk IO by Device (rpi-box-02/03)";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 12;
+          y = 32;
+        };
+        targets = [
+          {
+            expr = "sum by (instance, device) (rate(node_disk_read_bytes_total{instance=~\"rpi-box-0[23].*\",device!~\"loop.*|ram.*|zram.*|dm-.*|md.*\"}[5m]))";
+            legendFormat = "{{instance}} {{device}} read";
+            refId = "A";
+          }
+          {
+            expr = "sum by (instance, device) (rate(node_disk_written_bytes_total{instance=~\"rpi-box-0[23].*\",device!~\"loop.*|ram.*|zram.*|dm-.*|md.*\"}[5m]))";
+            legendFormat = "{{instance}} {{device}} write";
+            refId = "B";
+          }
+        ];
+      }
     ];
   };
   dnsEdgeDashboardJson = builtins.toJSON {
