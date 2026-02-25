@@ -957,7 +957,7 @@
       {
         id = 7;
         type = "timeseries";
-        title = "NAS Temperature C (hwmon)";
+        title = "NAS Temperature C";
         datasource = {
           type = "prometheus";
           uid = "prometheus";
@@ -971,8 +971,18 @@
         targets = [
           {
             expr = "max by (instance) (node_hwmon_temp_celsius{job=\"synology-nodes\"})";
-            legendFormat = "{{instance}}";
+            legendFormat = "{{instance}} hwmon";
             refId = "A";
+          }
+          {
+            expr = "max by (instance) (temperature{job=\"synology-snmp\"})";
+            legendFormat = "{{instance}} system";
+            refId = "B";
+          }
+          {
+            expr = "max by (instance) (diskTemperature{job=\"synology-snmp\"})";
+            legendFormat = "{{instance}} disk";
+            refId = "C";
           }
         ];
       }
