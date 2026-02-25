@@ -963,12 +963,12 @@
             refId = "B";
           }
           {
-            expr = "sum by (instance) (rate(ifHCInOctets{job=\"synology-snmp-network\",instance=~\"nas2\\\\..*\",ifName=\"eth0\"}[5m]))";
+            expr = "sum by (instance) (rate(ifHCInOctets{job=\"synology-snmp-network\",instance=~\"nas2\\\\..*\",ifName!~\"lo|sit0\"}[5m]))";
             legendFormat = "{{instance}} rx (snmp)";
             refId = "C";
           }
           {
-            expr = "sum by (instance) (rate(ifHCOutOctets{job=\"synology-snmp-network\",instance=~\"nas2\\\\..*\",ifName=\"eth0\"}[5m]))";
+            expr = "sum by (instance) (rate(ifHCOutOctets{job=\"synology-snmp-network\",instance=~\"nas2\\\\..*\",ifName!~\"lo|sit0\"}[5m]))";
             legendFormat = "{{instance}} tx (snmp)";
             refId = "D";
           }
