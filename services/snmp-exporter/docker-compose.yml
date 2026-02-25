@@ -9,4 +9,4 @@ services:
     ports:
       - "${SNMP_EXPORTER_LISTEN_ADDRESS}:${SNMP_EXPORTER_LISTEN_PORT}:9116"
     volumes:
-      - "/etc/snmp-exporter/snmp.yml:/etc/snmp_exporter/snmp.yml:ro"
+      - "${SNMP_EXPORTER_CONFIG_FILE}:/etc/snmp_exporter/snmp.yml:ro"

@@ -9,10 +9,6 @@
   composeDir = "/etc/${serviceName}";
   dockerBin = "${config.virtualisation.docker.package}/bin/docker";
   portType = lib.types.ints.between 1 65535;
-  snmpConfigText = builtins.replaceStrings
-    [ "community: public" ]
-    [ "community: ${cfg.snmpV2Community}" ]
-    (builtins.readFile "${pkgs.prometheus-snmp-exporter}/etc/snmp_exporter/snmp.yml");
 in {
   options.services.snmpExporterCompose = {
     enable = lib.mkEnableOption "Prometheus SNMP exporter (Docker Compose)";
@@ -50,6 +46,13 @@ in {
         `public_v1` and `public_v2`.
       '';
       example = "7fjeuibngymx";
+    };
+
+    configFile = lib.mkOption {
+      type = lib.types.str;
+      default = "/var/lib/snmp-exporter/snmp.yml";
+      description = "Writable host path for rendered SNMP exporter config file.";
+      example = "/var/lib/snmp-exporter/snmp.yml";
     };
 
     image = {
@@ -94,12 +97,15 @@ in {
         assertion = builtins.match "^[^[:space:]]+$" cfg.snmpV2Community != null;
         message = "services.snmpExporterCompose.snmpV2Community must not contain whitespace.";
       }
+      {
+        assertion = lib.hasPrefix "/" cfg.configFile;
+        message = "services.snmpExporterCompose.configFile must be an absolute path.";
+      }
     ];
 
     virtualisation.docker.enable = true;
 
     environment.etc."${serviceName}/docker-compose.yml".source = ./docker-compose.yml;
-    environment.etc."${serviceName}/snmp.yml".text = snmpConfigText;
 
     systemd.services.${serviceName} = {
       description = "Prometheus SNMP exporter (Docker Compose)";
@@ -108,7 +114,6 @@ in {
       wants = [ "network-online.target" ];
       restartTriggers = [
         config.environment.etc."${serviceName}/docker-compose.yml".source
-        config.environment.etc."${serviceName}/snmp.yml".source
       ];
 
       serviceConfig = {
@@ -122,14 +127,18 @@ in {
           "SNMP_EXPORTER_LISTEN_ADDRESS=${cfg.listenAddress}"
           "SNMP_EXPORTER_LISTEN_PORT=${toString cfg.listenPort}"
           "SNMP_EXPORTER_LOG_LEVEL=${cfg.logLevel}"
+          "SNMP_EXPORTER_CONFIG_FILE=${cfg.configFile}"
           "SNMP_EXPORTER_IMAGE_REPOSITORY=${cfg.image.repository}"
           "SNMP_EXPORTER_IMAGE_TAG=${cfg.image.tag}"
         ];
 
         ExecStartPre = [
           "${pkgs.runtimeShell} -c 'test -s ${composeDir}/docker-compose.yml'"
-          "${pkgs.runtimeShell} -c 'test -s ${composeDir}/snmp.yml'"
           "${pkgs.runtimeShell} -c 'for i in $(seq 1 30); do ${dockerBin} info >/dev/null 2>&1 && exit 0; sleep 1; done; echo \"snmp-exporter: docker daemon is not ready\" >&2; exit 1'"
+          "${pkgs.runtimeShell} -c 'mkdir -p \"$(dirname ${cfg.configFile})\"'"
+          "${pkgs.runtimeShell} -c '${dockerBin} run --rm --entrypoint cat ${cfg.image.repository}:${cfg.image.tag} /etc/snmp_exporter/snmp.yml > ${cfg.configFile}.tmp'"
+          "${pkgs.runtimeShell} -c '${pkgs.gnused}/bin/sed -i \"s/community: public/community: ${cfg.snmpV2Community}/g\" ${cfg.configFile}.tmp && mv ${cfg.configFile}.tmp ${cfg.configFile}'"
+          "${pkgs.runtimeShell} -c 'test -s ${cfg.configFile}'"
           "${pkgs.runtimeShell} -c '${dockerBin} compose config >/dev/null'"
         ];
 

@@ -17,6 +17,7 @@ Prometheus SNMP exporter for scraping network devices (for example Synology NAS)
 - `services.snmpExporterCompose.listenPort`
 - `services.snmpExporterCompose.logLevel`
 - `services.snmpExporterCompose.snmpV2Community`
+- `services.snmpExporterCompose.configFile`
 - `services.snmpExporterCompose.image.repository`
 - `services.snmpExporterCompose.image.tag`
 - `services.snmpExporterCompose.image.allowMutableTag`
@@ -29,5 +30,6 @@ services.snmpExporterCompose = {
   listenAddress = "0.0.0.0";
   listenPort = 9116;
   snmpV2Community = "7fjeuibngymx";
+  configFile = "/var/lib/snmp-exporter/snmp.yml";
 };
 ```
