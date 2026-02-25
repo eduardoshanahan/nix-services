@@ -203,8 +203,8 @@
         };
         targets = [
           {
-            expr = "sum(rate(traefik_service_requests_total{code=~\"5..\"}[5m])) by (code)";
-            legendFormat = "{{code}}";
+            expr = "sum(rate(traefik_service_requests_total{code=~\"5..\"}[5m])) by (instance, code)";
+            legendFormat = "{{instance}} {{code}}";
             refId = "A";
           }
         ];
