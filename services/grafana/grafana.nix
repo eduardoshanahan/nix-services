@@ -1673,6 +1673,43 @@
           }
         ];
       }
+      {
+        id = 12;
+        type = "timeseries";
+        title = "GitHub Profile Stats";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 24;
+          x = 0;
+          y = 21;
+        };
+        targets = [
+          {
+            expr = "max by (username) (github_profile_followers{job=\"github-profile\"})";
+            legendFormat = "{{username}} followers";
+            refId = "A";
+          }
+          {
+            expr = "max by (username) (github_profile_public_repos{job=\"github-profile\"})";
+            legendFormat = "{{username}} public repos";
+            refId = "B";
+          }
+          {
+            expr = "max by (username) (github_profile_total_stars{job=\"github-profile\"})";
+            legendFormat = "{{username}} stars";
+            refId = "C";
+          }
+          {
+            expr = "max by (username) (github_profile_total_open_issues{job=\"github-profile\"})";
+            legendFormat = "{{username}} open issues";
+            refId = "D";
+          }
+        ];
+      }
     ];
   };
   healthcheckScript = pkgs.writeShellScript "grafana-healthcheck" ''

@@ -200,6 +200,10 @@
         targets = cfg.scrape.giteaTargets;
       })
       ++ (optionalJobLines {
+        name = "github-profile";
+        targets = cfg.scrape.githubProfileTargets;
+      })
+      ++ (optionalJobLines {
         name = "alertmanager";
         targets = cfg.scrape.alertmanagerTargets;
       })
@@ -517,6 +521,13 @@ in {
         default = [];
         example = [ "gitea.internal.example:3000" ];
         description = "Gitea metrics targets (`host:port`) to scrape.";
+      };
+
+      githubProfileTargets = lib.mkOption {
+        type = lib.types.listOf lib.types.str;
+        default = [];
+        example = [ "rpi-box-02-metrics.internal.example:9145" ];
+        description = "GitHub profile exporter targets (`host:port`) to scrape.";
       };
 
       grafanaTargets = lib.mkOption {
