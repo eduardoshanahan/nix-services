@@ -925,6 +925,16 @@
             legendFormat = "{{instance}} write";
             refId = "B";
           }
+          {
+            expr = "sum by (instance) (rate(storageIONReadX{job=\"synology-snmp\",instance=~\"nas2\\\\..*\"}[5m]))";
+            legendFormat = "{{instance}} read (snmp)";
+            refId = "C";
+          }
+          {
+            expr = "sum by (instance) (rate(storageIONWrittenX{job=\"synology-snmp\",instance=~\"nas2\\\\..*\"}[5m]))";
+            legendFormat = "{{instance}} write (snmp)";
+            refId = "D";
+          }
         ];
       }
       {
