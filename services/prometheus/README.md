@@ -80,43 +80,43 @@ services.prometheusCompose = {
 
   scrape = {
     nodeTargets = [
-      "rpi-box-01.hhlab.home.arpa:9100"
-      "rpi-box-02.hhlab.home.arpa:9100"
-      "rpi-box-03.hhlab.home.arpa:9100"
+      "node-a.internal.example:9100"
+      "node-b.internal.example:9100"
+      "node-c.internal.example:9100"
     ];
     synologyNodeTargets = [
-      "hhnas4.hhlab.home.arpa:9100"
+      "nas-a.internal.example:9100"
     ];
     # If you deploy snmp_exporter for NAS telemetry:
     synologySnmpTargets = [
-      "hhnas4.hhlab.home.arpa"
-      "nas2.hhlab.home.arpa"
+      "nas-a.internal.example"
+      "nas-b.internal.example"
     ];
-    synologySnmpExporterAddress = "snmp-exporter.hhlab.home.arpa:9116";
+    synologySnmpExporterAddress = "snmp-exporter.internal.example:9116";
     synologySnmpModule = "synology";
     synologySnmpAuth = "public_v2";
-    synologySnmpSystemTargets = [ "nas2.hhlab.home.arpa" ];
-    synologySnmpMemoryTargets = [ "nas2.hhlab.home.arpa" ];
-    synologySnmpStorageTargets = [ "nas2.hhlab.home.arpa" ];
-    synologySnmpNetworkTargets = [ "nas2.hhlab.home.arpa" ];
-    synologySnmpLoadTargets = [ "nas2.hhlab.home.arpa" ];
-    synologySnmpUptimeTargets = [ "nas2.hhlab.home.arpa" ];
-    lokiTargets = [ "loki.hhlab.home.arpa:3100" ];
+    synologySnmpSystemTargets = [ "nas-b.internal.example" ];
+    synologySnmpMemoryTargets = [ "nas-b.internal.example" ];
+    synologySnmpStorageTargets = [ "nas-b.internal.example" ];
+    synologySnmpNetworkTargets = [ "nas-b.internal.example" ];
+    synologySnmpLoadTargets = [ "nas-b.internal.example" ];
+    synologySnmpUptimeTargets = [ "nas-b.internal.example" ];
+    lokiTargets = [ "loki.internal.example:3100" ];
     traefikTargets = [
-      "rpi-box-01-metrics.hhlab.home.arpa:8082"
-      "rpi-box-02-metrics.hhlab.home.arpa:8082"
-      "rpi-box-03-metrics.hhlab.home.arpa:8082"
+      "node-a-metrics.internal.example:8082"
+      "node-b-metrics.internal.example:8082"
+      "node-c-metrics.internal.example:8082"
     ];
     promtailTargets = [
-      "rpi-box-01.hhlab.home.arpa:9080"
-      "rpi-box-02.hhlab.home.arpa:9080"
-      "rpi-box-03.hhlab.home.arpa:9080"
+      "node-a.internal.example:9080"
+      "node-b.internal.example:9080"
+      "node-c.internal.example:9080"
     ];
     grafanaTargets = [
       "grafana:3000"
     ];
     piholeExporterTargets = [
-      "rpi-box-01-metrics.hhlab.home.arpa:9617"
+      "dns-node.internal.example:9617"
     ];
   };
 

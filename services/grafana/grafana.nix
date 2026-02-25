@@ -428,7 +428,7 @@
         };
         targets = [
           {
-            expr = "node_load1";
+            expr = "node_load1 or laLoadFloat{job=\"synology-snmp-load\",laNames=\"Load-1\"}";
             legendFormat = "{{instance}}";
             refId = "A";
           }
@@ -482,7 +482,7 @@
         };
         targets = [
           {
-            expr = "node_time_seconds - node_boot_time_seconds";
+            expr = "((node_time_seconds - node_boot_time_seconds) / 3600) or ((hrSystemUptime{job=\"synology-snmp-uptime\"} / 100) / 3600)";
             legendFormat = "{{instance}}";
             refId = "A";
           }
@@ -946,12 +946,12 @@
             refId = "B";
           }
           {
-            expr = "sum by (instance) (rate(storageIONReadX{job=\"synology-snmp\",instance=~\"nas2\\\\..*\"}[5m]))";
+            expr = "sum by (instance) (rate(storageIONReadX{job=\"synology-snmp\"}[5m]))";
             legendFormat = "{{instance}} read (snmp)";
             refId = "C";
           }
           {
-            expr = "sum by (instance) (rate(storageIONWrittenX{job=\"synology-snmp\",instance=~\"nas2\\\\..*\"}[5m]))";
+            expr = "sum by (instance) (rate(storageIONWrittenX{job=\"synology-snmp\"}[5m]))";
             legendFormat = "{{instance}} write (snmp)";
             refId = "D";
           }
@@ -983,12 +983,12 @@
             refId = "B";
           }
           {
-            expr = "sum by (instance) (rate(ifHCInOctets{job=\"synology-snmp-network\",instance=~\"nas2\\\\..*\",ifName!~\"lo|sit0\"}[5m]))";
+            expr = "sum by (instance) (rate(ifHCInOctets{job=\"synology-snmp-network\",ifName!~\"lo|sit0\"}[5m]))";
             legendFormat = "{{instance}} rx (snmp)";
             refId = "C";
           }
           {
-            expr = "sum by (instance) (rate(ifHCOutOctets{job=\"synology-snmp-network\",instance=~\"nas2\\\\..*\",ifName!~\"lo|sit0\"}[5m]))";
+            expr = "sum by (instance) (rate(ifHCOutOctets{job=\"synology-snmp-network\",ifName!~\"lo|sit0\"}[5m]))";
             legendFormat = "{{instance}} tx (snmp)";
             refId = "D";
           }
@@ -1374,7 +1374,7 @@ in {
           url = lib.mkOption {
             type = lib.types.nullOr lib.types.str;
             default = null;
-            example = "http://loki.hhlab.home.arpa:3100";
+            example = "http://loki.internal.example:3100";
             description = "Optional Loki URL for a provisioned Grafana datasource.";
           };
         };

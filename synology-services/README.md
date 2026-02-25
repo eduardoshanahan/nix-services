@@ -9,10 +9,10 @@ Sanitized, reproducible deployment artifacts for Synology hosts.
 
 ## Layout
 
-- `hhnas4/node-exporter/compose.yaml`
-- `hhnas4/node-exporter/.env.example`
-- `hhnas4/deploy.sh`
-- `hhnas4/DSM_MANUAL_CHECKLIST.md`
+- `nas-host-template/node-exporter/compose.yaml`
+- `nas-host-template/node-exporter/.env.example`
+- `nas-host-template/deploy.sh`
+- `nas-host-template/DSM_MANUAL_CHECKLIST.md`
 
 ## Reproducibility Contract
 

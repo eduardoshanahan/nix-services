@@ -29,7 +29,7 @@ services.snmpExporterCompose = {
   enable = true;
   listenAddress = "0.0.0.0";
   listenPort = 9116;
-  snmpV2Community = "7fjeuibngymx";
+  snmpV2Community = "change-me-snmp-community";
   configFile = "/var/lib/snmp-exporter/snmp.yml";
 };
 ```
