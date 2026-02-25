@@ -48,6 +48,10 @@ The module ships a baseline `homelab-core` rule group:
 - `services.prometheusCompose.scrape.synologySnmpStorageModule`
 - `services.prometheusCompose.scrape.synologySnmpNetworkTargets`
 - `services.prometheusCompose.scrape.synologySnmpNetworkModule`
+- `services.prometheusCompose.scrape.synologySnmpLoadTargets`
+- `services.prometheusCompose.scrape.synologySnmpLoadModule`
+- `services.prometheusCompose.scrape.synologySnmpUptimeTargets`
+- `services.prometheusCompose.scrape.synologySnmpUptimeModule`
 - `services.prometheusCompose.scrape.lokiTargets`
 - `services.prometheusCompose.scrape.traefikTargets`
 - `services.prometheusCompose.scrape.promtailTargets`
@@ -95,6 +99,8 @@ services.prometheusCompose = {
     synologySnmpMemoryTargets = [ "nas2.<homelab-domain>" ];
     synologySnmpStorageTargets = [ "nas2.<homelab-domain>" ];
     synologySnmpNetworkTargets = [ "nas2.<homelab-domain>" ];
+    synologySnmpLoadTargets = [ "nas2.<homelab-domain>" ];
+    synologySnmpUptimeTargets = [ "nas2.<homelab-domain>" ];
     lokiTargets = [ "loki.<homelab-domain>:3100" ];
     traefikTargets = [
       "rpi-box-01-metrics.<homelab-domain>:8082"
