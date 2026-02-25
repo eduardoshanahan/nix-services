@@ -78,6 +78,16 @@ services.grafanaCompose = {
 };
 ```
 
+## Provisioned Dashboards
+
+With `services.grafanaCompose.provisioning.dashboards.enableStarter = true`, the module provisions:
+
+- `Homelab Overview`
+- `Nodes Detail`
+- `DNS & Edge`
+- `NAS Detail`
+- `NAS File Activity` (only when Loki datasource is configured)
+
 ## Healthcheck units
 
 - Service: `grafana-healthcheck.service`

@@ -18,6 +18,9 @@ This module deploys Promtail using a checked-in Docker Compose file.
 - `services.promtailCompose.lokiPushUrl`
 - `services.promtailCompose.httpPort`
 - `services.promtailCompose.journalMaxAge`
+- `services.promtailCompose.syslog.enable`
+- `services.promtailCompose.syslog.listenAddress`
+- `services.promtailCompose.syslog.jobLabel`
 - `services.promtailCompose.image.repository`
 - `services.promtailCompose.image.tag`
 - `services.promtailCompose.image.allowMutableTag`
@@ -28,5 +31,10 @@ This module deploys Promtail using a checked-in Docker Compose file.
 services.promtailCompose = {
   enable = true;
   lokiPushUrl = "http://loki.<homelab-domain>:3100/loki/api/v1/push";
+  syslog = {
+    enable = true;
+    listenAddress = "0.0.0.0:1514";
+    jobLabel = "synology-file-activity";
+  };
 };
 ```

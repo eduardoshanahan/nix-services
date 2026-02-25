@@ -73,6 +73,14 @@
         targets = cfg.scrape.nodeTargets;
       })
       ++ (optionalJobLines {
+        name = "synology-nodes";
+        targets = cfg.scrape.synologyNodeTargets;
+      })
+      ++ (optionalJobLines {
+        name = "synology-snmp";
+        targets = cfg.scrape.synologySnmpTargets;
+      })
+      ++ (optionalJobLines {
         name = "loki";
         targets = cfg.scrape.lokiTargets;
       })
@@ -227,6 +235,26 @@ in {
         default = [];
         example = [ "rpi-box-01.<homelab-domain>:9100" "rpi-box-02.<homelab-domain>:9100" ];
         description = "Node exporter targets (`host:port`).";
+      };
+
+      synologyNodeTargets = lib.mkOption {
+        type = lib.types.listOf lib.types.str;
+        default = [];
+        example = [ "hhnas4.<homelab-domain>:9100" ];
+        description = ''
+          Synology NAS node-exporter targets (`host:port`), scraped under job
+          `synology-nodes`.
+        '';
+      };
+
+      synologySnmpTargets = lib.mkOption {
+        type = lib.types.listOf lib.types.str;
+        default = [];
+        example = [ "snmp-exporter.<homelab-domain>:9116" ];
+        description = ''
+          SNMP exporter targets (`host:port`) for Synology scraping, scraped
+          under job `synology-snmp`.
+        '';
       };
 
       lokiTargets = lib.mkOption {

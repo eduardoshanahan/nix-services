@@ -789,6 +789,366 @@
       }
     ];
   };
+  nasDetailDashboardJson = builtins.toJSON {
+    id = null;
+    uid = "nas-detail";
+    title = "NAS Detail";
+    tags = [ "homelab" "nas" "synology" ];
+    timezone = "browser";
+    schemaVersion = 39;
+    version = 1;
+    refresh = "30s";
+    time = {
+      from = "now-6h";
+      to = "now";
+    };
+    editable = true;
+    panels = [
+      {
+        id = 1;
+        type = "stat";
+        title = "Synology Node Targets Up";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 5;
+          w = 6;
+          x = 0;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = [ "lastNotNull" ];
+            fields = "";
+            values = false;
+          };
+        };
+        targets = [
+          {
+            expr = "sum(up{job=\"synology-nodes\"})";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 2;
+        type = "timeseries";
+        title = "NAS CPU Usage %";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 9;
+          x = 6;
+          y = 0;
+        };
+        targets = [
+          {
+            expr = "100 - (avg by (instance) (rate(node_cpu_seconds_total{job=\"synology-nodes\",mode=\"idle\"}[5m])) * 100)";
+            legendFormat = "{{instance}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 3;
+        type = "timeseries";
+        title = "NAS Memory Available %";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 9;
+          x = 15;
+          y = 0;
+        };
+        targets = [
+          {
+            expr = "(node_memory_MemAvailable_bytes{job=\"synology-nodes\"} / node_memory_MemTotal_bytes{job=\"synology-nodes\"}) * 100";
+            legendFormat = "{{instance}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 4;
+        type = "timeseries";
+        title = "NAS Root Disk Used %";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 0;
+          y = 8;
+        };
+        targets = [
+          {
+            expr = "100 * (1 - (node_filesystem_avail_bytes{job=\"synology-nodes\",mountpoint=\"/\",fstype!~\"tmpfs|overlay\"} / node_filesystem_size_bytes{job=\"synology-nodes\",mountpoint=\"/\",fstype!~\"tmpfs|overlay\"}))";
+            legendFormat = "{{instance}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 5;
+        type = "timeseries";
+        title = "NAS Disk IO (Bytes/s)";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 12;
+          y = 8;
+        };
+        targets = [
+          {
+            expr = "sum by (instance) (rate(node_disk_read_bytes_total{job=\"synology-nodes\"}[5m]))";
+            legendFormat = "{{instance}} read";
+            refId = "A";
+          }
+          {
+            expr = "sum by (instance) (rate(node_disk_written_bytes_total{job=\"synology-nodes\"}[5m]))";
+            legendFormat = "{{instance}} write";
+            refId = "B";
+          }
+        ];
+      }
+      {
+        id = 6;
+        type = "timeseries";
+        title = "NAS Network Throughput (Bytes/s)";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 0;
+          y = 16;
+        };
+        targets = [
+          {
+            expr = "sum by (instance) (rate(node_network_receive_bytes_total{job=\"synology-nodes\",device!=\"lo\"}[5m]))";
+            legendFormat = "{{instance}} rx";
+            refId = "A";
+          }
+          {
+            expr = "sum by (instance) (rate(node_network_transmit_bytes_total{job=\"synology-nodes\",device!=\"lo\"}[5m]))";
+            legendFormat = "{{instance}} tx";
+            refId = "B";
+          }
+        ];
+      }
+      {
+        id = 7;
+        type = "timeseries";
+        title = "NAS Temperature C (hwmon)";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 12;
+          y = 16;
+        };
+        targets = [
+          {
+            expr = "max by (instance) (node_hwmon_temp_celsius{job=\"synology-nodes\"})";
+            legendFormat = "{{instance}}";
+            refId = "A";
+          }
+        ];
+      }
+    ];
+  };
+  nasFileActivityDashboardJson = builtins.toJSON {
+    id = null;
+    uid = "nas-file-activity";
+    title = "NAS File Activity";
+    tags = [ "homelab" "nas" "logs" "loki" ];
+    timezone = "browser";
+    schemaVersion = 39;
+    version = 1;
+    refresh = "30s";
+    time = {
+      from = "now-6h";
+      to = "now";
+    };
+    editable = true;
+    panels = [
+      {
+        id = 1;
+        type = "logs";
+        title = "DSM File Activity (Raw)";
+        datasource = {
+          type = "loki";
+          uid = "loki";
+        };
+        gridPos = {
+          h = 12;
+          w = 24;
+          x = 0;
+          y = 0;
+        };
+        options = {
+          showCommonLabels = false;
+          showLabels = true;
+          showTime = true;
+          sortOrder = "Descending";
+        };
+        targets = [
+          {
+            expr = "{job=\"synology-file-activity\"}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 2;
+        type = "timeseries";
+        title = "File Activity Events/s";
+        datasource = {
+          type = "loki";
+          uid = "loki";
+        };
+        gridPos = {
+          h = 8;
+          w = 24;
+          x = 0;
+          y = 12;
+        };
+        targets = [
+          {
+            expr = "sum by (host) (rate({job=\"synology-file-activity\"}[5m]))";
+            legendFormat = "{{host}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 3;
+        type = "stat";
+        title = "Events (Last 1h)";
+        datasource = {
+          type = "loki";
+          uid = "loki";
+        };
+        gridPos = {
+          h = 6;
+          w = 6;
+          x = 0;
+          y = 20;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = [ "lastNotNull" ];
+            fields = "";
+            values = false;
+          };
+        };
+        targets = [
+          {
+            expr = "sum(count_over_time({job=\"synology-file-activity\"}[1h]))";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 4;
+        type = "timeseries";
+        title = "Auth/Permission Failures (events/s)";
+        datasource = {
+          type = "loki";
+          uid = "loki";
+        };
+        gridPos = {
+          h = 6;
+          w = 18;
+          x = 6;
+          y = 20;
+        };
+        targets = [
+          {
+            expr = "sum by (host) (rate({job=\"synology-file-activity\"} |~ \"(?i)(fail|denied|unauthorized|permission)\"[5m]))";
+            legendFormat = "{{host}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 5;
+        type = "timeseries";
+        title = "File Change Activity (events/s)";
+        datasource = {
+          type = "loki";
+          uid = "loki";
+        };
+        gridPos = {
+          h = 8;
+          w = 16;
+          x = 0;
+          y = 26;
+        };
+        targets = [
+          {
+            expr = "sum by (host) (rate({job=\"synology-file-activity\"} |~ \"(?i)(create|delete|rename|write|modify|moved|copied)\"[5m]))";
+            legendFormat = "{{host}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 6;
+        type = "bargauge";
+        title = "Top Noisy Hosts (15m)";
+        datasource = {
+          type = "loki";
+          uid = "loki";
+        };
+        gridPos = {
+          h = 8;
+          w = 8;
+          x = 16;
+          y = 26;
+        };
+        options = {
+          orientation = "horizontal";
+          reduceOptions = {
+            calcs = [ "lastNotNull" ];
+            fields = "";
+            values = false;
+          };
+          showUnfilled = true;
+        };
+        targets = [
+          {
+            expr = "topk(10, sum by (host) (count_over_time({job=\"synology-file-activity\"}[15m])))";
+            legendFormat = "{{host}}";
+            refId = "A";
+          }
+        ];
+      }
+    ];
+  };
   healthcheckScript = pkgs.writeShellScript "grafana-healthcheck" ''
     set -euo pipefail
 
@@ -1043,6 +1403,14 @@ in {
       text = dnsEdgeDashboardJson;
       mode = "0444";
     };
+    environment.etc."${serviceName}/provisioning/dashboards/nas-detail.json" = lib.mkIf (cfg.provisioning.enable && cfg.provisioning.dashboards.enableStarter) {
+      text = nasDetailDashboardJson;
+      mode = "0444";
+    };
+    environment.etc."${serviceName}/provisioning/dashboards/nas-file-activity.json" = lib.mkIf (cfg.provisioning.enable && cfg.provisioning.dashboards.enableStarter && cfg.provisioning.datasources.loki.url != null) {
+      text = nasFileActivityDashboardJson;
+      mode = "0444";
+    };
 
     systemd.services.${serviceName} = {
       description = "Grafana (Docker Compose)";
@@ -1058,6 +1426,9 @@ in {
         config.environment.etc."${serviceName}/provisioning/dashboards/homelab-overview.json".source
         config.environment.etc."${serviceName}/provisioning/dashboards/nodes-detail.json".source
         config.environment.etc."${serviceName}/provisioning/dashboards/dns-edge.json".source
+        config.environment.etc."${serviceName}/provisioning/dashboards/nas-detail.json".source
+      ] ++ lib.optionals (cfg.provisioning.enable && cfg.provisioning.dashboards.enableStarter && cfg.provisioning.datasources.loki.url != null) [
+        config.environment.etc."${serviceName}/provisioning/dashboards/nas-file-activity.json".source
       ] ++ [
         config.environment.etc."${serviceName}/docker-compose.yml".source
       ];
@@ -1094,6 +1465,9 @@ in {
           "${pkgs.runtimeShell} -c 'test -s ${composeDir}/provisioning/dashboards/homelab-overview.json'"
           "${pkgs.runtimeShell} -c 'test -s ${composeDir}/provisioning/dashboards/nodes-detail.json'"
           "${pkgs.runtimeShell} -c 'test -s ${composeDir}/provisioning/dashboards/dns-edge.json'"
+          "${pkgs.runtimeShell} -c 'test -s ${composeDir}/provisioning/dashboards/nas-detail.json'"
+        ] ++ lib.optionals (cfg.provisioning.enable && cfg.provisioning.dashboards.enableStarter && cfg.provisioning.datasources.loki.url != null) [
+          "${pkgs.runtimeShell} -c 'test -s ${composeDir}/provisioning/dashboards/nas-file-activity.json'"
         ] ++ [
           "${pkgs.runtimeShell} -c 'for i in $(seq 1 30); do ${dockerBin} info >/dev/null 2>&1 && exit 0; sleep 1; done; echo \"grafana: docker daemon is not ready\" >&2; exit 1'"
           (runtimeSecretEnv.mkRuntimeSecretEnvExecStartPre {

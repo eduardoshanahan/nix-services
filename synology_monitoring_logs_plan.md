@@ -134,6 +134,29 @@ Use reverse proxy for internal service URLs and centralized TLS.
 - `<nas-docker-root>/monitoring/prometheus/alert.rules.yml`
 - `<nas-docker-root>/monitoring/alertmanager/alertmanager.yml`
 
+### NAS host metrics (recommended)
+
+Run `node_exporter` on Synology and scrape it from Prometheus for NAS CPU, memory,
+disk, network, and thermal metrics.
+
+Example private compose fragment:
+
+```yaml
+services:
+  node-exporter:
+    image: prom/node-exporter:v1.8.2
+    container_name: node-exporter
+    restart: unless-stopped
+    network_mode: host
+    pid: host
+    command:
+      - --path.rootfs=/host
+      - --collector.systemd
+      - --collector.hwmon
+    volumes:
+      - /:/host:ro,rslave
+```
+
 ### Prometheus scrape pattern
 
 ```yaml
@@ -160,6 +183,11 @@ scrape_configs:
           - "<node-1-fqdn>:9100"
           - "<node-2-fqdn>:9100"
           - "<node-3-fqdn>:9100"
+
+  - job_name: "synology-nodes"
+    static_configs:
+      - targets:
+          - "<nas-fqdn>:9100"
 
   - job_name: "loki"
     static_configs:
@@ -208,6 +236,21 @@ Create private DNS records in your internal DNS system:
 - Terminate TLS at reverse proxy when possible.
 - Keep NAS management plane certificate lifecycle separate from app routing certificates.
 
+## File Activity Visibility (DSM -> Loki)
+
+For file/share activity, prefer logs over per-file metrics:
+
+1. Enable DSM Log Center events for SMB/NFS/AFP/file operations.
+2. Forward those logs via syslog to a promtail receiver on your logs node.
+3. In promtail, label streams with `job="synology-file-activity"` and `host="<nas-fqdn>"`.
+4. Query in Grafana/Loki for raw file events and activity rates.
+
+This gives you visibility for:
+
+- file create/delete/rename/access activity
+- authentication failures and permission denials
+- unusual access bursts by host/user/share
+
 ## Deployment Order
 
 1. Prepare Synology directories and permissions.
@@ -247,15 +290,14 @@ The following were created on Synology under `/volume1/docker/homelab`:
 
 ### Git-tracked template copy
 
-A sanitized template copy is tracked in this repository under:
+Synology deployment templates are tracked under:
 
-- `synology-services/monitoring/compose.yaml`
-- `synology-services/monitoring/prometheus/prometheus.yml`
-- `synology-services/monitoring/prometheus/alert.rules.yml`
-- `synology-services/monitoring/alertmanager/alertmanager.yml`
-- `synology-services/monitoring/grafana.env.example`
+- `synology-services/hhnas4/node-exporter/compose.yaml`
+- `synology-services/hhnas4/node-exporter/.env.example`
+- `synology-services/hhnas4/deploy.sh`
+- `synology-services/hhnas4/DSM_MANUAL_CHECKLIST.md`
 
-These files are publication-safe templates and must be copied/adapted in private Synology storage before deployment.
+These artifacts are sanitized and intentionally contain no secret material.
 
 ## Validation Checklist
 
