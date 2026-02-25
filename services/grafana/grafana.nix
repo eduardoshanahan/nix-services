@@ -1710,6 +1710,43 @@
           }
         ];
       }
+      {
+        id = 13;
+        type = "timeseries";
+        title = "GitHub Commits (1d/7d/30d/365d)";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 24;
+          x = 0;
+          y = 29;
+        };
+        targets = [
+          {
+            expr = "max by (username) (github_profile_commits_1d{job=\"github-profile\"})";
+            legendFormat = "{{username}} commits 1d";
+            refId = "A";
+          }
+          {
+            expr = "max by (username) (github_profile_commits_7d{job=\"github-profile\"})";
+            legendFormat = "{{username}} commits 7d";
+            refId = "B";
+          }
+          {
+            expr = "max by (username) (github_profile_commits_30d{job=\"github-profile\"})";
+            legendFormat = "{{username}} commits 30d";
+            refId = "C";
+          }
+          {
+            expr = "max by (username) (github_profile_commits_365d{job=\"github-profile\"})";
+            legendFormat = "{{username}} commits 365d";
+            refId = "D";
+          }
+        ];
+      }
     ];
   };
   healthcheckScript = pkgs.writeShellScript "grafana-healthcheck" ''
