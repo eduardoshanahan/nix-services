@@ -1264,7 +1264,7 @@
         };
         targets = [
           {
-            expr = "(sum by (host) (rate({job=\"synology-file-activity\"} |~ \"(?i)(fail|denied|unauthorized|permission)\"[5m]))) or on() vector(0)";
+            expr = "sum by (host) (rate({job=\"synology-file-activity\"} |~ \"(?i)(fail|denied|unauthorized|permission)\"[5m]))";
             legendFormat = "{{host}}";
             refId = "A";
           }
@@ -1286,7 +1286,7 @@
         };
         targets = [
           {
-            expr = "(sum by (host) (rate({job=\"synology-file-activity\"} |~ \"(?i)(create|delete|rename|write|modify|moved|copied)\"[5m]))) or on() vector(0)";
+            expr = "sum by (host) (rate({job=\"synology-file-activity\"} |~ \"(?i)(create|delete|rename|write|modify|moved|copied)\"[5m]))";
             legendFormat = "{{host}}";
             refId = "A";
           }
