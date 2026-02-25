@@ -4,6 +4,7 @@ services:
     container_name: "${SNMP_EXPORTER_CONTAINER_NAME}"
     restart: unless-stopped
     command:
+      - "--config.file=/etc/snmp_exporter/snmp.yml"
       - "--log.level=${SNMP_EXPORTER_LOG_LEVEL}"
     ports:
       - "${SNMP_EXPORTER_LISTEN_ADDRESS}:${SNMP_EXPORTER_LISTEN_PORT}:9116"
