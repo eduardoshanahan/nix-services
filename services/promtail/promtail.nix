@@ -9,6 +9,20 @@
   composeDir = "/etc/${serviceName}";
   dockerBin = "${config.virtualisation.docker.package}/bin/docker";
   portType = lib.types.ints.between 1 65535;
+  syslogScrapeConfig = lib.optionalString cfg.syslog.enable (
+    lib.concatStringsSep "\n" [
+      "  - job_name: syslog-receiver"
+      "    syslog:"
+      "      listen_address: ${cfg.syslog.listenAddress}"
+      "      idle_timeout: 60s"
+      "      label_structured_data: true"
+      "      labels:"
+      "        job: ${cfg.syslog.jobLabel}"
+      "    relabel_configs:"
+      "      - source_labels: ['__syslog_message_hostname']"
+      "        target_label: host"
+    ]
+  );
 in {
   options.services.promtailCompose = {
     enable = lib.mkEnableOption "Promtail log shipper (Docker Compose)";
@@ -42,6 +56,27 @@ in {
       type = lib.types.str;
       default = "12h";
       description = "Maximum age for journald entries scraped by Promtail.";
+    };
+
+    syslog = {
+      enable = lib.mkOption {
+        type = lib.types.bool;
+        default = false;
+        description = "Enable a Promtail syslog receiver for external log senders (for example DSM).";
+      };
+
+      listenAddress = lib.mkOption {
+        type = lib.types.str;
+        default = "0.0.0.0:1514";
+        example = "0.0.0.0:1514";
+        description = "Listen address for Promtail syslog receiver (`host:port`).";
+      };
+
+      jobLabel = lib.mkOption {
+        type = lib.types.str;
+        default = "synology-file-activity";
+        description = "Value used for the Loki `job` label on syslog-ingested logs.";
+      };
     };
 
     image = {
@@ -117,6 +152,7 @@ in {
           relabel_configs:
             - source_labels: ['__journal__hostname']
               target_label: host
+      ${syslogScrapeConfig}
     '';
 
     systemd.services.${serviceName} = {

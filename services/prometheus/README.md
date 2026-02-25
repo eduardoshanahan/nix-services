@@ -35,6 +35,8 @@ The module ships a baseline `homelab-core` rule group:
 - `services.prometheusCompose.image.tag`
 - `services.prometheusCompose.image.allowMutableTag`
 - `services.prometheusCompose.scrape.nodeTargets`
+- `services.prometheusCompose.scrape.synologyNodeTargets`
+- `services.prometheusCompose.scrape.synologySnmpTargets`
 - `services.prometheusCompose.scrape.lokiTargets`
 - `services.prometheusCompose.scrape.traefikTargets`
 - `services.prometheusCompose.scrape.promtailTargets`
@@ -66,6 +68,13 @@ services.prometheusCompose = {
       "rpi-box-01.hhlab.home.arpa:9100"
       "rpi-box-02.hhlab.home.arpa:9100"
       "rpi-box-03.hhlab.home.arpa:9100"
+    ];
+    synologyNodeTargets = [
+      "hhnas4.hhlab.home.arpa:9100"
+    ];
+    # If you deploy snmp_exporter for NAS telemetry:
+    synologySnmpTargets = [
+      "snmp-exporter.hhlab.home.arpa:9116"
     ];
     lokiTargets = [ "loki.hhlab.home.arpa:3100" ];
     traefikTargets = [
