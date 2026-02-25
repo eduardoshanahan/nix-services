@@ -1264,7 +1264,7 @@
         };
         targets = [
           {
-            expr = "sum by (host) (rate({job=\"synology-file-activity\"} |~ \"(?i)(fail|denied|unauthorized|permission)\"[5m]))";
+            expr = "sum by (host) (rate({job=\"synology-file-activity\"} |~ \"(?i)(fail|denied|unauthorized|permission)\"[5m])) or label_replace(vector(0), \"host\", \"hhsnas2\", \"\", \"\") or label_replace(vector(0), \"host\", \"hhsnas4\", \"\", \"\")";
             legendFormat = "{{host}}";
             refId = "A";
           }
