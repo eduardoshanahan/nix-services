@@ -1352,6 +1352,327 @@
       }
     ];
   };
+  giteaOverviewDashboardJson = builtins.toJSON {
+    id = null;
+    uid = "gitea-overview";
+    title = "Gitea Overview";
+    tags = [ "homelab" "gitea" ];
+    timezone = "browser";
+    schemaVersion = 39;
+    version = 1;
+    refresh = "30s";
+    time = {
+      from = "now-24h";
+      to = "now";
+    };
+    editable = true;
+    panels = [
+      {
+        id = 1;
+        type = "stat";
+        title = "Gitea Target Up";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 5;
+          w = 4;
+          x = 0;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = [ "lastNotNull" ];
+            fields = "";
+            values = false;
+          };
+          textMode = "auto";
+        };
+        targets = [
+          {
+            expr = "sum(up{job=\"gitea\"})";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 2;
+        type = "stat";
+        title = "Repositories";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 5;
+          w = 4;
+          x = 4;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = [ "lastNotNull" ];
+            fields = "";
+            values = false;
+          };
+          textMode = "auto";
+        };
+        targets = [
+          {
+            expr = "sum(gitea_repositories{job=\"gitea\"})";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 3;
+        type = "stat";
+        title = "Users";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 5;
+          w = 4;
+          x = 8;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = [ "lastNotNull" ];
+            fields = "";
+            values = false;
+          };
+          textMode = "auto";
+        };
+        targets = [
+          {
+            expr = "sum(gitea_users{job=\"gitea\"})";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 4;
+        type = "stat";
+        title = "Organizations";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 5;
+          w = 4;
+          x = 12;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = [ "lastNotNull" ];
+            fields = "";
+            values = false;
+          };
+          textMode = "auto";
+        };
+        targets = [
+          {
+            expr = "sum(gitea_organizations{job=\"gitea\"})";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 5;
+        type = "stat";
+        title = "Open Issues";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 5;
+          w = 4;
+          x = 16;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = [ "lastNotNull" ];
+            fields = "";
+            values = false;
+          };
+          textMode = "auto";
+        };
+        targets = [
+          {
+            expr = "sum(gitea_issues_open{job=\"gitea\"})";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 6;
+        type = "stat";
+        title = "Closed Issues";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 5;
+          w = 4;
+          x = 20;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = [ "lastNotNull" ];
+            fields = "";
+            values = false;
+          };
+          textMode = "auto";
+        };
+        targets = [
+          {
+            expr = "sum(gitea_issues_closed{job=\"gitea\"})";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 7;
+        type = "timeseries";
+        title = "Repositories (Trend)";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 8;
+          x = 0;
+          y = 5;
+        };
+        targets = [
+          {
+            expr = "sum(gitea_repositories{job=\"gitea\"})";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 8;
+        type = "timeseries";
+        title = "Users (Trend)";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 8;
+          x = 8;
+          y = 5;
+        };
+        targets = [
+          {
+            expr = "sum(gitea_users{job=\"gitea\"})";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 9;
+        type = "timeseries";
+        title = "Issues Open vs Closed";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 8;
+          x = 16;
+          y = 5;
+        };
+        targets = [
+          {
+            expr = "sum(gitea_issues_open{job=\"gitea\"})";
+            legendFormat = "open";
+            refId = "A";
+          }
+          {
+            expr = "sum(gitea_issues_closed{job=\"gitea\"})";
+            legendFormat = "closed";
+            refId = "B";
+          }
+        ];
+      }
+      {
+        id = 10;
+        type = "timeseries";
+        title = "Gitea Metrics Scrape Rate (req/s)";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 0;
+          y = 13;
+        };
+        targets = [
+          {
+            expr = "sum by (instance) (rate(promhttp_metric_handler_requests_total{job=\"gitea\"}[5m]))";
+            legendFormat = "{{instance}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 11;
+        type = "timeseries";
+        title = "Stars vs Watches";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 12;
+          y = 13;
+        };
+        targets = [
+          {
+            expr = "sum(gitea_stars{job=\"gitea\"})";
+            legendFormat = "stars";
+            refId = "A";
+          }
+          {
+            expr = "sum(gitea_watches{job=\"gitea\"})";
+            legendFormat = "watches";
+            refId = "B";
+          }
+        ];
+      }
+    ];
+  };
   healthcheckScript = pkgs.writeShellScript "grafana-healthcheck" ''
     set -euo pipefail
 
@@ -1614,6 +1935,10 @@ in {
       text = nasFileActivityDashboardJson;
       mode = "0444";
     };
+    environment.etc."${serviceName}/provisioning/dashboards/gitea-overview.json" = lib.mkIf (cfg.provisioning.enable && cfg.provisioning.dashboards.enableStarter) {
+      text = giteaOverviewDashboardJson;
+      mode = "0444";
+    };
 
     systemd.services.${serviceName} = {
       description = "Grafana (Docker Compose)";
@@ -1630,6 +1955,7 @@ in {
         config.environment.etc."${serviceName}/provisioning/dashboards/nodes-detail.json".source
         config.environment.etc."${serviceName}/provisioning/dashboards/dns-edge.json".source
         config.environment.etc."${serviceName}/provisioning/dashboards/nas-detail.json".source
+        config.environment.etc."${serviceName}/provisioning/dashboards/gitea-overview.json".source
       ] ++ lib.optionals (cfg.provisioning.enable && cfg.provisioning.dashboards.enableStarter && cfg.provisioning.datasources.loki.url != null) [
         config.environment.etc."${serviceName}/provisioning/dashboards/nas-file-activity.json".source
       ] ++ [
@@ -1669,6 +1995,7 @@ in {
           "${pkgs.runtimeShell} -c 'test -s ${composeDir}/provisioning/dashboards/nodes-detail.json'"
           "${pkgs.runtimeShell} -c 'test -s ${composeDir}/provisioning/dashboards/dns-edge.json'"
           "${pkgs.runtimeShell} -c 'test -s ${composeDir}/provisioning/dashboards/nas-detail.json'"
+          "${pkgs.runtimeShell} -c 'test -s ${composeDir}/provisioning/dashboards/gitea-overview.json'"
         ] ++ lib.optionals (cfg.provisioning.enable && cfg.provisioning.dashboards.enableStarter && cfg.provisioning.datasources.loki.url != null) [
           "${pkgs.runtimeShell} -c 'test -s ${composeDir}/provisioning/dashboards/nas-file-activity.json'"
         ] ++ [
