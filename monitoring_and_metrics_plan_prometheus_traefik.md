@@ -4,6 +4,10 @@
 > This document contains both declarative steps (implemented by Codex) and operational validation gates (validated by a human operator).
 >
 > Codex MUST NOT attempt to automate, infer, or “satisfy” operator-validated checks.
+> **Current-state note (2026-02-25)**  
+> Services are already deployed and operating. Use this plan as a rebuild-from-scratch, disaster recovery, or expansion reference unless an explicit new rollout is planned.
+> **Documentation boundary note**  
+> This document defines service-side monitoring architecture, module contracts, and constraints. For host-by-host runtime checks and operator quick commands, use `nix-pi/README.md`.
 
 This document defines the **monitoring and metrics architecture** for the homelab, based on **Prometheus** scraping metrics from **Traefik** and selected services.
 
@@ -63,7 +67,7 @@ The operator MUST confirm:
 
 ### How to validate (informational, not automated)
 
-- Traefik dashboard loads without errors
+- Traefik service/container is active and logs show no startup errors
 - Services are reachable via Traefik
 - Host reboot does not break Traefik
 

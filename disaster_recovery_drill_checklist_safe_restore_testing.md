@@ -4,6 +4,8 @@
 > This document defines a **repeatable disaster recovery drill** to safely test backups and restores **without risking live service availability**.
 >
 > Codex MUST NOT automate, infer, or execute any steps in this document.
+> **Current-state note (2026-02-25)**  
+> Services are already deployed and operating. Use this checklist as a rebuild-from-scratch, disaster recovery, or expansion reference unless an explicit new rollout is planned.
 
 This checklist validates that the **Backup & Restore Plan** actually works under realistic failure conditions.
 

@@ -4,6 +4,8 @@
 > This document defines how changes and upgrades are introduced safely into the system.
 >
 > Codex MUST NOT automate, infer, or execute operator-validated steps.
+> **Current-state note (2026-02-25)**  
+> Services are already deployed and operating. Use this plan as a rebuild-from-scratch, disaster recovery, or expansion reference unless an explicit new rollout is planned.
 
 This plan governs **NixOS rebuilds**, **Docker image upgrades**, and **service configuration changes** across Raspberry Pi ARM64 boxes.
 
@@ -179,7 +181,7 @@ Traefik changes are **high-impact**.
 Rules:
 
 - Apply Traefik changes alone
-- Validate routing and dashboard immediately
+- Validate routing and Traefik service health immediately
 - Do not combine with other upgrades
 
 ---
