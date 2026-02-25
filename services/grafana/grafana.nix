@@ -1212,7 +1212,7 @@
         };
         targets = [
           {
-            expr = "(sum by (host) (rate({job=\"synology-file-activity\"}[5m]))) or on() vector(0)";
+            expr = "sum by (host) (rate({job=\"synology-file-activity\"}[5m]))";
             legendFormat = "{{host}}";
             refId = "A";
           }
