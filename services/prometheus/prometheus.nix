@@ -163,6 +163,18 @@
         auth = cfg.scrape.synologySnmpAuth;
         targets = cfg.scrape.synologySnmpNetworkTargets;
       })
+      ++ (mkSnmpJobLines {
+        jobName = "synology-snmp-load";
+        module = cfg.scrape.synologySnmpLoadModule;
+        auth = cfg.scrape.synologySnmpAuth;
+        targets = cfg.scrape.synologySnmpLoadTargets;
+      })
+      ++ (mkSnmpJobLines {
+        jobName = "synology-snmp-uptime";
+        module = cfg.scrape.synologySnmpUptimeModule;
+        auth = cfg.scrape.synologySnmpAuth;
+        targets = cfg.scrape.synologySnmpUptimeTargets;
+      })
       ++ (optionalJobLines {
         name = "loki";
         targets = cfg.scrape.lokiTargets;
@@ -432,6 +444,40 @@ in {
         default = "if_mib";
         example = "if_mib";
         description = "SNMP exporter module used for `synology-snmp-network`.";
+      };
+
+      synologySnmpLoadTargets = lib.mkOption {
+        type = lib.types.listOf lib.types.str;
+        default = [];
+        example = [ "nas2.hhlab.home.arpa" ];
+        description = ''
+          Synology SNMP targets scraped under job `synology-snmp-load` for load
+          average metrics (for example `laLoadFloat`).
+        '';
+      };
+
+      synologySnmpLoadModule = lib.mkOption {
+        type = lib.types.str;
+        default = "ucd_la_table";
+        example = "ucd_la_table";
+        description = "SNMP exporter module used for `synology-snmp-load`.";
+      };
+
+      synologySnmpUptimeTargets = lib.mkOption {
+        type = lib.types.listOf lib.types.str;
+        default = [];
+        example = [ "nas2.hhlab.home.arpa" ];
+        description = ''
+          Synology SNMP targets scraped under job `synology-snmp-uptime` for
+          uptime metrics (for example `hrSystemUptime`).
+        '';
+      };
+
+      synologySnmpUptimeModule = lib.mkOption {
+        type = lib.types.str;
+        default = "hrSystem";
+        example = "hrSystem";
+        description = "SNMP exporter module used for `synology-snmp-uptime`.";
       };
 
       lokiTargets = lib.mkOption {
