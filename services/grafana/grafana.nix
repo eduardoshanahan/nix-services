@@ -829,7 +829,7 @@
         };
         targets = [
           {
-            expr = "sum(up{job=~\"synology-nodes|synology-snmp\"})";
+            expr = "sum(max by (instance) (up{job=~\"synology-nodes|synology-snmp\"}))";
             refId = "A";
           }
         ];
