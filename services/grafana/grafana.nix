@@ -356,7 +356,7 @@
         };
         targets = [
           {
-            expr = "sum by (instance) (rate(promtail_journal_target_lines_total[5m]) or rate(promtail_syslog_target_entries_total[5m]))";
+            expr = "sum by (instance) (rate(promtail_sent_entries_total[5m]))";
             legendFormat = "{{instance}}";
             refId = "A";
           }
@@ -905,7 +905,7 @@
         };
         targets = [
           {
-            expr = "sum by (instance) (rate(promtail_journal_target_lines_total[5m]) or rate(promtail_syslog_target_entries_total[5m]))";
+            expr = "sum by (instance) (rate(promtail_sent_entries_total[5m]))";
             legendFormat = "{{instance}}";
             refId = "A";
           }
