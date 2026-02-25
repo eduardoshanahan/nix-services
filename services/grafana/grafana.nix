@@ -962,6 +962,16 @@
             legendFormat = "{{instance}} tx";
             refId = "B";
           }
+          {
+            expr = "sum by (instance) (rate(ifHCInOctets{job=\"synology-snmp\",instance=~\"nas2\\\\..*\",ifName=\"eth0\"}[5m]))";
+            legendFormat = "{{instance}} rx (snmp)";
+            refId = "C";
+          }
+          {
+            expr = "sum by (instance) (rate(ifHCOutOctets{job=\"synology-snmp\",instance=~\"nas2\\\\..*\",ifName=\"eth0\"}[5m]))";
+            legendFormat = "{{instance}} tx (snmp)";
+            refId = "D";
+          }
         ];
       }
       {
