@@ -9,6 +9,10 @@
   composeDir = "/etc/${serviceName}";
   dockerBin = "${config.virtualisation.docker.package}/bin/docker";
   portType = lib.types.ints.between 1 65535;
+  snmpConfigText = builtins.replaceStrings
+    [ "community: public" ]
+    [ "community: ${cfg.snmpV2Community}" ]
+    (builtins.readFile "${pkgs.prometheus-snmp-exporter}/etc/snmp_exporter/snmp.yml");
 in {
   options.services.snmpExporterCompose = {
     enable = lib.mkEnableOption "Prometheus SNMP exporter (Docker Compose)";
@@ -36,6 +40,16 @@ in {
       type = lib.types.enum [ "debug" "info" "warn" "error" ];
       default = "info";
       description = "Exporter log level.";
+    };
+
+    snmpV2Community = lib.mkOption {
+      type = lib.types.str;
+      default = "public";
+      description = ''
+        SNMP v1/v2c community written into exporter auth profiles
+        `public_v1` and `public_v2`.
+      '';
+      example = "7fjeuibngymx";
     };
 
     image = {
@@ -76,11 +90,16 @@ in {
         assertion = cfg.image.allowMutableTag || cfg.image.tag != "latest";
         message = "services.snmpExporterCompose.image.tag must be pinned (not `latest`) unless services.snmpExporterCompose.image.allowMutableTag = true.";
       }
+      {
+        assertion = builtins.match "^[^[:space:]]+$" cfg.snmpV2Community != null;
+        message = "services.snmpExporterCompose.snmpV2Community must not contain whitespace.";
+      }
     ];
 
     virtualisation.docker.enable = true;
 
     environment.etc."${serviceName}/docker-compose.yml".source = ./docker-compose.yml;
+    environment.etc."${serviceName}/snmp.yml".text = snmpConfigText;
 
     systemd.services.${serviceName} = {
       description = "Prometheus SNMP exporter (Docker Compose)";
@@ -89,6 +108,7 @@ in {
       wants = [ "network-online.target" ];
       restartTriggers = [
         config.environment.etc."${serviceName}/docker-compose.yml".source
+        config.environment.etc."${serviceName}/snmp.yml".source
       ];
 
       serviceConfig = {
@@ -108,6 +128,7 @@ in {
 
         ExecStartPre = [
           "${pkgs.runtimeShell} -c 'test -s ${composeDir}/docker-compose.yml'"
+          "${pkgs.runtimeShell} -c 'test -s ${composeDir}/snmp.yml'"
           "${pkgs.runtimeShell} -c 'for i in $(seq 1 30); do ${dockerBin} info >/dev/null 2>&1 && exit 0; sleep 1; done; echo \"snmp-exporter: docker daemon is not ready\" >&2; exit 1'"
           "${pkgs.runtimeShell} -c '${dockerBin} compose config >/dev/null'"
         ];
