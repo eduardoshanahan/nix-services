@@ -8,3 +8,5 @@ services:
       - "--log.level=${SNMP_EXPORTER_LOG_LEVEL}"
     ports:
       - "${SNMP_EXPORTER_LISTEN_ADDRESS}:${SNMP_EXPORTER_LISTEN_PORT}:9116"
+    volumes:
+      - "/etc/snmp-exporter/snmp.yml:/etc/snmp_exporter/snmp.yml:ro"
