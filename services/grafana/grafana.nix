@@ -914,7 +914,7 @@
       {
         id = 11;
         type = "timeseries";
-        title = "Gitea HTTP Request Rate (req/s)";
+        title = "Gitea Metrics Endpoint Rate (req/s)";
         datasource = {
           type = "prometheus";
           uid = "prometheus";
@@ -927,7 +927,7 @@
         };
         targets = [
           {
-            expr = "sum by (instance) (rate(gitea_http_request_total[5m]))";
+            expr = "sum by (instance) (rate(promhttp_metric_handler_requests_total{job=\"gitea\"}[5m]))";
             legendFormat = "{{instance}}";
             refId = "A";
           }
