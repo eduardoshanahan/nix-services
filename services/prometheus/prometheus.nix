@@ -196,6 +196,10 @@
         targets = cfg.scrape.piholeExporterTargets;
       })
       ++ (optionalJobLines {
+        name = "gitea";
+        targets = cfg.scrape.giteaTargets;
+      })
+      ++ (optionalJobLines {
         name = "alertmanager";
         targets = cfg.scrape.alertmanagerTargets;
       })
@@ -506,6 +510,13 @@ in {
         default = [];
         example = [ "dns-node.internal.example:9617" ];
         description = "Pi-hole exporter targets (`host:port`) to scrape.";
+      };
+
+      giteaTargets = lib.mkOption {
+        type = lib.types.listOf lib.types.str;
+        default = [];
+        example = [ "gitea.internal.example:3000" ];
+        description = "Gitea metrics targets (`host:port`) to scrape.";
       };
 
       grafanaTargets = lib.mkOption {

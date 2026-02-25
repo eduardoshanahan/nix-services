@@ -197,14 +197,47 @@
         };
         gridPos = {
           h = 6;
-          w = 12;
-          x = 12;
+          w = 8;
+          x = 16;
           y = 0;
         };
         targets = [
           {
             expr = "sum(rate(traefik_service_requests_total{code=~\"5..\"}[5m])) by (instance, code)";
             legendFormat = "{{instance}} {{code}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 11;
+        type = "stat";
+        title = "Gitea Targets Up";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 4;
+          x = 12;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          justifyMode = "auto";
+          orientation = "auto";
+          reduceOptions = {
+            calcs = [ "lastNotNull" ];
+            fields = "";
+            values = false;
+          };
+          textMode = "auto";
+        };
+        targets = [
+          {
+            expr = "sum(up{job=\"gitea\"})";
             refId = "A";
           }
         ];
@@ -878,6 +911,28 @@
           }
         ];
       }
+      {
+        id = 11;
+        type = "timeseries";
+        title = "Gitea HTTP Request Rate (req/s)";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 24;
+          x = 0;
+          y = 29;
+        };
+        targets = [
+          {
+            expr = "sum by (instance) (rate(gitea_http_request_total[5m]))";
+            legendFormat = "{{instance}}";
+            refId = "A";
+          }
+        ];
+      }
     ];
   };
   nasDetailDashboardJson = builtins.toJSON {
@@ -1264,6 +1319,33 @@
           {
             expr = "topk(10, sum by (host) (count_over_time({job=\"synology-file-activity\"}[15m])))";
             legendFormat = "{{host}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 7;
+        type = "logs";
+        title = "Gitea Container Logs (Raw)";
+        datasource = {
+          type = "loki";
+          uid = "loki";
+        };
+        gridPos = {
+          h = 10;
+          w = 24;
+          x = 0;
+          y = 34;
+        };
+        options = {
+          showCommonLabels = false;
+          showLabels = true;
+          showTime = true;
+          sortOrder = "Descending";
+        };
+        targets = [
+          {
+            expr = "{job=\"synology-gitea\"}";
             refId = "A";
           }
         ];

@@ -56,6 +56,7 @@ The module ships a baseline `homelab-core` rule group:
 - `services.prometheusCompose.scrape.traefikTargets`
 - `services.prometheusCompose.scrape.promtailTargets`
 - `services.prometheusCompose.scrape.piholeExporterTargets`
+- `services.prometheusCompose.scrape.giteaTargets`
 - `services.prometheusCompose.scrape.grafanaTargets`
 - `services.prometheusCompose.scrape.alertmanagerTargets`
 - `services.prometheusCompose.alerting.enable`
@@ -117,6 +118,9 @@ services.prometheusCompose = {
     ];
     piholeExporterTargets = [
       "dns-node.internal.example:9617"
+    ];
+    giteaTargets = [
+      "gitea.internal.example:3000"
     ];
   };
 
