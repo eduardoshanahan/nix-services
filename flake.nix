@@ -78,6 +78,7 @@
         prometheusModule = import ./services/prometheus/prometheus.nix;
         lokiModule = import ./services/loki/loki.nix;
         promtailModule = import ./services/promtail/promtail.nix;
+        snmpExporterModule = import ./services/snmp-exporter/snmp-exporter.nix;
       in
       {
         nixosModules = {
@@ -92,6 +93,7 @@
           prometheus = prometheusModule;
           loki = lokiModule;
           promtail = promtailModule;
+          snmpExporter = snmpExporterModule;
         };
 
         services = {
@@ -106,6 +108,7 @@
           prometheus = prometheusModule;
           loki = lokiModule;
           promtail = promtailModule;
+          snmpExporter = snmpExporterModule;
         };
       }
     );

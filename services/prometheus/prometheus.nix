@@ -34,6 +34,33 @@
       ++ [""]
     );
 
+  synologySnmpJobLines =
+    lib.optionals (cfg.scrape.synologySnmpTargets != [] && cfg.scrape.synologySnmpExporterAddress != null) (
+      [
+        "  - job_name: \"synology-snmp\""
+        "    metrics_path: /snmp"
+        "    params:"
+        "      module: [\"${cfg.scrape.synologySnmpModule}\"]"
+        "      auth: [\"${cfg.scrape.synologySnmpAuth}\"]"
+        "    static_configs:"
+        "      - targets:"
+      ]
+      ++ (mkTargetLines {
+        targets = cfg.scrape.synologySnmpTargets;
+        indent = "        ";
+      })
+      ++ [
+        "    relabel_configs:"
+        "      - source_labels: [__address__]"
+        "        target_label: __param_target"
+        "      - source_labels: [__param_target]"
+        "        target_label: instance"
+        "      - target_label: __address__"
+        "        replacement: ${cfg.scrape.synologySnmpExporterAddress}"
+        ""
+      ]
+    );
+
   alertingLines = targets:
     lib.optionals (targets != []) (
       [
@@ -76,10 +103,10 @@
         name = "synology-nodes";
         targets = cfg.scrape.synologyNodeTargets;
       })
-      ++ (optionalJobLines {
+      ++ (if cfg.scrape.synologySnmpExporterAddress != null then synologySnmpJobLines else (optionalJobLines {
         name = "synology-snmp";
         targets = cfg.scrape.synologySnmpTargets;
-      })
+      }))
       ++ (optionalJobLines {
         name = "loki";
         targets = cfg.scrape.lokiTargets;
@@ -250,11 +277,37 @@ in {
       synologySnmpTargets = lib.mkOption {
         type = lib.types.listOf lib.types.str;
         default = [];
-        example = [ "snmp-exporter.hhlab.home.arpa:9116" ];
+        example = [ "hhnas4.hhlab.home.arpa" "nas2.hhlab.home.arpa" ];
         description = ''
-          SNMP exporter targets (`host:port`) for Synology scraping, scraped
-          under job `synology-snmp`.
+          Synology SNMP device targets (`host` or `host:port`), scraped under
+          job `synology-snmp`.
         '';
+      };
+
+      synologySnmpExporterAddress = lib.mkOption {
+        type = lib.types.nullOr lib.types.str;
+        default = null;
+        example = "snmp-exporter.hhlab.home.arpa:9116";
+        description = ''
+          SNMP exporter endpoint (`host:port`) used to scrape
+          `services.prometheusCompose.scrape.synologySnmpTargets` via `/snmp`.
+          When null, targets are scraped directly as generic Prometheus
+          endpoints for backward compatibility.
+        '';
+      };
+
+      synologySnmpModule = lib.mkOption {
+        type = lib.types.str;
+        default = "synology";
+        example = "synology";
+        description = "SNMP exporter module used for Synology SNMP scrape requests.";
+      };
+
+      synologySnmpAuth = lib.mkOption {
+        type = lib.types.str;
+        default = "public_v2";
+        example = "public_v2";
+        description = "SNMP exporter auth profile used for Synology SNMP scrape requests.";
       };
 
       lokiTargets = lib.mkOption {
