@@ -1570,6 +1570,7 @@
         targets = [
           {
             expr = "sum(gitea_repositories{job=\"gitea\"})";
+            legendFormat = "repositories";
             refId = "A";
           }
         ];
@@ -1591,6 +1592,7 @@
         targets = [
           {
             expr = "sum(gitea_users{job=\"gitea\"})";
+            legendFormat = "users";
             refId = "A";
           }
         ];
