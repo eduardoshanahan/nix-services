@@ -21,6 +21,12 @@ consumes exported NixOS modules from this repo.
 
 `nix-services` must remain service-focused and must not depend on `nix-pi`.
 
+## Public Repo Hygiene
+
+Before commit/push, run the sanitization checklist in:
+
+`PUBLIC_REPO_SANITIZATION_POLICY.md`
+
 ## diagrams.net Startup Behavior
 
 The `diagrams-net` service uses a Docker healthcheck and a systemd post-start

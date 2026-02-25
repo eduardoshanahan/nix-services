@@ -71,7 +71,7 @@ services.grafanaCompose = {
     enable = true;
     datasources = {
       prometheus.url = "http://prometheus:9090";
-      loki.url = "http://loki.<homelab-domain>:3100";
+      loki.url = "http://loki.internal.example:3100";
     };
     dashboards.enableStarter = true;
   };

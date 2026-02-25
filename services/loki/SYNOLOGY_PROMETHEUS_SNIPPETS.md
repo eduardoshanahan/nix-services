@@ -9,14 +9,14 @@ Add to `prometheus.yml` under `scrape_configs`:
 ```yaml
   - job_name: "loki"
     static_configs:
-      - targets: ["loki.<homelab-domain>:3100"]
+      - targets: ["loki.internal.example:3100"]
 
   - job_name: "pis-node-exporter"
     static_configs:
       - targets:
-          - "rpi-box-01.<homelab-domain>:9100"
-          - "rpi-box-02.<homelab-domain>:9100"
-          - "rpi-box-03.<homelab-domain>:9100"
+          - "node-a.internal.example:9100"
+          - "node-b.internal.example:9100"
+          - "node-c.internal.example:9100"
 ```
 
 ## Alert rules
@@ -38,14 +38,14 @@ Add to `alert.rules.yml`:
       - alert: LokiDiskFillingUp
         expr: |
           (
-            node_filesystem_avail_bytes{instance="rpi-box-03.<homelab-domain>:9100",mountpoint="/srv/loki",fstype!~"tmpfs|overlay"}
+            node_filesystem_avail_bytes{instance="node-c.internal.example:9100",mountpoint="/srv/loki",fstype!~"tmpfs|overlay"}
             /
-            node_filesystem_size_bytes{instance="rpi-box-03.<homelab-domain>:9100",mountpoint="/srv/loki",fstype!~"tmpfs|overlay"}
+            node_filesystem_size_bytes{instance="node-c.internal.example:9100",mountpoint="/srv/loki",fstype!~"tmpfs|overlay"}
           ) < 0.15
         for: 15m
         labels:
           severity: warning
         annotations:
           summary: "Loki disk filling up"
-          description: "/srv/loki is above 85% usage on rpi-box-03."
+          description: "/srv/loki is above 85% usage on the logs node."
 ```

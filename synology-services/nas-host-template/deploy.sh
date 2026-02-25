@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-TARGET_HOST="${1:-hhnas4.<homelab-domain>}"
-TARGET_BASE="${2:-/volume1/docker/homelab/hhnas4}"
+TARGET_HOST="${1:-nas-a.internal.example}"
+TARGET_BASE="${2:-/volume1/docker/homelab/nas-host-template}"
 SRC_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REMOTE_NODE_EXPORTER_DIR="${TARGET_BASE}/node-exporter"
 

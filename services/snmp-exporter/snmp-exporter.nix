@@ -45,7 +45,7 @@ in {
         SNMP v1/v2c community written into exporter auth profiles
         `public_v1` and `public_v2`.
       '';
-      example = "7fjeuibngymx";
+      example = "change-me-snmp-community";
     };
 
     configFile = lib.mkOption {

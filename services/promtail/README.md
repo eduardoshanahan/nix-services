@@ -30,7 +30,7 @@ This module deploys Promtail using a checked-in Docker Compose file.
 ```nix
 services.promtailCompose = {
   enable = true;
-  lokiPushUrl = "http://loki.<homelab-domain>:3100/loki/api/v1/push";
+  lokiPushUrl = "http://loki.internal.example:3100/loki/api/v1/push";
   syslog = {
     enable = true;
     listenAddress = "0.0.0.0:1514";

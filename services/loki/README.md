@@ -32,7 +32,7 @@ This module deploys Loki (single-node) using a checked-in Docker Compose file.
 ```nix
 services.lokiCompose = {
   enable = true;
-  listenAddress = "192.168.1.10";
+  listenAddress = "10.0.0.10";
   dataDir = "/srv/loki/data";
   httpPort = 3100;
   retentionPeriod = "30d";

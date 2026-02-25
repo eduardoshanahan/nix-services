@@ -21,7 +21,7 @@ Verify **all** of the following before proceeding.
 
 - Pi‑hole host has a **stable IP address**
   - Either via DHCP reservation **or** static NixOS configuration
-  - Example: `192.168.3.97`
+  - Example: `10.0.3.97`
 - Pi‑hole is reachable from at least one other LAN machine
 - Pi‑hole DNS resolution works:
 
@@ -65,8 +65,8 @@ In the Pi‑hole UI:
 
 - Navigate to **Settings → DHCP**
 - Configure:
-  - DHCP range (e.g. `192.168.1.100 – 192.168.1.200`)
-  - Router / gateway IP (e.g. `192.168.1.1`)
+  - DHCP range (e.g. `10.0.1.100 – 10.0.1.200`)
+  - Router / gateway IP (e.g. `10.0.1.1`)
   - Lease time (default is fine)
 - **Do NOT enable DHCP yet**
 - Save settings

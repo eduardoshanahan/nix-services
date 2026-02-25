@@ -269,7 +269,7 @@ This gives you visibility for:
 - Rationale: Synology host ports `80/443` are already used by DSM, so initial rollout uses host-local published ports plus DSM reverse proxy later.
 - Decision: use `/volume1/docker/homelab` as the Synology base directory for this stack.
 - Decision: expose Grafana on LAN port `3000` during bootstrap to simplify operator onboarding; tighten access later behind DSM reverse proxy.
-- Decision: after DSM reverse proxy validation, Grafana bind was tightened back to `127.0.0.1:3000` and external access is via `https://grafana.<homelab-domain>`.
+- Decision: after DSM reverse proxy validation, Grafana bind was tightened back to `127.0.0.1:3000` and external access is via `https://grafana.internal.example`.
 
 ### 2026-02-24
 
@@ -277,7 +277,7 @@ This gives you visibility for:
 
 ## Current Implementation State
 
-### nas2 (older Synology, no Docker runtime)
+### Secondary NAS (older Synology, no Docker runtime)
 
 - Host model validation: DS215j-class ARMv7 with DSM 7.1.1.
 - Docker/Container Manager is not available on this NAS class.
@@ -300,10 +300,10 @@ The following were created on Synology under `/volume1/docker/homelab`:
 
 Synology deployment templates are tracked under:
 
-- `synology-services/hhnas4/node-exporter/compose.yaml`
-- `synology-services/hhnas4/node-exporter/.env.example`
-- `synology-services/hhnas4/deploy.sh`
-- `synology-services/hhnas4/DSM_MANUAL_CHECKLIST.md`
+- `synology-services/nas-host-template/node-exporter/compose.yaml`
+- `synology-services/nas-host-template/node-exporter/.env.example`
+- `synology-services/nas-host-template/deploy.sh`
+- `synology-services/nas-host-template/DSM_MANUAL_CHECKLIST.md`
 
 These artifacts are sanitized and intentionally contain no secret material.
 

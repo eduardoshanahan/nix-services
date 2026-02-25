@@ -328,14 +328,14 @@ in {
       nodeTargets = lib.mkOption {
         type = lib.types.listOf lib.types.str;
         default = [];
-        example = [ "rpi-box-01.<homelab-domain>:9100" "rpi-box-02.<homelab-domain>:9100" ];
+        example = [ "node-a.internal.example:9100" "node-b.internal.example:9100" ];
         description = "Node exporter targets (`host:port`).";
       };
 
       synologyNodeTargets = lib.mkOption {
         type = lib.types.listOf lib.types.str;
         default = [];
-        example = [ "hhnas4.<homelab-domain>:9100" ];
+        example = [ "nas-a.internal.example:9100" ];
         description = ''
           Synology NAS node-exporter targets (`host:port`), scraped under job
           `synology-nodes`.
@@ -345,7 +345,7 @@ in {
       synologySnmpTargets = lib.mkOption {
         type = lib.types.listOf lib.types.str;
         default = [];
-        example = [ "hhnas4.<homelab-domain>" "nas2.<homelab-domain>" ];
+        example = [ "nas-a.internal.example" "nas-b.internal.example" ];
         description = ''
           Synology SNMP device targets (`host` or `host:port`), scraped under
           job `synology-snmp`.
@@ -355,7 +355,7 @@ in {
       synologySnmpExporterAddress = lib.mkOption {
         type = lib.types.nullOr lib.types.str;
         default = null;
-        example = "snmp-exporter.<homelab-domain>:9116";
+        example = "snmp-exporter.internal.example:9116";
         description = ''
           SNMP exporter endpoint (`host:port`) used to scrape
           `services.prometheusCompose.scrape.synologySnmpTargets` via `/snmp`.
@@ -381,7 +381,7 @@ in {
       synologySnmpSystemTargets = lib.mkOption {
         type = lib.types.listOf lib.types.str;
         default = [];
-        example = [ "nas2.<homelab-domain>" ];
+        example = [ "nas-b.internal.example" ];
         description = ''
           Synology SNMP targets scraped under job `synology-snmp-system` for
           CPU/system metrics (for example `ssCpuIdle`).
@@ -398,7 +398,7 @@ in {
       synologySnmpMemoryTargets = lib.mkOption {
         type = lib.types.listOf lib.types.str;
         default = [];
-        example = [ "nas2.<homelab-domain>" ];
+        example = [ "nas-b.internal.example" ];
         description = ''
           Synology SNMP targets scraped under job `synology-snmp-memory` for
           memory metrics (for example `memTotalReal`, `memAvailReal`).
@@ -415,7 +415,7 @@ in {
       synologySnmpStorageTargets = lib.mkOption {
         type = lib.types.listOf lib.types.str;
         default = [];
-        example = [ "nas2.<homelab-domain>" ];
+        example = [ "nas-b.internal.example" ];
         description = ''
           Synology SNMP targets scraped under job `synology-snmp-storage` for
           filesystem metrics (for example `hrStorageUsed`, `hrStorageSize`).
@@ -432,7 +432,7 @@ in {
       synologySnmpNetworkTargets = lib.mkOption {
         type = lib.types.listOf lib.types.str;
         default = [];
-        example = [ "nas2.<homelab-domain>" ];
+        example = [ "nas-b.internal.example" ];
         description = ''
           Synology SNMP targets scraped under job `synology-snmp-network` for
           interface throughput metrics (for example `ifHCInOctets`).
@@ -449,7 +449,7 @@ in {
       synologySnmpLoadTargets = lib.mkOption {
         type = lib.types.listOf lib.types.str;
         default = [];
-        example = [ "nas2.<homelab-domain>" ];
+        example = [ "nas-b.internal.example" ];
         description = ''
           Synology SNMP targets scraped under job `synology-snmp-load` for load
           average metrics (for example `laLoadFloat`).
@@ -466,7 +466,7 @@ in {
       synologySnmpUptimeTargets = lib.mkOption {
         type = lib.types.listOf lib.types.str;
         default = [];
-        example = [ "nas2.<homelab-domain>" ];
+        example = [ "nas-b.internal.example" ];
         description = ''
           Synology SNMP targets scraped under job `synology-snmp-uptime` for
           uptime metrics (for example `hrSystemUptime`).
@@ -483,28 +483,28 @@ in {
       lokiTargets = lib.mkOption {
         type = lib.types.listOf lib.types.str;
         default = [];
-        example = [ "loki.<homelab-domain>:3100" ];
+        example = [ "loki.internal.example:3100" ];
         description = "Loki targets (`host:port`) to scrape.";
       };
 
       traefikTargets = lib.mkOption {
         type = lib.types.listOf lib.types.str;
         default = [];
-        example = [ "rpi-box-01-metrics.<homelab-domain>:8082" "rpi-box-02-metrics.<homelab-domain>:8082" ];
+        example = [ "node-a-metrics.internal.example:8082" "node-b-metrics.internal.example:8082" ];
         description = "Traefik metrics targets (`host:port`) to scrape.";
       };
 
       promtailTargets = lib.mkOption {
         type = lib.types.listOf lib.types.str;
         default = [];
-        example = [ "rpi-box-01.<homelab-domain>:9080" "rpi-box-02.<homelab-domain>:9080" ];
+        example = [ "node-a.internal.example:9080" "node-b.internal.example:9080" ];
         description = "Promtail targets (`host:port`) to scrape.";
       };
 
       piholeExporterTargets = lib.mkOption {
         type = lib.types.listOf lib.types.str;
         default = [];
-        example = [ "rpi-box-01-metrics.<homelab-domain>:9617" ];
+        example = [ "dns-node.internal.example:9617" ];
         description = "Pi-hole exporter targets (`host:port`) to scrape.";
       };
 

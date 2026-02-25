@@ -1,20 +1,20 @@
-# hhnas4
+# Synology Host (Template)
 
-Reproducible Synology monitoring artifacts for host `hhnas4`.
+Reproducible Synology monitoring artifacts for one Synology host.
 
 ## Deploy
 
 From this repository:
 
 ```bash
-cd synology-services/hhnas4
-./deploy.sh hhnas4.<homelab-domain>
+cd synology-services/nas-host-template
+./deploy.sh nas-a.internal.example
 ```
 
 Optional target directory override:
 
 ```bash
-./deploy.sh hhnas4.<homelab-domain> /volume1/docker/homelab/hhnas4
+./deploy.sh nas-a.internal.example /volume1/docker/homelab/nas-a
 ```
 
 ## What is automated

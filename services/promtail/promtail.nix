@@ -43,7 +43,7 @@ in {
       type = lib.types.nullOr lib.types.str;
       default = null;
       description = "Loki push endpoint URL (`/loki/api/v1/push`).";
-      example = "http://loki.<homelab-domain>:3100/loki/api/v1/push";
+      example = "http://loki.internal.example:3100/loki/api/v1/push";
     };
 
     httpPort = lib.mkOption {
