@@ -61,6 +61,38 @@
       ]
     );
 
+  mkSnmpJobLines = {
+    jobName,
+    module,
+    auth,
+    targets,
+  }:
+    lib.optionals (targets != [] && cfg.scrape.synologySnmpExporterAddress != null) (
+      [
+        "  - job_name: \"${jobName}\""
+        "    metrics_path: /snmp"
+        "    params:"
+        "      module: [\"${module}\"]"
+        "      auth: [\"${auth}\"]"
+        "    static_configs:"
+        "      - targets:"
+      ]
+      ++ (mkTargetLines {
+        inherit targets;
+        indent = "        ";
+      })
+      ++ [
+        "    relabel_configs:"
+        "      - source_labels: [__address__]"
+        "        target_label: __param_target"
+        "      - source_labels: [__param_target]"
+        "        target_label: instance"
+        "      - target_label: __address__"
+        "        replacement: ${cfg.scrape.synologySnmpExporterAddress}"
+        ""
+      ]
+    );
+
   alertingLines = targets:
     lib.optionals (targets != []) (
       [
@@ -107,6 +139,24 @@
         name = "synology-snmp";
         targets = cfg.scrape.synologySnmpTargets;
       }))
+      ++ (mkSnmpJobLines {
+        jobName = "synology-snmp-system";
+        module = cfg.scrape.synologySnmpSystemModule;
+        auth = cfg.scrape.synologySnmpAuth;
+        targets = cfg.scrape.synologySnmpSystemTargets;
+      })
+      ++ (mkSnmpJobLines {
+        jobName = "synology-snmp-memory";
+        module = cfg.scrape.synologySnmpMemoryModule;
+        auth = cfg.scrape.synologySnmpAuth;
+        targets = cfg.scrape.synologySnmpMemoryTargets;
+      })
+      ++ (mkSnmpJobLines {
+        jobName = "synology-snmp-storage";
+        module = cfg.scrape.synologySnmpStorageModule;
+        auth = cfg.scrape.synologySnmpAuth;
+        targets = cfg.scrape.synologySnmpStorageTargets;
+      })
       ++ (optionalJobLines {
         name = "loki";
         targets = cfg.scrape.lokiTargets;
@@ -308,6 +358,57 @@ in {
         default = "public_v2";
         example = "public_v2";
         description = "SNMP exporter auth profile used for Synology SNMP scrape requests.";
+      };
+
+      synologySnmpSystemTargets = lib.mkOption {
+        type = lib.types.listOf lib.types.str;
+        default = [];
+        example = [ "nas2.hhlab.home.arpa" ];
+        description = ''
+          Synology SNMP targets scraped under job `synology-snmp-system` for
+          CPU/system metrics (for example `ssCpuIdle`).
+        '';
+      };
+
+      synologySnmpSystemModule = lib.mkOption {
+        type = lib.types.str;
+        default = "ucd_system_stats";
+        example = "ucd_system_stats";
+        description = "SNMP exporter module used for `synology-snmp-system`.";
+      };
+
+      synologySnmpMemoryTargets = lib.mkOption {
+        type = lib.types.listOf lib.types.str;
+        default = [];
+        example = [ "nas2.hhlab.home.arpa" ];
+        description = ''
+          Synology SNMP targets scraped under job `synology-snmp-memory` for
+          memory metrics (for example `memTotalReal`, `memAvailReal`).
+        '';
+      };
+
+      synologySnmpMemoryModule = lib.mkOption {
+        type = lib.types.str;
+        default = "ucd_memory";
+        example = "ucd_memory";
+        description = "SNMP exporter module used for `synology-snmp-memory`.";
+      };
+
+      synologySnmpStorageTargets = lib.mkOption {
+        type = lib.types.listOf lib.types.str;
+        default = [];
+        example = [ "nas2.hhlab.home.arpa" ];
+        description = ''
+          Synology SNMP targets scraped under job `synology-snmp-storage` for
+          filesystem metrics (for example `hrStorageUsed`, `hrStorageSize`).
+        '';
+      };
+
+      synologySnmpStorageModule = lib.mkOption {
+        type = lib.types.str;
+        default = "hrStorage";
+        example = "hrStorage";
+        description = "SNMP exporter module used for `synology-snmp-storage`.";
       };
 
       lokiTargets = lib.mkOption {

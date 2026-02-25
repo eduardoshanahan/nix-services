@@ -850,7 +850,7 @@
         };
         targets = [
           {
-            expr = "100 - (avg by (instance) (rate(node_cpu_seconds_total{job=\"synology-nodes\",mode=\"idle\"}[5m])) * 100)";
+            expr = "(100 - (avg by (instance) (rate(node_cpu_seconds_total{job=\"synology-nodes\",mode=\"idle\"}[5m])) * 100)) or (100 - avg by (instance) (ssCpuIdle{job=\"synology-snmp-system\"}))";
             legendFormat = "{{instance}}";
             refId = "A";
           }
@@ -872,7 +872,7 @@
         };
         targets = [
           {
-            expr = "(node_memory_MemAvailable_bytes{job=\"synology-nodes\"} / node_memory_MemTotal_bytes{job=\"synology-nodes\"}) * 100";
+            expr = "((node_memory_MemAvailable_bytes{job=\"synology-nodes\"} / node_memory_MemTotal_bytes{job=\"synology-nodes\"}) * 100) or (100 * (memAvailReal{job=\"synology-snmp-memory\"} / memTotalReal{job=\"synology-snmp-memory\"}))";
             legendFormat = "{{instance}}";
             refId = "A";
           }
@@ -894,7 +894,7 @@
         };
         targets = [
           {
-            expr = "100 * (1 - (node_filesystem_avail_bytes{job=\"synology-nodes\",mountpoint=\"/\",fstype!~\"tmpfs|overlay\"} / node_filesystem_size_bytes{job=\"synology-nodes\",mountpoint=\"/\",fstype!~\"tmpfs|overlay\"}))";
+            expr = "(100 * (1 - (node_filesystem_avail_bytes{job=\"synology-nodes\",mountpoint=\"/\",fstype!~\"tmpfs|overlay\"} / node_filesystem_size_bytes{job=\"synology-nodes\",mountpoint=\"/\",fstype!~\"tmpfs|overlay\"}))) or (100 * (hrStorageUsed{job=\"synology-snmp-storage\",hrStorageDescr=\"/volume1\"} / hrStorageSize{job=\"synology-snmp-storage\",hrStorageDescr=\"/volume1\"}))";
             legendFormat = "{{instance}}";
             refId = "A";
           }
