@@ -122,6 +122,72 @@
         ];
       }
       {
+        id = 5;
+        type = "stat";
+        title = "Node Targets Up";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 4;
+          x = 4;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          justifyMode = "auto";
+          orientation = "auto";
+          reduceOptions = {
+            calcs = [ "lastNotNull" ];
+            fields = "";
+            values = false;
+          };
+          textMode = "auto";
+        };
+        targets = [
+          {
+            expr = "sum(up{job=\"nodes\"})";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 6;
+        type = "stat";
+        title = "Promtail Targets Up";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 4;
+          x = 8;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          justifyMode = "auto";
+          orientation = "auto";
+          reduceOptions = {
+            calcs = [ "lastNotNull" ];
+            fields = "";
+            values = false;
+          };
+          textMode = "auto";
+        };
+        targets = [
+          {
+            expr = "sum(up{job=\"promtail\"})";
+            refId = "A";
+          }
+        ];
+      }
+      {
         id = 2;
         type = "timeseries";
         title = "HTTP 5xx Rate (Traefik)";
@@ -130,9 +196,9 @@
           uid = "prometheus";
         };
         gridPos = {
-          h = 9;
-          w = 18;
-          x = 6;
+          h = 6;
+          w = 12;
+          x = 12;
           y = 0;
         };
         targets = [
@@ -152,7 +218,7 @@
           uid = "prometheus";
         };
         gridPos = {
-          h = 9;
+          h = 8;
           w = 12;
           x = 0;
           y = 6;
@@ -174,14 +240,548 @@
           uid = "prometheus";
         };
         gridPos = {
-          h = 9;
+          h = 8;
           w = 12;
           x = 12;
-          y = 9;
+          y = 6;
         };
         targets = [
           {
             expr = "(node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) * 100";
+            legendFormat = "{{instance}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 7;
+        type = "timeseries";
+        title = "Root Disk Used % (Nodes)";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 0;
+          y = 14;
+        };
+        targets = [
+          {
+            expr = "100 * (1 - (node_filesystem_avail_bytes{mountpoint=\"/\",fstype!~\"tmpfs|overlay\"} / node_filesystem_size_bytes{mountpoint=\"/\",fstype!~\"tmpfs|overlay\"}))";
+            legendFormat = "{{instance}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 8;
+        type = "timeseries";
+        title = "Node Temperature C (hwmon)";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 12;
+          y = 14;
+        };
+        targets = [
+          {
+            expr = "max by (instance) (node_hwmon_temp_celsius)";
+            legendFormat = "{{instance}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 9;
+        type = "timeseries";
+        title = "Promtail Processed Lines/s";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 24;
+          x = 0;
+          y = 22;
+        };
+        targets = [
+          {
+            expr = "sum by (instance) (rate(promtail_processed_lines_total[5m]))";
+            legendFormat = "{{instance}}";
+            refId = "A";
+          }
+        ];
+      }
+    ];
+  };
+  nodesDetailDashboardJson = builtins.toJSON {
+    id = null;
+    uid = "nodes-detail";
+    title = "Nodes Detail";
+    tags = [ "homelab" "nodes" ];
+    timezone = "browser";
+    schemaVersion = 39;
+    version = 1;
+    refresh = "30s";
+    time = {
+      from = "now-6h";
+      to = "now";
+    };
+    editable = true;
+    panels = [
+      {
+        id = 1;
+        type = "timeseries";
+        title = "CPU Usage %";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 0;
+          y = 0;
+        };
+        targets = [
+          {
+            expr = "100 - (avg by (instance) (rate(node_cpu_seconds_total{mode=\"idle\"}[5m])) * 100)";
+            legendFormat = "{{instance}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 2;
+        type = "timeseries";
+        title = "Memory Available %";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 12;
+          y = 0;
+        };
+        targets = [
+          {
+            expr = "(node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) * 100";
+            legendFormat = "{{instance}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 3;
+        type = "timeseries";
+        title = "Root Disk Used %";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 0;
+          y = 8;
+        };
+        targets = [
+          {
+            expr = "100 * (1 - (node_filesystem_avail_bytes{mountpoint=\"/\",fstype!~\"tmpfs|overlay\"} / node_filesystem_size_bytes{mountpoint=\"/\",fstype!~\"tmpfs|overlay\"}))";
+            legendFormat = "{{instance}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 4;
+        type = "timeseries";
+        title = "Load Average (1m)";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 12;
+          y = 8;
+        };
+        targets = [
+          {
+            expr = "node_load1";
+            legendFormat = "{{instance}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 5;
+        type = "timeseries";
+        title = "Node Temperature C (hwmon)";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 0;
+          y = 16;
+        };
+        targets = [
+          {
+            expr = "max by (instance) (node_hwmon_temp_celsius)";
+            legendFormat = "{{instance}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 6;
+        type = "timeseries";
+        title = "Uptime (hours)";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 12;
+          y = 16;
+        };
+        targets = [
+          {
+            expr = "node_time_seconds - node_boot_time_seconds";
+            legendFormat = "{{instance}}";
+            refId = "A";
+          }
+        ];
+        fieldConfig = {
+          defaults = {
+            unit = "h";
+          };
+          overrides = [ ];
+        };
+      }
+      {
+        id = 7;
+        type = "timeseries";
+        title = "Network Receive Bytes/s";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 0;
+          y = 24;
+        };
+        targets = [
+          {
+            expr = "sum by (instance) (rate(node_network_receive_bytes_total{device!=\"lo\"}[5m]))";
+            legendFormat = "{{instance}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 8;
+        type = "timeseries";
+        title = "Network Transmit Bytes/s";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 12;
+          y = 24;
+        };
+        targets = [
+          {
+            expr = "sum by (instance) (rate(node_network_transmit_bytes_total{device!=\"lo\"}[5m]))";
+            legendFormat = "{{instance}}";
+            refId = "A";
+          }
+        ];
+      }
+    ];
+  };
+  dnsEdgeDashboardJson = builtins.toJSON {
+    id = null;
+    uid = "dns-edge";
+    title = "DNS & Edge";
+    tags = [ "homelab" "dns" "edge" ];
+    timezone = "browser";
+    schemaVersion = 39;
+    version = 1;
+    refresh = "30s";
+    time = {
+      from = "now-6h";
+      to = "now";
+    };
+    editable = true;
+    panels = [
+      {
+        id = 1;
+        type = "stat";
+        title = "Traefik Targets Up";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 5;
+          w = 6;
+          x = 0;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = [ "lastNotNull" ];
+            fields = "";
+            values = false;
+          };
+        };
+        targets = [
+          {
+            expr = "sum(up{job=\"traefik\"})";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 2;
+        type = "stat";
+        title = "Pi-hole Exporter Targets Up";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 5;
+          w = 6;
+          x = 6;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = [ "lastNotNull" ];
+            fields = "";
+            values = false;
+          };
+        };
+        targets = [
+          {
+            expr = "sum(up{job=\"pihole-exporter\"})";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 3;
+        type = "stat";
+        title = "Promtail Targets Up";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 5;
+          w = 6;
+          x = 12;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = [ "lastNotNull" ];
+            fields = "";
+            values = false;
+          };
+        };
+        targets = [
+          {
+            expr = "sum(up{job=\"promtail\"})";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 4;
+        type = "stat";
+        title = "Blocked Domains";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 5;
+          w = 6;
+          x = 18;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = [ "lastNotNull" ];
+            fields = "";
+            values = false;
+          };
+        };
+        targets = [
+          {
+            expr = "sum(pihole_domains_being_blocked)";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 5;
+        type = "timeseries";
+        title = "Traefik Request Rate (req/s)";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 0;
+          y = 5;
+        };
+        targets = [
+          {
+            expr = "sum by (instance) (rate(traefik_service_requests_total[5m]))";
+            legendFormat = "{{instance}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 6;
+        type = "timeseries";
+        title = "Traefik 5xx Rate (req/s)";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 12;
+          y = 5;
+        };
+        targets = [
+          {
+            expr = "sum by (instance) (rate(traefik_service_requests_total{code=~\"5..\"}[5m]))";
+            legendFormat = "{{instance}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 7;
+        type = "timeseries";
+        title = "Pi-hole Queries Today";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 8;
+          x = 0;
+          y = 13;
+        };
+        targets = [
+          {
+            expr = "sum by (instance) (pihole_dns_queries_today)";
+            legendFormat = "{{instance}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 8;
+        type = "timeseries";
+        title = "Pi-hole Ads Blocked Today";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 8;
+          x = 8;
+          y = 13;
+        };
+        targets = [
+          {
+            expr = "sum by (instance) (pihole_ads_blocked_today)";
+            legendFormat = "{{instance}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 9;
+        type = "timeseries";
+        title = "Pi-hole Ads Blocked %";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 8;
+          x = 16;
+          y = 13;
+        };
+        targets = [
+          {
+            expr = "avg by (instance) (pihole_ads_percentage_today)";
+            legendFormat = "{{instance}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 10;
+        type = "timeseries";
+        title = "Promtail Processed Lines/s";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 24;
+          x = 0;
+          y = 21;
+        };
+        targets = [
+          {
+            expr = "sum by (instance) (rate(promtail_processed_lines_total[5m]))";
             legendFormat = "{{instance}}";
             refId = "A";
           }
@@ -435,6 +1035,14 @@ in {
       text = starterDashboardJson;
       mode = "0444";
     };
+    environment.etc."${serviceName}/provisioning/dashboards/nodes-detail.json" = lib.mkIf (cfg.provisioning.enable && cfg.provisioning.dashboards.enableStarter) {
+      text = nodesDetailDashboardJson;
+      mode = "0444";
+    };
+    environment.etc."${serviceName}/provisioning/dashboards/dns-edge.json" = lib.mkIf (cfg.provisioning.enable && cfg.provisioning.dashboards.enableStarter) {
+      text = dnsEdgeDashboardJson;
+      mode = "0444";
+    };
 
     systemd.services.${serviceName} = {
       description = "Grafana (Docker Compose)";
@@ -448,6 +1056,8 @@ in {
         config.environment.etc."${serviceName}/provisioning/dashboards/providers.yml".source
       ] ++ lib.optionals (cfg.provisioning.enable && cfg.provisioning.dashboards.enableStarter) [
         config.environment.etc."${serviceName}/provisioning/dashboards/homelab-overview.json".source
+        config.environment.etc."${serviceName}/provisioning/dashboards/nodes-detail.json".source
+        config.environment.etc."${serviceName}/provisioning/dashboards/dns-edge.json".source
       ] ++ [
         config.environment.etc."${serviceName}/docker-compose.yml".source
       ];
@@ -482,6 +1092,8 @@ in {
           "${pkgs.runtimeShell} -c 'test -s ${composeDir}/provisioning/dashboards/providers.yml'"
         ] ++ lib.optionals (cfg.provisioning.enable && cfg.provisioning.dashboards.enableStarter) [
           "${pkgs.runtimeShell} -c 'test -s ${composeDir}/provisioning/dashboards/homelab-overview.json'"
+          "${pkgs.runtimeShell} -c 'test -s ${composeDir}/provisioning/dashboards/nodes-detail.json'"
+          "${pkgs.runtimeShell} -c 'test -s ${composeDir}/provisioning/dashboards/dns-edge.json'"
         ] ++ [
           "${pkgs.runtimeShell} -c 'for i in $(seq 1 30); do ${dockerBin} info >/dev/null 2>&1 && exit 0; sleep 1; done; echo \"grafana: docker daemon is not ready\" >&2; exit 1'"
           (runtimeSecretEnv.mkRuntimeSecretEnvExecStartPre {
