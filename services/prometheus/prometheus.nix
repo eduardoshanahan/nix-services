@@ -157,6 +157,12 @@
         auth = cfg.scrape.synologySnmpAuth;
         targets = cfg.scrape.synologySnmpStorageTargets;
       })
+      ++ (mkSnmpJobLines {
+        jobName = "synology-snmp-network";
+        module = cfg.scrape.synologySnmpNetworkModule;
+        auth = cfg.scrape.synologySnmpAuth;
+        targets = cfg.scrape.synologySnmpNetworkTargets;
+      })
       ++ (optionalJobLines {
         name = "loki";
         targets = cfg.scrape.lokiTargets;
@@ -409,6 +415,23 @@ in {
         default = "hrStorage";
         example = "hrStorage";
         description = "SNMP exporter module used for `synology-snmp-storage`.";
+      };
+
+      synologySnmpNetworkTargets = lib.mkOption {
+        type = lib.types.listOf lib.types.str;
+        default = [];
+        example = [ "nas2.<homelab-domain>" ];
+        description = ''
+          Synology SNMP targets scraped under job `synology-snmp-network` for
+          interface throughput metrics (for example `ifHCInOctets`).
+        '';
+      };
+
+      synologySnmpNetworkModule = lib.mkOption {
+        type = lib.types.str;
+        default = "if_mib";
+        example = "if_mib";
+        description = "SNMP exporter module used for `synology-snmp-network`.";
       };
 
       lokiTargets = lib.mkOption {
