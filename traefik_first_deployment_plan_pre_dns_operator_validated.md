@@ -4,6 +4,8 @@
 > This document contains both declarative steps (implemented by Codex) and operational validation gates (validated by a human operator).
 >
 > Codex MUST NOT attempt to automate, infer, or “satisfy” operator-validated checks.
+> **Current-state note (2026-02-25)**  
+> Services are already deployed and operating. Use this plan as a rebuild-from-scratch, disaster recovery, or expansion reference unless an explicit new rollout is planned.
 
 This document defines the **step-by-step implementation plan** for introducing **Traefik** as the first service on ARM64 NixOS boxes, explicitly supporting **deployment and testing before DNS is active**.
 
@@ -89,7 +91,7 @@ Traefik MUST:
 
 - Run via Docker Compose
 - Bind to host ports **80 and 443**
-- Expose the Traefik dashboard
+- Keep Traefik API/dashboard disabled by default (`--api=false`)
 - Use the **Docker provider only**
 - Use a pinned, multi-arch image compatible with **linux/arm64**
 
@@ -124,7 +126,7 @@ The Traefik `docker-compose.yml` MUST:
 - Contain **no secrets**
 - Pin the Traefik image version (no `latest`)
 - Expose ports 80 and 443
-- Enable the dashboard
+- Keep API/dashboard disabled by default
 - Use conservative logging defaults suitable for ARM64
 - Attach Traefik to a dedicated Docker network (e.g. `traefik`)
 
@@ -173,7 +175,7 @@ After deployment, the operator MUST validate:
 - [ ] Host boots successfully with Traefik enabled
 - [ ] Docker starts automatically
 - [ ] Traefik container is running
-- [ ] Traefik dashboard is reachable via browser (using `/etc/hosts`)
+- [ ] Traefik starts cleanly (no startup errors in logs)
 - [ ] Ports 80 and 443 are bound by Traefik only
 - [ ] Rebooting the host restarts Traefik automatically
 

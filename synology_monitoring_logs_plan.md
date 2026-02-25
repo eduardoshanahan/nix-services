@@ -5,6 +5,9 @@ This runbook defines a repository-safe plan for operating a Synology NAS alongsi
 - Monitoring stack (Prometheus, Grafana, Alertmanager, Uptime Kuma)
 - Centralized logs (Loki on a separate log node)
 
+> **Current-state note (2026-02-25)**  
+> Services are already deployed and operating. Use this runbook as a rebuild-from-scratch, disaster recovery, or expansion reference unless an explicit new rollout is planned.
+
 This document is intentionally generic and contains no real domains, IPs, credentials, or secrets.
 
 ## Scope

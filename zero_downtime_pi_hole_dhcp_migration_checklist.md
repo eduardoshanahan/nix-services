@@ -2,6 +2,9 @@
 
 This document describes a **safe, operator‑validated, zero‑downtime procedure** for migrating DHCP authority from an upstream router (e.g. UCG / ISP router) to **Pi‑hole**, as used in the `nix-services` architecture.
 
+> **Current-state note (2026-02-25)**  
+> Services are already deployed and operating. Use this checklist as a rebuild-from-scratch, disaster recovery, or expansion reference unless an explicit new rollout is planned.
+
 It is designed to be:
 
 - Reproducible

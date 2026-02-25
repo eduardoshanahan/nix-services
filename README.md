@@ -21,6 +21,26 @@ consumes exported NixOS modules from this repo.
 
 `nix-services` must remain service-focused and must not depend on `nix-pi`.
 
+## Documentation Ownership
+
+To avoid duplication and contradictions between `nix-pi` and `nix-services`,
+documentation is split by responsibility:
+
+- `nix-services` owns service architecture, service module contracts, Compose +
+  systemd runtime patterns, service-level plans, and Synology service runbooks.
+- `nix-pi` owns host lifecycle docs: workstation setup, image build/flash,
+  bootstrap, host rebuild/deploy flow, and SOPS provisioning workflow.
+
+For the current ownership matrix and first contradiction register, see:
+`documentation_unification_block_1.md`.
+
+Quick pointer map:
+
+- Host setup/provisioning/secrets: `nix-pi` -> `docs/SETUP.md`,
+  `docs/PROVISIONING.md`, `docs/SECRETS.md`.
+- Service behavior/options/operations: `nix-services` -> `services/*/README.md`
+  and service plans in this repository.
+
 ## Public Repo Hygiene
 
 Before commit/push, run the sanitization checklist in:

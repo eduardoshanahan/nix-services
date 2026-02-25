@@ -4,6 +4,8 @@
 > This document contains both declarative steps (implemented by Codex) and operational validation gates (validated by a human operator).
 >
 > Codex MUST NOT attempt to automate, infer, or “satisfy” operator-validated checks.
+> **Current-state note (2026-02-25)**  
+> Services are already deployed and operating. Use this plan as a rebuild-from-scratch, disaster recovery, or expansion reference unless an explicit new rollout is planned.
 
 This document defines the **step-by-step plan** to enable **TLS/HTTPS** on services routed through **Traefik**, **after DNS is active and stable**.
 

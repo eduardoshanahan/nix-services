@@ -2,6 +2,11 @@
 
 This document defines the **step-by-step implementation plan** for deploying **Pi-hole** behind **Traefik** on ARM64 NixOS boxes, starting **before DNS is active**, and then transitioning to **Pi-hole-provided DNS** once validated.
 
+> **Current-state note (2026-02-25)**  
+> Services are already deployed and operating. Use this plan as a rebuild-from-scratch, disaster recovery, or expansion reference unless an explicit new rollout is planned.
+> **Documentation boundary note**  
+> This document defines service-side constraints and invariants. For host-by-host operator execution during DNS cutover, use `nix-pi/zero_downtime_dns_migration_checklist.md`.
+
 This plan is written to be **directly executable by Codex**.
 
 Codex MUST follow this plan **in order** and MUST comply with:
@@ -41,12 +46,12 @@ Before starting Pi-hole work, Codex MUST confirm the operator has verified:
 
 - [ ] Traefik is deployed and stable on the target box(es)
 - [ ] Traefik owns host ports **80 and 443** (exclusively)
-- [ ] Traefik dashboard is reachable (via `/etc/hosts` on a client)
+- [ ] Traefik starts cleanly (no startup errors in logs)
 - [ ] Docker and systemd supervision are working (reboot test)
 
 ### How to validate (informational, not automated)
 
-- **Traefik dashboard**: Open a browser to the Traefik dashboard hostname (via `/etc/hosts`).
+- **Traefik health**: Confirm Traefik service/container is active and logs show no startup errors.
 - **Port ownership**: Verify ports 80 and 443 are bound by Traefik (`ss -lntup | grep ':80\|:443'`).
 - **Reboot test**: Reboot the host and confirm Traefik is running automatically.
 
