@@ -37,6 +37,9 @@ The module ships a baseline `homelab-core` rule group:
 - `services.prometheusCompose.scrape.nodeTargets`
 - `services.prometheusCompose.scrape.synologyNodeTargets`
 - `services.prometheusCompose.scrape.synologySnmpTargets`
+- `services.prometheusCompose.scrape.synologySnmpExporterAddress`
+- `services.prometheusCompose.scrape.synologySnmpModule`
+- `services.prometheusCompose.scrape.synologySnmpAuth`
 - `services.prometheusCompose.scrape.lokiTargets`
 - `services.prometheusCompose.scrape.traefikTargets`
 - `services.prometheusCompose.scrape.promtailTargets`
@@ -74,8 +77,12 @@ services.prometheusCompose = {
     ];
     # If you deploy snmp_exporter for NAS telemetry:
     synologySnmpTargets = [
-      "snmp-exporter.<homelab-domain>:9116"
+      "hhnas4.<homelab-domain>"
+      "nas2.<homelab-domain>"
     ];
+    synologySnmpExporterAddress = "snmp-exporter.<homelab-domain>:9116";
+    synologySnmpModule = "synology";
+    synologySnmpAuth = "public_v2";
     lokiTargets = [ "loki.<homelab-domain>:3100" ];
     traefikTargets = [
       "rpi-box-01-metrics.<homelab-domain>:8082"

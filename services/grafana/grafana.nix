@@ -807,7 +807,7 @@
       {
         id = 1;
         type = "stat";
-        title = "Synology Node Targets Up";
+        title = "Synology Targets Up (Node + SNMP)";
         datasource = {
           type = "prometheus";
           uid = "prometheus";
@@ -829,7 +829,7 @@
         };
         targets = [
           {
-            expr = "sum(up{job=\"synology-nodes\"})";
+            expr = "sum(up{job=~\"synology-nodes|synology-snmp\"})";
             refId = "A";
           }
         ];

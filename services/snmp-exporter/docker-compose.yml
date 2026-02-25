@@ -1,0 +1,9 @@
+services:
+  snmp-exporter:
+    image: "${SNMP_EXPORTER_IMAGE_REPOSITORY}:${SNMP_EXPORTER_IMAGE_TAG}"
+    container_name: "${SNMP_EXPORTER_CONTAINER_NAME}"
+    restart: unless-stopped
+    command:
+      - "--log.level=${SNMP_EXPORTER_LOG_LEVEL}"
+    ports:
+      - "${SNMP_EXPORTER_LISTEN_ADDRESS}:${SNMP_EXPORTER_LISTEN_PORT}:9116"
