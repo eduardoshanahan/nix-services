@@ -362,7 +362,7 @@
         };
         targets = [
           {
-            expr = "100 - (avg by (instance) (rate(node_cpu_seconds_total{mode=\"idle\"}[5m])) * 100)";
+            expr = "(100 - (avg by (instance) (rate(node_cpu_seconds_total{mode=\"idle\"}[5m])) * 100)) or (100 - avg by (instance) (ssCpuIdle{job=\"synology-snmp-system\"}))";
             legendFormat = "{{instance}}";
             refId = "A";
           }
@@ -384,7 +384,7 @@
         };
         targets = [
           {
-            expr = "(node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) * 100";
+            expr = "((node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) * 100) or (100 * (memAvailReal{job=\"synology-snmp-memory\"} / memTotalReal{job=\"synology-snmp-memory\"}))";
             legendFormat = "{{instance}}";
             refId = "A";
           }
@@ -406,7 +406,7 @@
         };
         targets = [
           {
-            expr = "100 * (1 - (node_filesystem_avail_bytes{mountpoint=\"/\",fstype!~\"tmpfs|overlay\"} / node_filesystem_size_bytes{mountpoint=\"/\",fstype!~\"tmpfs|overlay\"}))";
+            expr = "(100 * (1 - (node_filesystem_avail_bytes{mountpoint=\"/\",fstype!~\"tmpfs|overlay\"} / node_filesystem_size_bytes{mountpoint=\"/\",fstype!~\"tmpfs|overlay\"}))) or (100 * (hrStorageUsed{job=\"synology-snmp-storage\",hrStorageDescr=\"/volume1\"} / hrStorageSize{job=\"synology-snmp-storage\",hrStorageDescr=\"/volume1\"}))";
             legendFormat = "{{instance}}";
             refId = "A";
           }
@@ -437,7 +437,7 @@
       {
         id = 5;
         type = "timeseries";
-        title = "Node Temperature C (hwmon)";
+        title = "Node Temperature C";
         datasource = {
           type = "prometheus";
           uid = "prometheus";
@@ -451,8 +451,18 @@
         targets = [
           {
             expr = "max by (instance) (node_hwmon_temp_celsius)";
-            legendFormat = "{{instance}}";
+            legendFormat = "{{instance}} hwmon";
             refId = "A";
+          }
+          {
+            expr = "max by (instance) (temperature{job=\"synology-snmp\"})";
+            legendFormat = "{{instance}} system";
+            refId = "B";
+          }
+          {
+            expr = "max by (instance) (diskTemperature{job=\"synology-snmp\"})";
+            legendFormat = "{{instance}} disk";
+            refId = "C";
           }
         ];
       }
