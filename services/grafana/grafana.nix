@@ -329,6 +329,28 @@
           }
         ];
       }
+      {
+        id = 10;
+        type = "timeseries";
+        title = "HTTP 5xx by Service (Traefik)";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 24;
+          x = 0;
+          y = 30;
+        };
+        targets = [
+          {
+            expr = "sum by (instance, service, code) (rate(traefik_service_requests_total{code=~\"5..\"}[5m]))";
+            legendFormat = "{{instance}} {{service}} {{code}}";
+            refId = "A";
+          }
+        ];
+      }
     ];
   };
   nodesDetailDashboardJson = builtins.toJSON {
