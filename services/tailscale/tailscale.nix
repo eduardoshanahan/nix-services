@@ -188,15 +188,13 @@ in {
           "TAILSCALE_SOCKET=${toString cfg.socketPath}"
           "TAILSCALE_IMAGE_REPOSITORY=${cfg.image.repository}"
           "TAILSCALE_IMAGE_TAG=${cfg.image.tag}"
-          "TAILSCALE_EXTRA_ARGS=${tailscaleArgs}"
-        ] ++ runtimeSecrets.mkSecretFileEnvVar {
-          envVar = "TAILSCALE_ENV_FILE";
-          secretFile = cfg.authKeyFile;
-          fallback = "/dev/null";
-        };
+          "TAILSCALE_EXTRA_ARGS=\"${tailscaleArgs}\""
+          "TAILSCALE_ENV_FILE=/run/secrets/${serviceName}.env"
+        ];
 
         ExecStartPre = [
           "${pkgs.runtimeShell} -c 'mkdir -p ${toString cfg.stateDir} /var/run/tailscale && chmod 0700 ${toString cfg.stateDir}'"
+          "${pkgs.runtimeShell} -c 'install -d -m 0700 /run/secrets && : > /run/secrets/${serviceName}.env && chmod 0600 /run/secrets/${serviceName}.env'"
           "${pkgs.runtimeShell} -c 'test -c /dev/net/tun'"
           "${pkgs.runtimeShell} -c 'test -s ${composeDir}/docker-compose.yml'"
           "${pkgs.runtimeShell} -c 'for i in $(seq 1 30); do ${dockerBin} info >/dev/null 2>&1 && exit 0; sleep 1; done; echo \"tailscale: docker daemon is not ready\" >&2; exit 1'"
