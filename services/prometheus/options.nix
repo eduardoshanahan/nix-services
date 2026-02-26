@@ -244,6 +244,13 @@
         description = "Pi-hole exporter targets (`host:port`) to scrape.";
       };
 
+      unpollerTargets = lib.mkOption {
+        type = lib.types.listOf lib.types.str;
+        default = [];
+        example = ["rpi-box-02.internal.example:9130"];
+        description = "UniFi Poller (unpoller) targets (`host:port`) to scrape.";
+      };
+
       giteaTargets = lib.mkOption {
         type = lib.types.listOf lib.types.str;
         default = [];

@@ -27,6 +27,7 @@
     nasDetailDashboardJson
     nasFileActivityDashboardJson
     giteaOverviewDashboardJson
+    unifiOverviewDashboardJson
     ;
   inherit (scripts) backupScript healthcheckScript waitForHealthy;
 in {
@@ -241,6 +242,10 @@ in {
       text = giteaOverviewDashboardJson;
       mode = "0444";
     };
+    environment.etc."${serviceName}/provisioning/dashboards/unifi-overview.json" = lib.mkIf (cfg.provisioning.enable && cfg.provisioning.dashboards.enableStarter) {
+      text = unifiOverviewDashboardJson;
+      mode = "0444";
+    };
 
     systemd.services.${serviceName} = {
       description = "Grafana (Docker Compose)";
@@ -260,6 +265,7 @@ in {
           config.environment.etc."${serviceName}/provisioning/dashboards/dns-edge.json".source
           config.environment.etc."${serviceName}/provisioning/dashboards/nas-detail.json".source
           config.environment.etc."${serviceName}/provisioning/dashboards/gitea-overview.json".source
+          config.environment.etc."${serviceName}/provisioning/dashboards/unifi-overview.json".source
         ]
         ++ lib.optionals (cfg.provisioning.enable && cfg.provisioning.dashboards.enableStarter && cfg.provisioning.datasources.loki.url != null) [
           config.environment.etc."${serviceName}/provisioning/dashboards/nas-file-activity.json".source
@@ -313,6 +319,7 @@ in {
             "${pkgs.runtimeShell} -c 'test -s ${composeDir}/provisioning/dashboards/dns-edge.json'"
             "${pkgs.runtimeShell} -c 'test -s ${composeDir}/provisioning/dashboards/nas-detail.json'"
             "${pkgs.runtimeShell} -c 'test -s ${composeDir}/provisioning/dashboards/gitea-overview.json'"
+            "${pkgs.runtimeShell} -c 'test -s ${composeDir}/provisioning/dashboards/unifi-overview.json'"
           ]
           ++ lib.optionals (cfg.provisioning.enable && cfg.provisioning.dashboards.enableStarter && cfg.provisioning.datasources.loki.url != null) [
             "${pkgs.runtimeShell} -c 'test -s ${composeDir}/provisioning/dashboards/nas-file-activity.json'"

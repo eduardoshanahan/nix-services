@@ -191,6 +191,10 @@
         targets = cfg.scrape.piholeExporterTargets;
       })
       ++ (optionalJobLines {
+        name = "unpoller";
+        targets = cfg.scrape.unpollerTargets;
+      })
+      ++ (optionalJobLines {
         name = "gitea";
         targets = cfg.scrape.giteaTargets;
       })

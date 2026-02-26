@@ -1675,4 +1675,177 @@
       }
     ];
   };
+  unifiOverviewDashboardJson = builtins.toJSON {
+    id = null;
+    uid = "unifi-overview";
+    title = "UniFi Overview";
+    tags = ["homelab" "unifi" "network"];
+    timezone = "browser";
+    schemaVersion = 39;
+    version = 1;
+    refresh = "30s";
+    time = {
+      from = "now-6h";
+      to = "now";
+    };
+    editable = true;
+    panels = [
+      {
+        id = 1;
+        type = "stat";
+        title = "Unpoller Targets Up";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 8;
+          x = 0;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+        };
+        targets = [
+          {
+            expr = "sum(up{job=\"unpoller\"})";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 2;
+        type = "stat";
+        title = "UniFi Metric Series";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 8;
+          x = 8;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+        };
+        targets = [
+          {
+            expr = "count({__name__=~\"unifi_.*\"})";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 3;
+        type = "stat";
+        title = "Unpoller Scrape Samples";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 8;
+          x = 16;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+        };
+        targets = [
+          {
+            expr = "sum(scrape_samples_scraped{job=\"unpoller\"})";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 4;
+        type = "timeseries";
+        title = "Unpoller Up (per instance)";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 0;
+          y = 6;
+        };
+        targets = [
+          {
+            expr = "up{job=\"unpoller\"}";
+            legendFormat = "{{instance}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 5;
+        type = "timeseries";
+        title = "Unpoller Scrape Duration (s)";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 12;
+          y = 6;
+        };
+        targets = [
+          {
+            expr = "scrape_duration_seconds{job=\"unpoller\"}";
+            legendFormat = "{{instance}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 6;
+        type = "timeseries";
+        title = "Prometheus Sample Rate (unpoller)";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 24;
+          x = 0;
+          y = 14;
+        };
+        targets = [
+          {
+            expr = "sum(rate(scrape_samples_scraped{job=\"unpoller\"}[5m]))";
+            legendFormat = "samples/s";
+            refId = "A";
+          }
+        ];
+      }
+    ];
+  };
 }

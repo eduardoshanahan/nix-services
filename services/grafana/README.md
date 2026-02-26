@@ -86,6 +86,7 @@ With `services.grafanaCompose.provisioning.dashboards.enableStarter = true`, the
 - `Nodes Detail`
 - `DNS & Edge`
 - `NAS Detail`
+- `UniFi Overview`
 - `NAS File Activity` (only when Loki datasource is configured)
 
 ## Healthcheck units
