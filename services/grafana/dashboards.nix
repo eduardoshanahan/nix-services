@@ -1693,14 +1693,14 @@
       {
         id = 1;
         type = "stat";
-        title = "Unpoller Targets Up";
+        title = "Connected Clients";
         datasource = {
           type = "prometheus";
           uid = "prometheus";
         };
         gridPos = {
           h = 6;
-          w = 8;
+          w = 6;
           x = 0;
           y = 0;
         };
@@ -1715,7 +1715,7 @@
         };
         targets = [
           {
-            expr = "sum(up{job=\"unpoller\"})";
+            expr = "sum(unpoller_site_stations{job=\"unpoller\"})";
             refId = "A";
           }
         ];
@@ -1723,15 +1723,15 @@
       {
         id = 2;
         type = "stat";
-        title = "UniFi Metric Series";
+        title = "Gateways";
         datasource = {
           type = "prometheus";
           uid = "prometheus";
         };
         gridPos = {
           h = 6;
-          w = 8;
-          x = 8;
+          w = 6;
+          x = 6;
           y = 0;
         };
         options = {
@@ -1745,7 +1745,7 @@
         };
         targets = [
           {
-            expr = "count({__name__=~\"unifi_.*\"})";
+            expr = "sum(unpoller_site_gateways{job=\"unpoller\"})";
             refId = "A";
           }
         ];
@@ -1753,15 +1753,15 @@
       {
         id = 3;
         type = "stat";
-        title = "Unpoller Scrape Samples";
+        title = "Access Points";
         datasource = {
           type = "prometheus";
           uid = "prometheus";
         };
         gridPos = {
           h = 6;
-          w = 8;
-          x = 16;
+          w = 6;
+          x = 12;
           y = 0;
         };
         options = {
@@ -1775,15 +1775,45 @@
         };
         targets = [
           {
-            expr = "sum(scrape_samples_scraped{job=\"unpoller\"})";
+            expr = "sum(unpoller_site_aps{job=\"unpoller\"})";
             refId = "A";
           }
         ];
       }
       {
         id = 4;
+        type = "stat";
+        title = "Switches";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 6;
+          x = 18;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+        };
+        targets = [
+          {
+            expr = "sum(unpoller_site_switches{job=\"unpoller\"})";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 5;
         type = "timeseries";
-        title = "Unpoller Up (per instance)";
+        title = "UCG WAN Throughput (bytes/s)";
         datasource = {
           type = "prometheus";
           uid = "prometheus";
@@ -1796,16 +1826,21 @@
         };
         targets = [
           {
-            expr = "up{job=\"unpoller\"}";
-            legendFormat = "{{instance}}";
+            expr = "sum by (name, port) (unpoller_device_wan_receive_rate_bytes{job=\"unpoller\",type=\"udm\"})";
+            legendFormat = "{{name}} {{port}} rx";
             refId = "A";
+          }
+          {
+            expr = "sum by (name, port) (unpoller_device_wan_transmit_rate_bytes{job=\"unpoller\",type=\"udm\"})";
+            legendFormat = "{{name}} {{port}} tx";
+            refId = "B";
           }
         ];
       }
       {
-        id = 5;
+        id = 6;
         type = "timeseries";
-        title = "Unpoller Scrape Duration (s)";
+        title = "UCG CPU / Memory (%)";
         datasource = {
           type = "prometheus";
           uid = "prometheus";
@@ -1818,30 +1853,101 @@
         };
         targets = [
           {
-            expr = "scrape_duration_seconds{job=\"unpoller\"}";
-            legendFormat = "{{instance}}";
+            expr = "100 * unpoller_device_cpu_utilization_ratio{job=\"unpoller\",type=\"udm\"}";
+            legendFormat = "{{name}} cpu";
             refId = "A";
+          }
+          {
+            expr = "100 * unpoller_device_memory_utilization_ratio{job=\"unpoller\",type=\"udm\"}";
+            legendFormat = "{{name}} memory";
+            refId = "B";
           }
         ];
       }
       {
-        id = 6;
+        id = 7;
         type = "timeseries";
-        title = "Prometheus Sample Rate (unpoller)";
+        title = "UCG Temperature (C)";
         datasource = {
           type = "prometheus";
           uid = "prometheus";
         };
         gridPos = {
           h = 8;
-          w = 24;
+          w = 12;
           x = 0;
           y = 14;
         };
         targets = [
           {
-            expr = "sum(rate(scrape_samples_scraped{job=\"unpoller\"}[5m]))";
-            legendFormat = "samples/s";
+            expr = "unpoller_device_temperature_celsius{job=\"unpoller\",type=\"udm\"}";
+            legendFormat = "{{name}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 8;
+        type = "timeseries";
+        title = "AP Connected Stations";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 12;
+          y = 14;
+        };
+        targets = [
+          {
+            expr = "sum by (name) (unpoller_device_stations{job=\"unpoller\",type=\"uap\"})";
+            legendFormat = "{{name}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 9;
+        type = "timeseries";
+        title = "AP Avg Client Signal (dBm)";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 0;
+          y = 22;
+        };
+        targets = [
+          {
+            expr = "avg by (name) (unpoller_device_vap_average_client_signal{job=\"unpoller\"})";
+            legendFormat = "{{name}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 10;
+        type = "timeseries";
+        title = "Top Clients by Throughput (bytes/s)";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 12;
+          y = 22;
+        };
+        targets = [
+          {
+            expr = "topk(10, unpoller_client_receive_rate_bytes{job=\"unpoller\"} + unpoller_client_transmit_rate_bytes{job=\"unpoller\"})";
+            legendFormat = "{{name}} {{mac}}";
             refId = "A";
           }
         ];
