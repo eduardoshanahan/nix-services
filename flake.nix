@@ -79,6 +79,7 @@
         lokiModule = import ./services/loki/loki.nix;
         promtailModule = import ./services/promtail/promtail.nix;
         snmpExporterModule = import ./services/snmp-exporter/snmp-exporter.nix;
+        unpollerModule = import ./services/unpoller/unpoller.nix;
       in
       {
         nixosModules = {
@@ -94,6 +95,7 @@
           loki = lokiModule;
           promtail = promtailModule;
           snmpExporter = snmpExporterModule;
+          unpoller = unpollerModule;
         };
 
         services = {
@@ -109,6 +111,7 @@
           loki = lokiModule;
           promtail = promtailModule;
           snmpExporter = snmpExporterModule;
+          unpoller = unpollerModule;
         };
       }
     );
