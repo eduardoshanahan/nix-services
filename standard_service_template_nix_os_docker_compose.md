@@ -51,6 +51,12 @@ Rules:
 
 This file defines **only container-level concerns**.
 
+Compose source may be either:
+
+- A checked-in file (`./docker-compose.yml`) copied to `/etc/<service>/docker-compose.yml`
+- A generated template rendered by the module when option-driven compose content
+  is required
+
 ### Mandatory rules
 
 - No secrets (no passwords, tokens, keys)
@@ -145,6 +151,12 @@ in
   };
 }
 ```
+
+Note:
+
+- For simple services, prefer `environment.etc."...".source = ./docker-compose.yml`.
+- For option-heavy services (for example ingress), `environment.etc."...".text`
+  with generated compose content is acceptable and expected.
 
 ---
 

@@ -33,7 +33,7 @@ They are not the day-to-day path for already-deployed stable services.
 ## Source-of-Truth Matrix
 
 | Topic | Canonical repo | Canonical document(s) | Non-canonical repo rule |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | Repo boundary and architecture model | `nix-services` | `repository_boundary_and_responsibility_guidelines.md`, `architecture_and_implementation_guidelines.md`, `service_deployment_model.md` | Keep only a short pointer paragraph in `nix-pi` |
 | Host setup, provisioning, flashing | `nix-pi` | `docs/SETUP.md`, `docs/PROVISIONING.md`, `sd-image/README.md` | `nix-services` should not duplicate host bootstrap steps |
 | Runtime secrets ownership split | `nix-services` | `runtime_secrets_docker_services.md` | `nix-pi` references this for the contract and documents only host-side secret provisioning |

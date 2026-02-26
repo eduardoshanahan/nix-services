@@ -1,0 +1,1678 @@
+{
+  starterDashboardJson = builtins.toJSON {
+    id = null;
+    uid = "homelab-overview";
+    title = "Homelab Overview";
+    tags = ["homelab" "starter"];
+    timezone = "browser";
+    schemaVersion = 39;
+    version = 1;
+    refresh = "30s";
+    time = {
+      from = "now-6h";
+      to = "now";
+    };
+    editable = true;
+    panels = [
+      {
+        id = 1;
+        type = "stat";
+        title = "Targets Up";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 6;
+          x = 0;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          justifyMode = "auto";
+          orientation = "auto";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+          textMode = "auto";
+        };
+        targets = [
+          {
+            expr = "sum(up)";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 5;
+        type = "stat";
+        title = "Node Targets Up";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 4;
+          x = 4;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          justifyMode = "auto";
+          orientation = "auto";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+          textMode = "auto";
+        };
+        targets = [
+          {
+            expr = "sum(up{job=\"nodes\"})";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 6;
+        type = "stat";
+        title = "Promtail Targets Up";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 4;
+          x = 8;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          justifyMode = "auto";
+          orientation = "auto";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+          textMode = "auto";
+        };
+        targets = [
+          {
+            expr = "sum(up{job=\"promtail\"})";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 2;
+        type = "timeseries";
+        title = "HTTP 5xx Rate (Traefik)";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 8;
+          x = 16;
+          y = 0;
+        };
+        targets = [
+          {
+            expr = "sum(rate(traefik_service_requests_total{code=~\"5..\"}[5m])) by (instance, code)";
+            legendFormat = "{{instance}} {{code}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 11;
+        type = "stat";
+        title = "Gitea Targets Up";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 4;
+          x = 12;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          justifyMode = "auto";
+          orientation = "auto";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+          textMode = "auto";
+        };
+        targets = [
+          {
+            expr = "sum(up{job=\"gitea\"})";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 3;
+        type = "timeseries";
+        title = "CPU Usage % (Nodes)";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 0;
+          y = 6;
+        };
+        targets = [
+          {
+            expr = "(100 - (avg by (instance) (rate(node_cpu_seconds_total{mode=\"idle\"}[5m])) * 100)) or (100 - avg by (instance) (ssCpuIdle{job=\"synology-snmp-system\"}))";
+            legendFormat = "{{instance}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 4;
+        type = "timeseries";
+        title = "Memory Available % (Nodes)";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 12;
+          y = 6;
+        };
+        targets = [
+          {
+            expr = "((node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) * 100) or (100 * (memAvailReal{job=\"synology-snmp-memory\"} / memTotalReal{job=\"synology-snmp-memory\"}))";
+            legendFormat = "{{instance}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 7;
+        type = "timeseries";
+        title = "Root Disk Used % (Nodes)";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 0;
+          y = 14;
+        };
+        targets = [
+          {
+            expr = "(100 * (1 - (node_filesystem_avail_bytes{mountpoint=\"/\",fstype!~\"tmpfs|overlay\"} / node_filesystem_size_bytes{mountpoint=\"/\",fstype!~\"tmpfs|overlay\"}))) or (100 * (hrStorageUsed{job=\"synology-snmp-storage\",hrStorageDescr=\"/volume1\"} / hrStorageSize{job=\"synology-snmp-storage\",hrStorageDescr=\"/volume1\"}))";
+            legendFormat = "{{instance}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 8;
+        type = "timeseries";
+        title = "Node Temperature C";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 12;
+          y = 14;
+        };
+        targets = [
+          {
+            expr = "max by (instance) (node_hwmon_temp_celsius)";
+            legendFormat = "{{instance}} hwmon";
+            refId = "A";
+          }
+          {
+            expr = "max by (instance) (temperature{job=\"synology-snmp\"})";
+            legendFormat = "{{instance}} system";
+            refId = "B";
+          }
+          {
+            expr = "max by (instance) (diskTemperature{job=\"synology-snmp\"})";
+            legendFormat = "{{instance}} disk";
+            refId = "C";
+          }
+        ];
+      }
+      {
+        id = 9;
+        type = "timeseries";
+        title = "Promtail Processed Lines/s";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 24;
+          x = 0;
+          y = 22;
+        };
+        targets = [
+          {
+            expr = "sum by (instance) (rate(promtail_sent_entries_total[5m]))";
+            legendFormat = "{{instance}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 10;
+        type = "timeseries";
+        title = "HTTP 5xx by Service (Traefik)";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 24;
+          x = 0;
+          y = 30;
+        };
+        targets = [
+          {
+            expr = "sum by (instance, service, code) (rate(traefik_service_requests_total{code=~\"5..\"}[5m]))";
+            legendFormat = "{{instance}} {{service}} {{code}}";
+            refId = "A";
+          }
+        ];
+      }
+    ];
+  };
+  nodesDetailDashboardJson = builtins.toJSON {
+    id = null;
+    uid = "nodes-detail";
+    title = "Nodes Detail";
+    tags = ["homelab" "nodes"];
+    timezone = "browser";
+    schemaVersion = 39;
+    version = 1;
+    refresh = "30s";
+    time = {
+      from = "now-6h";
+      to = "now";
+    };
+    editable = true;
+    panels = [
+      {
+        id = 1;
+        type = "timeseries";
+        title = "CPU Usage %";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 0;
+          y = 0;
+        };
+        targets = [
+          {
+            expr = "(100 - (avg by (instance) (rate(node_cpu_seconds_total{mode=\"idle\"}[5m])) * 100)) or (100 - avg by (instance) (ssCpuIdle{job=\"synology-snmp-system\"}))";
+            legendFormat = "{{instance}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 2;
+        type = "timeseries";
+        title = "Memory Available %";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 12;
+          y = 0;
+        };
+        targets = [
+          {
+            expr = "((node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) * 100) or (100 * (memAvailReal{job=\"synology-snmp-memory\"} / memTotalReal{job=\"synology-snmp-memory\"}))";
+            legendFormat = "{{instance}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 3;
+        type = "timeseries";
+        title = "Root Disk Used %";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 0;
+          y = 8;
+        };
+        targets = [
+          {
+            expr = "(100 * (1 - (node_filesystem_avail_bytes{mountpoint=\"/\",fstype!~\"tmpfs|overlay\"} / node_filesystem_size_bytes{mountpoint=\"/\",fstype!~\"tmpfs|overlay\"}))) or (100 * (hrStorageUsed{job=\"synology-snmp-storage\",hrStorageDescr=\"/volume1\"} / hrStorageSize{job=\"synology-snmp-storage\",hrStorageDescr=\"/volume1\"}))";
+            legendFormat = "{{instance}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 4;
+        type = "timeseries";
+        title = "Load Average (1m)";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 12;
+          y = 8;
+        };
+        targets = [
+          {
+            expr = "node_load1 or laLoadFloat{job=\"synology-snmp-load\",laNames=\"Load-1\"}";
+            legendFormat = "{{instance}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 5;
+        type = "timeseries";
+        title = "Node Temperature C";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 0;
+          y = 16;
+        };
+        targets = [
+          {
+            expr = "max by (instance) (node_hwmon_temp_celsius)";
+            legendFormat = "{{instance}} hwmon";
+            refId = "A";
+          }
+          {
+            expr = "max by (instance) (temperature{job=\"synology-snmp\"})";
+            legendFormat = "{{instance}} system";
+            refId = "B";
+          }
+          {
+            expr = "max by (instance) (diskTemperature{job=\"synology-snmp\"})";
+            legendFormat = "{{instance}} disk";
+            refId = "C";
+          }
+        ];
+      }
+      {
+        id = 6;
+        type = "timeseries";
+        title = "Uptime (hours)";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 12;
+          y = 16;
+        };
+        targets = [
+          {
+            expr = "((node_time_seconds - node_boot_time_seconds) / 3600) or ((hrSystemUptime{job=\"synology-snmp-uptime\"} / 100) / 3600)";
+            legendFormat = "{{instance}}";
+            refId = "A";
+          }
+        ];
+        fieldConfig = {
+          defaults = {
+            unit = "h";
+          };
+          overrides = [];
+        };
+      }
+      {
+        id = 7;
+        type = "timeseries";
+        title = "Network Receive Bytes/s";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 0;
+          y = 24;
+        };
+        targets = [
+          {
+            expr = "(sum by (instance) (rate(node_network_receive_bytes_total{device!=\"lo\"}[5m]))) or (sum by (instance) (rate(ifHCInOctets{job=\"synology-snmp-network\",ifName!~\"lo|sit0\"}[5m])))";
+            legendFormat = "{{instance}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 8;
+        type = "timeseries";
+        title = "Network Transmit Bytes/s";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 12;
+          y = 24;
+        };
+        targets = [
+          {
+            expr = "(sum by (instance) (rate(node_network_transmit_bytes_total{device!=\"lo\"}[5m]))) or (sum by (instance) (rate(ifHCOutOctets{job=\"synology-snmp-network\",ifName!~\"lo|sit0\"}[5m])))";
+            legendFormat = "{{instance}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 9;
+        type = "timeseries";
+        title = "Pi Storage Used % (rpi-box-02/03)";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 0;
+          y = 32;
+        };
+        targets = [
+          {
+            expr = "100 * (1 - (node_filesystem_avail_bytes{instance=~\"rpi-box-0[23].*\",mountpoint=\"/\",fstype!~\"tmpfs|overlay\"} / node_filesystem_size_bytes{instance=~\"rpi-box-0[23].*\",mountpoint=\"/\",fstype!~\"tmpfs|overlay\"}))";
+            legendFormat = "{{instance}} /";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 10;
+        type = "timeseries";
+        title = "Pi Disk IO by Device (rpi-box-02/03)";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 12;
+          y = 32;
+        };
+        targets = [
+          {
+            expr = "sum by (instance, device) (rate(node_disk_read_bytes_total{instance=~\"rpi-box-0[23].*\",device!~\"loop.*|ram.*|zram.*|dm-.*|md.*\"}[5m]))";
+            legendFormat = "{{instance}} {{device}} read";
+            refId = "A";
+          }
+          {
+            expr = "sum by (instance, device) (rate(node_disk_written_bytes_total{instance=~\"rpi-box-0[23].*\",device!~\"loop.*|ram.*|zram.*|dm-.*|md.*\"}[5m]))";
+            legendFormat = "{{instance}} {{device}} write";
+            refId = "B";
+          }
+        ];
+      }
+    ];
+  };
+  dnsEdgeDashboardJson = builtins.toJSON {
+    id = null;
+    uid = "dns-edge";
+    title = "DNS & Edge";
+    tags = ["homelab" "dns" "edge"];
+    timezone = "browser";
+    schemaVersion = 39;
+    version = 1;
+    refresh = "30s";
+    time = {
+      from = "now-6h";
+      to = "now";
+    };
+    editable = true;
+    panels = [
+      {
+        id = 1;
+        type = "stat";
+        title = "Traefik Targets Up";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 5;
+          w = 6;
+          x = 0;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+        };
+        targets = [
+          {
+            expr = "sum(up{job=\"traefik\"})";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 2;
+        type = "stat";
+        title = "Pi-hole Exporter Targets Up";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 5;
+          w = 6;
+          x = 6;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+        };
+        targets = [
+          {
+            expr = "sum(up{job=\"pihole-exporter\"})";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 3;
+        type = "stat";
+        title = "Promtail Targets Up";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 5;
+          w = 6;
+          x = 12;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+        };
+        targets = [
+          {
+            expr = "sum(up{job=\"promtail\"})";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 4;
+        type = "stat";
+        title = "Blocked Domains";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 5;
+          w = 6;
+          x = 18;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+        };
+        targets = [
+          {
+            expr = "sum(pihole_domains_being_blocked)";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 5;
+        type = "timeseries";
+        title = "Traefik Request Rate (req/s)";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 0;
+          y = 5;
+        };
+        targets = [
+          {
+            expr = "sum by (instance) (rate(traefik_service_requests_total[5m]))";
+            legendFormat = "{{instance}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 6;
+        type = "timeseries";
+        title = "Traefik 5xx Rate (req/s)";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 12;
+          y = 5;
+        };
+        targets = [
+          {
+            expr = "sum by (instance) (rate(traefik_service_requests_total{code=~\"5..\"}[5m]))";
+            legendFormat = "{{instance}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 7;
+        type = "timeseries";
+        title = "Pi-hole Queries Today";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 8;
+          x = 0;
+          y = 13;
+        };
+        targets = [
+          {
+            expr = "sum by (instance) (pihole_dns_queries_today)";
+            legendFormat = "{{instance}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 8;
+        type = "timeseries";
+        title = "Pi-hole Ads Blocked Today";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 8;
+          x = 8;
+          y = 13;
+        };
+        targets = [
+          {
+            expr = "sum by (instance) (pihole_ads_blocked_today)";
+            legendFormat = "{{instance}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 9;
+        type = "timeseries";
+        title = "Pi-hole Ads Blocked %";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 8;
+          x = 16;
+          y = 13;
+        };
+        targets = [
+          {
+            expr = "avg by (instance) (pihole_ads_percentage_today)";
+            legendFormat = "{{instance}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 10;
+        type = "timeseries";
+        title = "Promtail Processed Lines/s";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 24;
+          x = 0;
+          y = 21;
+        };
+        targets = [
+          {
+            expr = "sum by (instance) (rate(promtail_sent_entries_total[5m]))";
+            legendFormat = "{{instance}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 11;
+        type = "timeseries";
+        title = "Gitea Metrics Endpoint Rate (req/s)";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 24;
+          x = 0;
+          y = 29;
+        };
+        targets = [
+          {
+            expr = "sum by (instance) (rate(promhttp_metric_handler_requests_total{job=\"gitea\"}[5m]))";
+            legendFormat = "{{instance}}";
+            refId = "A";
+          }
+        ];
+      }
+    ];
+  };
+  nasDetailDashboardJson = builtins.toJSON {
+    id = null;
+    uid = "nas-detail";
+    title = "NAS Detail";
+    tags = ["homelab" "nas" "synology"];
+    timezone = "browser";
+    schemaVersion = 39;
+    version = 1;
+    refresh = "30s";
+    time = {
+      from = "now-6h";
+      to = "now";
+    };
+    editable = true;
+    panels = [
+      {
+        id = 1;
+        type = "stat";
+        title = "Synology Targets Up (Node + SNMP)";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 5;
+          w = 6;
+          x = 0;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+        };
+        targets = [
+          {
+            expr = "sum(max by (instance) (up{job=~\"synology-nodes|synology-snmp\"}))";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 2;
+        type = "timeseries";
+        title = "NAS CPU Usage %";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 9;
+          x = 6;
+          y = 0;
+        };
+        targets = [
+          {
+            expr = "(100 - (avg by (instance) (rate(node_cpu_seconds_total{job=\"synology-nodes\",mode=\"idle\"}[5m])) * 100)) or (100 - avg by (instance) (ssCpuIdle{job=\"synology-snmp-system\"}))";
+            legendFormat = "{{instance}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 3;
+        type = "timeseries";
+        title = "NAS Memory Available %";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 9;
+          x = 15;
+          y = 0;
+        };
+        targets = [
+          {
+            expr = "((node_memory_MemAvailable_bytes{job=\"synology-nodes\"} / node_memory_MemTotal_bytes{job=\"synology-nodes\"}) * 100) or (100 * (memAvailReal{job=\"synology-snmp-memory\"} / memTotalReal{job=\"synology-snmp-memory\"}))";
+            legendFormat = "{{instance}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 4;
+        type = "timeseries";
+        title = "NAS Root Disk Used %";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 0;
+          y = 8;
+        };
+        targets = [
+          {
+            expr = "(100 * (1 - (node_filesystem_avail_bytes{job=\"synology-nodes\",mountpoint=\"/\",fstype!~\"tmpfs|overlay\"} / node_filesystem_size_bytes{job=\"synology-nodes\",mountpoint=\"/\",fstype!~\"tmpfs|overlay\"}))) or (100 * (hrStorageUsed{job=\"synology-snmp-storage\",hrStorageDescr=\"/volume1\"} / hrStorageSize{job=\"synology-snmp-storage\",hrStorageDescr=\"/volume1\"}))";
+            legendFormat = "{{instance}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 5;
+        type = "timeseries";
+        title = "NAS Disk IO (Bytes/s)";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 12;
+          y = 8;
+        };
+        targets = [
+          {
+            expr = "sum by (instance) (rate(node_disk_read_bytes_total{job=\"synology-nodes\"}[5m]))";
+            legendFormat = "{{instance}} read";
+            refId = "A";
+          }
+          {
+            expr = "sum by (instance) (rate(node_disk_written_bytes_total{job=\"synology-nodes\"}[5m]))";
+            legendFormat = "{{instance}} write";
+            refId = "B";
+          }
+          {
+            expr = "sum by (instance) (rate(storageIONReadX{job=\"synology-snmp\"}[5m]))";
+            legendFormat = "{{instance}} read (snmp)";
+            refId = "C";
+          }
+          {
+            expr = "sum by (instance) (rate(storageIONWrittenX{job=\"synology-snmp\"}[5m]))";
+            legendFormat = "{{instance}} write (snmp)";
+            refId = "D";
+          }
+        ];
+      }
+      {
+        id = 6;
+        type = "timeseries";
+        title = "NAS Network Throughput (Bytes/s)";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 0;
+          y = 16;
+        };
+        targets = [
+          {
+            expr = "sum by (instance) (rate(node_network_receive_bytes_total{job=\"synology-nodes\",device!=\"lo\"}[5m]))";
+            legendFormat = "{{instance}} rx";
+            refId = "A";
+          }
+          {
+            expr = "sum by (instance) (rate(node_network_transmit_bytes_total{job=\"synology-nodes\",device!=\"lo\"}[5m]))";
+            legendFormat = "{{instance}} tx";
+            refId = "B";
+          }
+          {
+            expr = "sum by (instance) (rate(ifHCInOctets{job=\"synology-snmp-network\",ifName!~\"lo|sit0\"}[5m]))";
+            legendFormat = "{{instance}} rx (snmp)";
+            refId = "C";
+          }
+          {
+            expr = "sum by (instance) (rate(ifHCOutOctets{job=\"synology-snmp-network\",ifName!~\"lo|sit0\"}[5m]))";
+            legendFormat = "{{instance}} tx (snmp)";
+            refId = "D";
+          }
+        ];
+      }
+      {
+        id = 7;
+        type = "timeseries";
+        title = "NAS Temperature C";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 12;
+          y = 16;
+        };
+        targets = [
+          {
+            expr = "max by (instance) (node_hwmon_temp_celsius{job=\"synology-nodes\"})";
+            legendFormat = "{{instance}} hwmon";
+            refId = "A";
+          }
+          {
+            expr = "max by (instance) (temperature{job=\"synology-snmp\"})";
+            legendFormat = "{{instance}} system";
+            refId = "B";
+          }
+          {
+            expr = "max by (instance) (diskTemperature{job=\"synology-snmp\"})";
+            legendFormat = "{{instance}} disk";
+            refId = "C";
+          }
+        ];
+      }
+    ];
+  };
+  nasFileActivityDashboardJson = builtins.toJSON {
+    id = null;
+    uid = "nas-file-activity";
+    title = "NAS File Activity";
+    tags = ["homelab" "nas" "logs" "loki"];
+    timezone = "browser";
+    schemaVersion = 39;
+    version = 1;
+    refresh = "30s";
+    time = {
+      from = "now-6h";
+      to = "now";
+    };
+    editable = true;
+    panels = [
+      {
+        id = 1;
+        type = "logs";
+        title = "DSM File Activity (Raw)";
+        datasource = {
+          type = "loki";
+          uid = "loki";
+        };
+        gridPos = {
+          h = 12;
+          w = 24;
+          x = 0;
+          y = 0;
+        };
+        options = {
+          showCommonLabels = false;
+          showLabels = true;
+          showTime = true;
+          sortOrder = "Descending";
+        };
+        targets = [
+          {
+            expr = "{job=\"synology-file-activity\"}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 2;
+        type = "timeseries";
+        title = "File Activity Events/s";
+        datasource = {
+          type = "loki";
+          uid = "loki";
+        };
+        gridPos = {
+          h = 8;
+          w = 24;
+          x = 0;
+          y = 12;
+        };
+        targets = [
+          {
+            expr = "sum by (host) (rate({job=\"synology-file-activity\"}[5m]))";
+            legendFormat = "{{host}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 3;
+        type = "stat";
+        title = "Events (Last 1h)";
+        datasource = {
+          type = "loki";
+          uid = "loki";
+        };
+        gridPos = {
+          h = 6;
+          w = 6;
+          x = 0;
+          y = 20;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+        };
+        targets = [
+          {
+            expr = "sum(count_over_time({job=\"synology-file-activity\"}[1h])) or on() vector(0)";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 4;
+        type = "timeseries";
+        title = "Auth/Permission Failures (events/s)";
+        datasource = {
+          type = "loki";
+          uid = "loki";
+        };
+        gridPos = {
+          h = 6;
+          w = 18;
+          x = 6;
+          y = 20;
+        };
+        targets = [
+          {
+            expr = "sum by (host) (rate({job=\"synology-file-activity\"} |~ \"(?i)(fail|denied|unauthorized|permission)\"[5m])) or label_replace(vector(0), \"host\", \"hhsnas2\", \"\", \"\") or label_replace(vector(0), \"host\", \"hhsnas4\", \"\", \"\")";
+            legendFormat = "{{host}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 5;
+        type = "timeseries";
+        title = "File Change Activity (events/s)";
+        datasource = {
+          type = "loki";
+          uid = "loki";
+        };
+        gridPos = {
+          h = 8;
+          w = 16;
+          x = 0;
+          y = 26;
+        };
+        targets = [
+          {
+            expr = "sum by (host) (rate({job=\"synology-file-activity\"} |~ \"(?i)(create|delete|rename|write|modify|moved|copied)\"[5m]))";
+            legendFormat = "{{host}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 6;
+        type = "bargauge";
+        title = "Top Noisy Hosts (15m)";
+        datasource = {
+          type = "loki";
+          uid = "loki";
+        };
+        gridPos = {
+          h = 8;
+          w = 8;
+          x = 16;
+          y = 26;
+        };
+        options = {
+          orientation = "horizontal";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+          showUnfilled = true;
+        };
+        targets = [
+          {
+            expr = "topk(10, sum by (host) (count_over_time({job=\"synology-file-activity\"}[15m])))";
+            legendFormat = "{{host}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 7;
+        type = "logs";
+        title = "Gitea Container Logs (Raw)";
+        datasource = {
+          type = "loki";
+          uid = "loki";
+        };
+        gridPos = {
+          h = 10;
+          w = 24;
+          x = 0;
+          y = 34;
+        };
+        options = {
+          showCommonLabels = false;
+          showLabels = true;
+          showTime = true;
+          sortOrder = "Descending";
+        };
+        targets = [
+          {
+            expr = "{job=\"synology-gitea\"}";
+            refId = "A";
+          }
+        ];
+      }
+    ];
+  };
+  giteaOverviewDashboardJson = builtins.toJSON {
+    id = null;
+    uid = "gitea-overview";
+    title = "Gitea Overview";
+    tags = ["homelab" "gitea"];
+    timezone = "browser";
+    schemaVersion = 39;
+    version = 1;
+    refresh = "30s";
+    time = {
+      from = "now-24h";
+      to = "now";
+    };
+    editable = true;
+    panels = [
+      {
+        id = 1;
+        type = "stat";
+        title = "Gitea Target Up";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 5;
+          w = 4;
+          x = 0;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+          textMode = "auto";
+        };
+        targets = [
+          {
+            expr = "sum(up{job=\"gitea\"})";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 2;
+        type = "stat";
+        title = "Repositories";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 5;
+          w = 4;
+          x = 4;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+          textMode = "auto";
+        };
+        targets = [
+          {
+            expr = "sum(gitea_repositories{job=\"gitea\"})";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 3;
+        type = "stat";
+        title = "Users";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 5;
+          w = 4;
+          x = 8;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+          textMode = "auto";
+        };
+        targets = [
+          {
+            expr = "sum(gitea_users{job=\"gitea\"})";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 4;
+        type = "stat";
+        title = "Organizations";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 5;
+          w = 4;
+          x = 12;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+          textMode = "auto";
+        };
+        targets = [
+          {
+            expr = "sum(gitea_organizations{job=\"gitea\"})";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 5;
+        type = "stat";
+        title = "Open Issues";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 5;
+          w = 4;
+          x = 16;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+          textMode = "auto";
+        };
+        targets = [
+          {
+            expr = "sum(gitea_issues_open{job=\"gitea\"})";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 6;
+        type = "stat";
+        title = "Closed Issues";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 5;
+          w = 4;
+          x = 20;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+          textMode = "auto";
+        };
+        targets = [
+          {
+            expr = "sum(gitea_issues_closed{job=\"gitea\"})";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 7;
+        type = "timeseries";
+        title = "Repositories (Trend)";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 8;
+          x = 0;
+          y = 5;
+        };
+        targets = [
+          {
+            expr = "sum(gitea_repositories{job=\"gitea\"})";
+            legendFormat = "repositories";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 8;
+        type = "timeseries";
+        title = "Users (Trend)";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 8;
+          x = 8;
+          y = 5;
+        };
+        targets = [
+          {
+            expr = "sum(gitea_users{job=\"gitea\"})";
+            legendFormat = "users";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 9;
+        type = "timeseries";
+        title = "Issues Open vs Closed";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 8;
+          x = 16;
+          y = 5;
+        };
+        targets = [
+          {
+            expr = "sum(gitea_issues_open{job=\"gitea\"})";
+            legendFormat = "open";
+            refId = "A";
+          }
+          {
+            expr = "sum(gitea_issues_closed{job=\"gitea\"})";
+            legendFormat = "closed";
+            refId = "B";
+          }
+        ];
+      }
+      {
+        id = 10;
+        type = "timeseries";
+        title = "Gitea Metrics Scrape Rate (req/s)";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 0;
+          y = 13;
+        };
+        targets = [
+          {
+            expr = "sum by (instance) (rate(promhttp_metric_handler_requests_total{job=\"gitea\"}[5m]))";
+            legendFormat = "{{instance}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 11;
+        type = "timeseries";
+        title = "Stars vs Watches";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 12;
+          y = 13;
+        };
+        targets = [
+          {
+            expr = "sum(gitea_stars{job=\"gitea\"})";
+            legendFormat = "stars";
+            refId = "A";
+          }
+          {
+            expr = "sum(gitea_watches{job=\"gitea\"})";
+            legendFormat = "watches";
+            refId = "B";
+          }
+        ];
+      }
+      {
+        id = 12;
+        type = "timeseries";
+        title = "GitHub Profile Stats";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 24;
+          x = 0;
+          y = 21;
+        };
+        targets = [
+          {
+            expr = "max by (username) (github_profile_followers{job=\"github-profile\"})";
+            legendFormat = "{{username}} followers";
+            refId = "A";
+          }
+          {
+            expr = "max by (username) (github_profile_public_repos{job=\"github-profile\"})";
+            legendFormat = "{{username}} public repos";
+            refId = "B";
+          }
+          {
+            expr = "max by (username) (github_profile_total_stars{job=\"github-profile\"})";
+            legendFormat = "{{username}} stars";
+            refId = "C";
+          }
+          {
+            expr = "max by (username) (github_profile_total_open_issues{job=\"github-profile\"})";
+            legendFormat = "{{username}} open issues";
+            refId = "D";
+          }
+        ];
+      }
+      {
+        id = 13;
+        type = "timeseries";
+        title = "GitHub Commits (1d/7d/30d/365d)";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 24;
+          x = 0;
+          y = 29;
+        };
+        targets = [
+          {
+            expr = "max by (username) (github_profile_commits_1d{job=\"github-profile\"})";
+            legendFormat = "{{username}} commits 1d";
+            refId = "A";
+          }
+          {
+            expr = "max by (username) (github_profile_commits_7d{job=\"github-profile\"})";
+            legendFormat = "{{username}} commits 7d";
+            refId = "B";
+          }
+          {
+            expr = "max by (username) (github_profile_commits_30d{job=\"github-profile\"})";
+            legendFormat = "{{username}} commits 30d";
+            refId = "C";
+          }
+          {
+            expr = "max by (username) (github_profile_commits_365d{job=\"github-profile\"})";
+            legendFormat = "{{username}} commits 365d";
+            refId = "D";
+          }
+        ];
+      }
+    ];
+  };
+}

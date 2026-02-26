@@ -15,137 +15,16 @@
     if cfg.image.digest == null
     then "${cfg.image.repository}:${cfg.image.tag}"
     else "${cfg.image.repository}@${cfg.image.digest}";
-  healthcheckScript = pkgs.writeShellScript "excalidraw-healthcheck" ''
-    set -euo pipefail
 
-    service_name=${serviceName}
-    container_name=${cfg.containerName}
-
-    if ! systemctl is-active --quiet "$service_name"; then
-      echo "excalidraw-healthcheck: systemd service $service_name is not active" >&2
-      exit 1
-    fi
-
-    status="$(${dockerBin} inspect --format '{{if .State.Health}}{{.State.Health.Status}}{{else}}none{{end}}' "$container_name" 2>/dev/null || true)"
-    if [ "$status" != "healthy" ]; then
-      echo "excalidraw-healthcheck: container health is '$status' (expected 'healthy')" >&2
-      ${dockerBin} ps --filter "name=^/$container_name$" --format 'table {{.Names}}\t{{.Status}}' >&2 || true
-      exit 1
-    fi
-  '';
-
-  waitForHealthy = pkgs.writeShellScript "excalidraw-wait-healthy" ''
-    set -euo pipefail
-
-    container_name=${cfg.containerName}
-    timeout_seconds=120
-    deadline=$((SECONDS + timeout_seconds))
-
-    while true; do
-      status="$(${dockerBin} inspect --format '{{if .State.Health}}{{.State.Health.Status}}{{else}}none{{end}}' "$container_name" 2>/dev/null || true)"
-
-      case "$status" in
-        healthy)
-          exit 0
-          ;;
-        unhealthy)
-          echo "excalidraw: container became unhealthy" >&2
-          ${dockerBin} ps --filter "name=^/$container_name$" --format 'table {{.Names}}\t{{.Status}}' >&2 || true
-          exit 1
-          ;;
-        starting|none|"")
-          ;;
-        *)
-          echo "excalidraw: unexpected health status: $status" >&2
-          ;;
-      esac
-
-      if [ "$SECONDS" -ge "$deadline" ]; then
-        echo "excalidraw: timed out waiting for a healthy container (''${timeout_seconds}s)" >&2
-        ${dockerBin} ps --filter "name=^/$container_name$" --format 'table {{.Names}}\t{{.Status}}' >&2 || true
-        exit 1
-      fi
-
-      sleep 2
-    done
-  '';
-in {
-  options.services.excalidraw = {
-    enable = lib.mkEnableOption "Excalidraw service (Docker Compose)";
-
-    containerName = lib.mkOption {
-      type = lib.types.str;
-      default = "excalidraw";
-      description = "Docker container name.";
-    };
-
-    hostname = lib.mkOption {
-      type = lib.types.str;
-      description = "Hostname used for the Traefik router `Host()` rule.";
-    };
-
-    timezone = lib.mkOption {
-      type = lib.types.str;
-      default = "UTC";
-      description = "Timezone passed to the container via `TZ`.";
-    };
-
-    network = lib.mkOption {
-      type = lib.types.str;
-      default = "traefik";
-      description = "External Docker network name used by Traefik and downstream services.";
-    };
-
-    image = {
-      repository = lib.mkOption {
-        type = lib.types.str;
-        default = "excalidraw/excalidraw";
-        description = "Container image repository.";
-      };
-
-      tag = lib.mkOption {
-        type = lib.types.str;
-        default = "latest";
-        description = "Container image tag.";
-      };
-
-      digest = lib.mkOption {
-        type = lib.types.nullOr lib.types.str;
-        default = null;
-        description = ''
-          Optional immutable digest pin (for example `sha256:...`). When set,
-          the module uses `repository@digest` form and
-          ignores `services.excalidraw.image.tag`.
-        '';
-      };
-
-      allowMutableTag = lib.mkOption {
-        type = lib.types.bool;
-        default = false;
-        description = ''
-          Allow mutable tags such as `latest` when using tag mode.
-          Keep disabled to enforce pinned tags by default.
-        '';
-      };
-    };
-
-    tls = lib.mkEnableOption "TLS on the Excalidraw Traefik router";
-
-    monitoring = {
-      enable = lib.mkOption {
-        type = lib.types.bool;
-        default = true;
-        description = "Enable periodic service/container health checks via systemd timer.";
-      };
-
-      interval = lib.mkOption {
-        type = lib.types.str;
-        default = "5m";
-        description = "How often to run the Excalidraw healthcheck (for example `5m`).";
-      };
-    };
+  scripts = import ./scripts.nix {
+    inherit pkgs cfg serviceName dockerBin;
   };
 
+  inherit (scripts) healthcheckScript waitForHealthy;
+in {
+  imports = [
+    ./options.nix
+  ];
   config = lib.mkIf cfg.enable {
     assertions = [
       {
@@ -204,8 +83,16 @@ in {
           "EXCALIDRAW_IMAGE=${imageRef}"
           "EXCALIDRAW_NETWORK=${cfg.network}"
           "EXCALIDRAW_HOSTNAME=${cfg.hostname}"
-          "EXCALIDRAW_ENTRYPOINTS=${if cfg.tls then "websecure" else "web"}"
-          "EXCALIDRAW_TLS=${if cfg.tls then "true" else "false"}"
+          "EXCALIDRAW_ENTRYPOINTS=${
+            if cfg.tls
+            then "websecure"
+            else "web"
+          }"
+          "EXCALIDRAW_TLS=${
+            if cfg.tls
+            then "true"
+            else "false"
+          }"
           "TZ=${cfg.timezone}"
         ];
 

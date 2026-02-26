@@ -8,101 +8,16 @@
   serviceName = "promtail";
   composeDir = "/etc/${serviceName}";
   dockerBin = "${config.virtualisation.docker.package}/bin/docker";
-  portType = lib.types.ints.between 1 65535;
-  syslogScrapeConfig = lib.optionalString cfg.syslog.enable (
-    lib.concatStringsSep "\n" [
-      "  - job_name: syslog-receiver"
-      "    syslog:"
-      "      listen_address: ${cfg.syslog.listenAddress}"
-      "      idle_timeout: 60s"
-      "      label_structured_data: true"
-      "      labels:"
-      "        job: ${cfg.syslog.jobLabel}"
-      "    relabel_configs:"
-      "      - source_labels: ['__syslog_message_hostname']"
-      "        target_label: host"
-    ]
-  );
-in {
-  options.services.promtailCompose = {
-    enable = lib.mkEnableOption "Promtail log shipper (Docker Compose)";
 
-    containerName = lib.mkOption {
-      type = lib.types.str;
-      default = "promtail";
-      description = "Docker container name.";
-    };
-
-    dataDir = lib.mkOption {
-      type = lib.types.str;
-      default = "/var/lib/promtail";
-      description = "Persistent host path used for Promtail positions data.";
-    };
-
-    lokiPushUrl = lib.mkOption {
-      type = lib.types.nullOr lib.types.str;
-      default = null;
-      description = "Loki push endpoint URL (`/loki/api/v1/push`).";
-      example = "http://loki.internal.example:3100/loki/api/v1/push";
-    };
-
-    httpPort = lib.mkOption {
-      type = portType;
-      default = 9080;
-      description = "Promtail local HTTP listen port (health/metrics).";
-    };
-
-    journalMaxAge = lib.mkOption {
-      type = lib.types.str;
-      default = "12h";
-      description = "Maximum age for journald entries scraped by Promtail.";
-    };
-
-    syslog = {
-      enable = lib.mkOption {
-        type = lib.types.bool;
-        default = false;
-        description = "Enable a Promtail syslog receiver for external log senders (for example DSM).";
-      };
-
-      listenAddress = lib.mkOption {
-        type = lib.types.str;
-        default = "0.0.0.0:1514";
-        example = "0.0.0.0:1514";
-        description = "Listen address for Promtail syslog receiver (`host:port`).";
-      };
-
-      jobLabel = lib.mkOption {
-        type = lib.types.str;
-        default = "synology-file-activity";
-        description = "Value used for the Loki `job` label on syslog-ingested logs.";
-      };
-    };
-
-    image = {
-      repository = lib.mkOption {
-        type = lib.types.str;
-        default = "grafana/promtail";
-        description = "Container image repository.";
-      };
-
-      tag = lib.mkOption {
-        type = lib.types.str;
-        default = "3.1.1";
-        description = "Container image tag.";
-      };
-
-      allowMutableTag = lib.mkOption {
-        type = lib.types.bool;
-        default = false;
-        description = ''
-          Allow mutable tags such as `latest`. Keep disabled to enforce pinned
-          image tags by default.
-        '';
-      };
-    };
+  render = import ./render.nix {
+    inherit lib cfg;
   };
 
+  inherit (render) configYaml;
+in {
+  imports = [
+    ./options.nix
+  ];
   config = lib.mkIf cfg.enable {
     assertions = [
       {
@@ -131,36 +46,14 @@ in {
 
     environment.etc."${serviceName}/docker-compose.yml".source = ./docker-compose.yml;
 
-    environment.etc."${serviceName}/config.yml".text = ''
-      server:
-        http_listen_port: ${toString cfg.httpPort}
-        grpc_listen_port: 0
-
-      positions:
-        filename: /var/lib/promtail/positions.yaml
-
-      clients:
-        - url: ${cfg.lokiPushUrl}
-
-      scrape_configs:
-        - job_name: journal
-          journal:
-            max_age: ${cfg.journalMaxAge}
-            path: /run/log/journal
-            labels:
-              job: systemd-journal
-          relabel_configs:
-            - source_labels: ['__journal__hostname']
-              target_label: host
-      ${syslogScrapeConfig}
-    '';
+    environment.etc."${serviceName}/config.yml".text = configYaml;
 
     systemd.services.${serviceName} = {
       description = "Promtail log shipper (Docker Compose)";
 
-      wantedBy = [ "multi-user.target" ];
-      after = [ "docker.service" "network-online.target" ];
-      wants = [ "network-online.target" ];
+      wantedBy = ["multi-user.target"];
+      after = ["docker.service" "network-online.target"];
+      wants = ["network-online.target"];
       restartTriggers = [
         config.environment.etc."${serviceName}/docker-compose.yml".source
         config.environment.etc."${serviceName}/config.yml".source
