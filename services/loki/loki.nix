@@ -8,114 +8,16 @@
   serviceName = "loki";
   composeDir = "/etc/${serviceName}";
   dockerBin = "${config.virtualisation.docker.package}/bin/docker";
-  portType = lib.types.ints.between 1 65535;
-  backupScript = pkgs.writeShellScript "loki-backup" ''
-    set -euo pipefail
 
-    src=${lib.escapeShellArg cfg.dataDir}
-    dst=${lib.escapeShellArg cfg.backup.targetDir}
-    keep_days=${toString cfg.backup.keepDays}
-
-    if [[ ! -d "$src" ]]; then
-      echo "loki-backup: source directory not found: $src" >&2
-      exit 1
-    fi
-
-    install -d -m 0750 "$dst"
-
-    stamp="$(${pkgs.coreutils}/bin/date -u +%Y%m%dT%H%M%SZ)"
-    archive="$dst/loki-$stamp.tar.zst"
-
-    ${pkgs.gnutar}/bin/tar \
-      --use-compress-program="${pkgs.zstd}/bin/zstd -T0 -19" \
-      -cf "$archive" \
-      -C "$src" .
-
-    ${pkgs.findutils}/bin/find "$dst" -maxdepth 1 -type f -name 'loki-*.tar.zst' -mtime "+$keep_days" -delete
-  '';
-in {
-  options.services.lokiCompose = {
-    enable = lib.mkEnableOption "Loki log aggregation service (Docker Compose)";
-
-    containerName = lib.mkOption {
-      type = lib.types.str;
-      default = "loki";
-      description = "Docker container name.";
-    };
-
-    dataDir = lib.mkOption {
-      type = lib.types.str;
-      default = "/var/lib/loki";
-      description = "Persistent host path used for Loki data.";
-    };
-
-    httpPort = lib.mkOption {
-      type = portType;
-      default = 3100;
-      description = "Host TCP port published for Loki HTTP API.";
-    };
-
-    listenAddress = lib.mkOption {
-      type = lib.types.str;
-      default = "0.0.0.0";
-      description = ''
-        Host IP address used for the published Loki port binding.
-        Set this to a LAN IP (for example `10.0.0.10`) to avoid broad exposure.
-      '';
-    };
-
-    retentionPeriod = lib.mkOption {
-      type = lib.types.str;
-      default = "30d";
-      description = "Loki retention period.";
-    };
-
-    image = {
-      repository = lib.mkOption {
-        type = lib.types.str;
-        default = "grafana/loki";
-        description = "Container image repository.";
-      };
-
-      tag = lib.mkOption {
-        type = lib.types.str;
-        default = "3.1.1";
-        description = "Container image tag.";
-      };
-
-      allowMutableTag = lib.mkOption {
-        type = lib.types.bool;
-        default = false;
-        description = ''
-          Allow mutable tags such as `latest`. Keep disabled to enforce pinned
-          image tags by default.
-        '';
-      };
-    };
-
-    backup = {
-      enable = lib.mkEnableOption "periodic Loki data backups";
-
-      targetDir = lib.mkOption {
-        type = lib.types.str;
-        default = "/var/backups/loki";
-        description = "Directory where compressed Loki backup archives are written.";
-      };
-
-      schedule = lib.mkOption {
-        type = lib.types.str;
-        default = "daily";
-        description = "Systemd OnCalendar expression for Loki backups.";
-      };
-
-      keepDays = lib.mkOption {
-        type = lib.types.ints.positive;
-        default = 14;
-        description = "How many days of backup archives to keep.";
-      };
-    };
+  render = import ./render.nix {
+    inherit lib pkgs cfg;
   };
 
+  inherit (render) backupScript configYaml;
+in {
+  imports = [
+    ./options.nix
+  ];
   config = lib.mkIf cfg.enable {
     assertions = [
       {
@@ -148,41 +50,7 @@ in {
 
     environment.etc."${serviceName}/docker-compose.yml".source = ./docker-compose.yml;
 
-    environment.etc."${serviceName}/config.yaml".text = ''
-      auth_enabled: false
-
-      server:
-        http_listen_port: 3100
-
-      common:
-        path_prefix: /loki
-        storage:
-          filesystem:
-            chunks_directory: /loki/chunks
-            rules_directory: /loki/rules
-        replication_factor: 1
-        ring:
-          kvstore:
-            store: inmemory
-
-      schema_config:
-        configs:
-          - from: 2024-01-01
-            store: tsdb
-            object_store: filesystem
-            schema: v13
-            index:
-              prefix: index_
-              period: 24h
-
-      limits_config:
-        retention_period: ${cfg.retentionPeriod}
-
-      compactor:
-        working_directory: /loki/compactor
-        retention_enabled: true
-        delete_request_store: filesystem
-    '';
+    environment.etc."${serviceName}/config.yaml".text = configYaml;
 
     systemd.services.${serviceName} = {
       description = "Loki log aggregation service (Docker Compose)";
@@ -229,8 +97,8 @@ in {
 
     systemd.services."${serviceName}-backup" = lib.mkIf cfg.backup.enable {
       description = "Backup Loki data";
-      after = [ "${serviceName}.service" ];
-      requires = [ "${serviceName}.service" ];
+      after = ["${serviceName}.service"];
+      requires = ["${serviceName}.service"];
 
       serviceConfig = {
         Type = "oneshot";
@@ -240,7 +108,7 @@ in {
 
     systemd.timers."${serviceName}-backup" = lib.mkIf cfg.backup.enable {
       description = "Periodic Loki backup";
-      wantedBy = [ "timers.target" ];
+      wantedBy = ["timers.target"];
       timerConfig = {
         OnCalendar = cfg.backup.schedule;
         Persistent = true;

@@ -11,94 +11,15 @@
   hostnameRegex = "^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)(\\.([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?))*$";
   networkRegex = "^[a-zA-Z0-9][a-zA-Z0-9_.-]*$";
 
-  waitForHealthy = pkgs.writeShellScript "diagrams-net-wait-healthy" ''
-    set -euo pipefail
-
-    container_name=${cfg.containerName}
-    timeout_seconds=120
-    deadline=$((SECONDS + timeout_seconds))
-
-    while true; do
-      status="$(${dockerBin} inspect --format '{{if .State.Health}}{{.State.Health.Status}}{{else}}none{{end}}' "$container_name" 2>/dev/null || true)"
-
-      case "$status" in
-        healthy)
-          exit 0
-          ;;
-        unhealthy)
-          echo "diagrams-net: container became unhealthy" >&2
-          ${dockerBin} ps --filter "name=^/$container_name$" --format 'table {{.Names}}\t{{.Status}}' >&2 || true
-          exit 1
-          ;;
-        starting|none|"")
-          ;;
-        *)
-          echo "diagrams-net: unexpected health status: $status" >&2
-          ;;
-      esac
-
-      if [ "$SECONDS" -ge "$deadline" ]; then
-        echo "diagrams-net: timed out waiting for a healthy container (''${timeout_seconds}s)" >&2
-        ${dockerBin} ps --filter "name=^/$container_name$" --format 'table {{.Names}}\t{{.Status}}' >&2 || true
-        exit 1
-      fi
-
-      sleep 2
-    done
-  '';
-in {
-  options.services.diagramsNet = {
-    enable = lib.mkEnableOption "diagrams.net service (Docker Compose)";
-
-    containerName = lib.mkOption {
-      type = lib.types.str;
-      default = "diagrams-net";
-      description = "Docker container name.";
-    };
-
-    hostname = lib.mkOption {
-      type = lib.types.str;
-      description = "Hostname used for the Traefik router `Host()` rule.";
-    };
-
-    timezone = lib.mkOption {
-      type = lib.types.str;
-      default = "UTC";
-      description = "Timezone passed to the container via `TZ`.";
-    };
-
-    network = lib.mkOption {
-      type = lib.types.str;
-      default = "traefik";
-      description = "External Docker network name used by Traefik and downstream services.";
-    };
-
-    image = {
-      repository = lib.mkOption {
-        type = lib.types.str;
-        default = "jgraph/drawio";
-        description = "Container image repository.";
-      };
-
-      tag = lib.mkOption {
-        type = lib.types.str;
-        default = "29.0.3";
-        description = "Container image tag.";
-      };
-
-      allowMutableTag = lib.mkOption {
-        type = lib.types.bool;
-        default = false;
-        description = ''
-          Allow mutable tags such as `latest`. Keep disabled to enforce pinned
-          image tags by default.
-        '';
-      };
-    };
-
-    tls = lib.mkEnableOption "TLS on the diagrams.net Traefik router";
+  scripts = import ./scripts.nix {
+    inherit pkgs cfg dockerBin;
   };
 
+  inherit (scripts) waitForHealthy;
+in {
+  imports = [
+    ./options.nix
+  ];
   config = lib.mkIf cfg.enable {
     assertions = [
       {
@@ -154,8 +75,16 @@ in {
           "DIAGRAMS_NET_IMAGE_TAG=${cfg.image.tag}"
           "DIAGRAMS_NET_NETWORK=${cfg.network}"
           "DIAGRAMS_NET_HOSTNAME=${cfg.hostname}"
-          "DIAGRAMS_NET_ENTRYPOINTS=${if cfg.tls then "websecure" else "web"}"
-          "DIAGRAMS_NET_TLS=${if cfg.tls then "true" else "false"}"
+          "DIAGRAMS_NET_ENTRYPOINTS=${
+            if cfg.tls
+            then "websecure"
+            else "web"
+          }"
+          "DIAGRAMS_NET_TLS=${
+            if cfg.tls
+            then "true"
+            else "false"
+          }"
           "TZ=${cfg.timezone}"
         ];
 
