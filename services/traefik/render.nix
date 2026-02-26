@@ -20,7 +20,7 @@
       "--ping=true"
       "--providers.docker=true"
       "--providers.docker.exposedByDefault=false"
-      "--providers.docker.network=${TRAEFIK_NETWORK}"
+      "--providers.docker.network=''${TRAEFIK_NETWORK}"
       "--providers.file.filename=/etc/traefik/tls.yml"
       "--entryPoints.web.address=:80"
       "--entryPoints.websecure.address=:443"
