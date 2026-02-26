@@ -80,6 +80,7 @@
         promtailModule = import ./services/promtail/promtail.nix;
         snmpExporterModule = import ./services/snmp-exporter/snmp-exporter.nix;
         unpollerModule = import ./services/unpoller/unpoller.nix;
+        tailscaleModule = import ./services/tailscale/tailscale.nix;
       in
       {
         nixosModules = {
@@ -96,6 +97,7 @@
           promtail = promtailModule;
           snmpExporter = snmpExporterModule;
           unpoller = unpollerModule;
+          tailscale = tailscaleModule;
         };
 
         services = {
@@ -112,6 +114,7 @@
           promtail = promtailModule;
           snmpExporter = snmpExporterModule;
           unpoller = unpollerModule;
+          tailscale = tailscaleModule;
         };
       }
     );
