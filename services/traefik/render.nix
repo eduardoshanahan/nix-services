@@ -6,7 +6,6 @@
   tlsEnabled = cfg.tls.enable;
   httpToHttpsRedirectEnabled = cfg.httpToHttpsRedirect;
   metricsEnabled = cfg.metrics.enable;
-  ghostActivityPubEnabled = cfg.ghostActivityPub.enable;
   mkYamlList = {
     indent,
     items,
@@ -124,31 +123,9 @@
       tls: {}
     '';
 
-  ghostActivityPubBlock =
-    if ghostActivityPubEnabled
-    then ''
-      http:
-        routers:
-          ghost-activitypub:
-            entryPoints:
-              - websecure
-            rule: Host(`${cfg.ghostActivityPub.hostname}`) && (PathPrefix(`/.ghost/activitypub/`) || Path(`/.well-known/webfinger`) || Path(`/.well-known/nodeinfo`))
-            priority: 200
-            service: ghost-activitypub
-            tls: true
-        services:
-          ghost-activitypub:
-            loadBalancer:
-              passHostHeader: true
-              servers:
-                - url: https://ap.ghost.org
-    ''
-    else "";
-
   tlsConfigText = lib.concatStringsSep "\n" (
     lib.filter (block: block != "") [
       tlsBlock
-      ghostActivityPubBlock
     ]
   );
 in {
