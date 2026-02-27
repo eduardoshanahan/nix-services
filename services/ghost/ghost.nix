@@ -6,12 +6,71 @@
 }: let
   cfg = config.services.ghost;
   runtimeSecrets = import ../../lib/runtime-secrets.nix {inherit lib;};
-  runtimeSecretEnv = import ../../lib/runtime-secret-env.nix {inherit lib pkgs;};
   serviceName = "ghost";
   composeDir = "/etc/${serviceName}";
   dockerBin = "${config.virtualisation.docker.package}/bin/docker";
   hostnameRegex = "^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)(\\.([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?))*$";
   networkRegex = "^[a-zA-Z0-9][a-zA-Z0-9_.-]*$";
+  writeRuntimeEnv = pkgs.writeShellScript "ghost-write-runtime-env" ''
+    set -euo pipefail
+    umask 0077
+
+    db_secret_file=${lib.escapeShellArg (toString cfg.database.passwordFile)}
+    mail_secret_file=${lib.escapeShellArg (
+      if cfg.mail.passwordFile == null
+      then ""
+      else toString cfg.mail.passwordFile
+    )}
+
+    if [[ ! -s "$db_secret_file" ]]; then
+      echo "ghost: missing or empty database password file: $db_secret_file" >&2
+      exit 1
+    fi
+
+    db_password="$(cat "$db_secret_file")"
+    db_password="''${db_password%$'\n'}"
+    db_password="''${db_password%$'\r'}"
+
+    if [[ -z "$db_password" ]]; then
+      echo "ghost: database password file is empty after trimming" >&2
+      exit 1
+    fi
+
+    escape_env() {
+      local value="$1"
+      value="''${value//\\/\\\\}"
+      value="''${value//\"/\\\"}"
+      printf '%s' "$value"
+    }
+
+    install -d -m 0700 /run/secrets
+    tmp="$(mktemp -p /run/secrets '.ghost.env.XXXXXX')"
+
+    printf 'database__connection__password="%s"\n' "$(escape_env "$db_password")" > "$tmp"
+
+    if [[ -n "$mail_secret_file" ]]; then
+      if [[ ! -s "$mail_secret_file" ]]; then
+        echo "ghost: missing or empty mail password file: $mail_secret_file" >&2
+        rm -f "$tmp"
+        exit 1
+      fi
+
+      mail_password="$(cat "$mail_secret_file")"
+      mail_password="''${mail_password%$'\n'}"
+      mail_password="''${mail_password%$'\r'}"
+
+      if [[ -z "$mail_password" ]]; then
+        echo "ghost: mail password file is empty after trimming" >&2
+        rm -f "$tmp"
+        exit 1
+      fi
+
+      printf 'mail__options__auth__pass="%s"\n' "$(escape_env "$mail_password")" >> "$tmp"
+    fi
+
+    chmod 0600 "$tmp"
+    mv -f "$tmp" /run/secrets/ghost.env
+  '';
   waitForHealthy = pkgs.writeShellScript "ghost-wait-healthy" ''
     set -euo pipefail
 
@@ -137,6 +196,52 @@ in {
       };
     };
 
+    mail = {
+      enable = lib.mkOption {
+        type = lib.types.bool;
+        default = false;
+        description = "Enable SMTP mail delivery for Ghost.";
+      };
+
+      from = lib.mkOption {
+        type = lib.types.str;
+        default = "eduardoshanahan@gmail.com";
+        description = "Sender address for Ghost mail.";
+      };
+
+      host = lib.mkOption {
+        type = lib.types.str;
+        default = "smtp.gmail.com";
+        description = "SMTP host used by Ghost.";
+      };
+
+      port = lib.mkOption {
+        type = lib.types.port;
+        default = 465;
+        description = "SMTP port used by Ghost.";
+      };
+
+      secure = lib.mkOption {
+        type = lib.types.bool;
+        default = true;
+        description = "Whether Ghost uses SMTPS/TLS for the mail connection.";
+      };
+
+      user = lib.mkOption {
+        type = lib.types.str;
+        default = "eduardoshanahan@gmail.com";
+        description = "SMTP username used by Ghost.";
+      };
+
+      passwordFile = runtimeSecrets.mkSecretFileOption {
+        description = ''
+          Absolute path to a runtime-provisioned file containing the SMTP password
+          used by Ghost mail delivery.
+        '';
+        example = "/run/secrets/ghost-mail-password";
+      };
+    };
+
     tls = lib.mkEnableOption "TLS on the Ghost Traefik router";
   };
 
@@ -173,6 +278,10 @@ in {
       {
         assertion = cfg.database.passwordFile != null;
         message = "services.ghost.database.passwordFile must be set when enabling Ghost.";
+      }
+      {
+        assertion = !cfg.mail.enable || cfg.mail.passwordFile != null;
+        message = "services.ghost.mail.passwordFile must be set when services.ghost.mail.enable = true.";
       }
     ];
 
@@ -215,6 +324,12 @@ in {
           "GHOST_DATABASE_PORT=${toString cfg.database.port}"
           "GHOST_DATABASE_NAME=${cfg.database.name}"
           "GHOST_DATABASE_USER=${cfg.database.user}"
+          "GHOST_MAIL_TRANSPORT=${if cfg.mail.enable then "SMTP" else "Direct"}"
+          "GHOST_MAIL_FROM=${if cfg.mail.enable then cfg.mail.from else ""}"
+          "GHOST_MAIL_HOST=${if cfg.mail.enable then cfg.mail.host else ""}"
+          "GHOST_MAIL_PORT=${if cfg.mail.enable then toString cfg.mail.port else ""}"
+          "GHOST_MAIL_SECURE=${if cfg.mail.enable && cfg.mail.secure then "true" else "false"}"
+          "GHOST_MAIL_USER=${if cfg.mail.enable then cfg.mail.user else ""}"
           "TZ=${cfg.timezone}"
         ];
 
@@ -222,11 +337,7 @@ in {
           "${pkgs.runtimeShell} -c 'mkdir -p ${cfg.dataDir} && chown 1000:1000 ${cfg.dataDir} && chmod 0750 ${cfg.dataDir}'"
           "${pkgs.runtimeShell} -c 'test -s ${composeDir}/docker-compose.yml'"
           "${pkgs.runtimeShell} -c 'for i in $(seq 1 30); do ${dockerBin} info >/dev/null 2>&1 && exit 0; sleep 1; done; echo \"ghost: docker daemon is not ready\" >&2; exit 1'"
-          (runtimeSecretEnv.mkRuntimeSecretEnvExecStartPre {
-            name = serviceName;
-            secretFile = cfg.database.passwordFile;
-            envVar = "database__connection__password";
-          })
+          writeRuntimeEnv
           "${pkgs.runtimeShell} -c '${dockerBin} compose config >/dev/null'"
           "${pkgs.runtimeShell} -c '${dockerBin} network inspect ${cfg.network} >/dev/null 2>&1 || ${dockerBin} network create ${cfg.network}'"
         ];

@@ -20,6 +20,12 @@ services:
       - database__connection__port=${GHOST_DATABASE_PORT}
       - database__connection__user=${GHOST_DATABASE_USER}
       - database__connection__database=${GHOST_DATABASE_NAME}
+      - mail__transport=${GHOST_MAIL_TRANSPORT}
+      - mail__from=${GHOST_MAIL_FROM}
+      - mail__options__host=${GHOST_MAIL_HOST}
+      - mail__options__port=${GHOST_MAIL_PORT}
+      - mail__options__secure=${GHOST_MAIL_SECURE}
+      - mail__options__auth__user=${GHOST_MAIL_USER}
 
     volumes:
       - "${GHOST_DATA_DIR}:/var/lib/ghost/content"
