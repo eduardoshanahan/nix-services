@@ -4,6 +4,7 @@ Reproducible, sanitized deployment artifacts for host `hhnas4`.
 
 ## Included stack
 
+- `ghost-mysql` for a dedicated Ghost production database.
 - `gitea` with built-in container registry enabled.
 - `promtail` shipping `gitea` container logs to Loki.
 
@@ -58,6 +59,7 @@ Example image path:
 
 - The copied `.env` is a template; adjust values on NAS as needed.
 - No credentials or secret values are committed in this directory.
+- Ghost database stack: `ghost-mysql/README.md`
 - Session continuity notes: `SESSION_NOTES.md`
 - Post-deploy operations checklist: `GITEA_OPERATIONS_CHECKLIST.md`
 - Promtail settings live at `promtail/.env` on the NAS. Set `LOKI_PUSH_URL` to

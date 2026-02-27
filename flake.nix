@@ -81,6 +81,7 @@
         snmpExporterModule = import ./services/snmp-exporter/snmp-exporter.nix;
         unpollerModule = import ./services/unpoller/unpoller.nix;
         tailscaleModule = import ./services/tailscale/tailscale.nix;
+        ghostModule = import ./services/ghost/ghost.nix;
       in
       {
         nixosModules = {
@@ -98,6 +99,7 @@
           snmpExporter = snmpExporterModule;
           unpoller = unpollerModule;
           tailscale = tailscaleModule;
+          ghost = ghostModule;
         };
 
         services = {
@@ -115,6 +117,7 @@
           snmpExporter = snmpExporterModule;
           unpoller = unpollerModule;
           tailscale = tailscaleModule;
+          ghost = ghostModule;
         };
       }
     );
