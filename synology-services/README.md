@@ -14,6 +14,10 @@ Sanitized, reproducible deployment artifacts for Synology hosts.
 - `nas-host-template/deploy.sh`
 - `nas-host-template/DSM_MANUAL_CHECKLIST.md`
 - `hhnas4/gitea/compose.yaml`
+- `hhnas4/ghost-mysql/compose.yaml`
+- `hhnas4/ghost-mysql/.env.example`
+- `hhnas4/ghost-mysql/deploy.sh`
+- `hhnas4/ghost-mysql/README.md`
 - `hhnas4/gitea/.env.example`
 - `hhnas4/promtail/compose.yaml`
 - `hhnas4/promtail/config.yml`

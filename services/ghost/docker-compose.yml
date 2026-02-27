@@ -1,0 +1,61 @@
+services:
+  ghost:
+    image: ${GHOST_IMAGE_REPOSITORY}:${GHOST_IMAGE_TAG}
+    container_name: ${GHOST_CONTAINER_NAME}
+    restart: unless-stopped
+    init: true
+
+    expose:
+      - "2368"
+
+    env_file:
+      - /run/secrets/ghost.env
+
+    environment:
+      - TZ
+      - url=${GHOST_URL}
+      - NODE_ENV=production
+      - database__client=mysql
+      - database__connection__host=${GHOST_DATABASE_HOST}
+      - database__connection__port=${GHOST_DATABASE_PORT}
+      - database__connection__user=${GHOST_DATABASE_USER}
+      - database__connection__password=${GHOST_DATABASE_PASSWORD}
+      - database__connection__database=${GHOST_DATABASE_NAME}
+
+    volumes:
+      - "${GHOST_DATA_DIR}:/var/lib/ghost/content"
+
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "require('http').get('http://127.0.0.1:2368/', (r) => process.exit(r.statusCode < 500 ? 0 : 1)).on('error', () => process.exit(1));",
+        ]
+      interval: 15s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=${GHOST_NETWORK}"
+      - "traefik.http.routers.ghost.rule=Host(`${GHOST_HOSTNAME}`)"
+      - "traefik.http.services.ghost.loadbalancer.server.port=2368"
+      - "traefik.http.routers.ghost.entrypoints=${GHOST_ENTRYPOINTS}"
+      - "traefik.http.routers.ghost.tls=${GHOST_TLS}"
+
+    networks:
+      - traefik
+
+networks:
+  traefik:
+    external: true
+    name: ${GHOST_NETWORK}
