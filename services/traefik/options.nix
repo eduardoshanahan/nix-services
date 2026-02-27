@@ -66,5 +66,18 @@ in {
         description = "Host/container TCP port used by Traefik Prometheus metrics entrypoint.";
       };
     };
+
+    ghostActivityPub = {
+      enable = lib.mkEnableOption "Ghost ActivityPub reverse-proxy routes to ap.ghost.org";
+
+      hostname = lib.mkOption {
+        type = lib.types.str;
+        default = "";
+        description = ''
+          Public Ghost hostname whose ActivityPub endpoints should be proxied to `https://ap.ghost.org`.
+        '';
+        example = "blog.example.com";
+      };
+    };
   };
 }

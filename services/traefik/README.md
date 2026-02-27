@@ -23,3 +23,16 @@ This module deploys Traefik as the ingress service.
 Most services in this repository use checked-in compose files and generate
 service-specific config files. Traefik is different because ingress behavior is
 more option-driven at the compose layer.
+
+## Ghost ActivityPub
+
+When `services.traefik.ghostActivityPub.enable = true`, the file-provider YAML
+also adds high-priority routes for:
+
+- `/.ghost/activitypub/`
+- `/.well-known/webfinger`
+- `/.well-known/nodeinfo`
+
+for the configured Ghost hostname, proxying those requests to
+`https://ap.ghost.org`. This is required for Ghost 6 Social Web / ActivityPub
+when you are using Traefik instead of Ghost's bundled proxy examples.

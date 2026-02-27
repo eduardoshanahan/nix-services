@@ -41,6 +41,10 @@ in {
         assertion = !httpToHttpsRedirectEnabled || tlsEnabled;
         message = "services.traefik.httpToHttpsRedirect requires services.traefik.tls.enable = true.";
       }
+      {
+        assertion = !cfg.ghostActivityPub.enable || cfg.ghostActivityPub.hostname != "";
+        message = "services.traefik.ghostActivityPub.hostname must be set when services.traefik.ghostActivityPub.enable = true.";
+      }
     ];
 
     virtualisation.docker.enable = true;
