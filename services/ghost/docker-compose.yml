@@ -15,6 +15,7 @@ services:
       - TZ
       - url=${GHOST_URL}
       - NODE_ENV=production
+      - NODE_EXTRA_CA_CERTS=/etc/ghost/host-ca-bundle.crt
       - database__client=mysql
       - database__connection__host=${GHOST_DATABASE_HOST}
       - database__connection__port=${GHOST_DATABASE_PORT}
@@ -29,6 +30,7 @@ services:
 
     volumes:
       - "${GHOST_DATA_DIR}:/var/lib/ghost/content"
+      - "/etc/ssl/certs/ca-bundle.crt:/etc/ghost/host-ca-bundle.crt:ro"
 
     healthcheck:
       test:
