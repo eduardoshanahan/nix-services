@@ -225,7 +225,7 @@ in {
           (runtimeSecretEnv.mkRuntimeSecretEnvExecStartPre {
             name = serviceName;
             secretFile = cfg.database.passwordFile;
-            envVar = "GHOST_DATABASE_PASSWORD";
+            envVar = "database__connection__password";
           })
           "${pkgs.runtimeShell} -c '${dockerBin} compose config >/dev/null'"
           "${pkgs.runtimeShell} -c '${dockerBin} network inspect ${cfg.network} >/dev/null 2>&1 || ${dockerBin} network create ${cfg.network}'"

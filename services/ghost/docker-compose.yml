@@ -19,7 +19,6 @@ services:
       - database__connection__host=${GHOST_DATABASE_HOST}
       - database__connection__port=${GHOST_DATABASE_PORT}
       - database__connection__user=${GHOST_DATABASE_USER}
-      - database__connection__password=${GHOST_DATABASE_PASSWORD}
       - database__connection__database=${GHOST_DATABASE_NAME}
 
     volumes:
