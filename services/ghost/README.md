@@ -9,8 +9,8 @@ This module deploys Ghost behind Traefik using a checked-in Docker Compose file.
 - Ghost database password is injected at runtime from `services.ghost.database.passwordFile` into `/run/secrets/ghost.env`.
 - systemd runs `docker compose up -d` / `docker compose down` and waits for container health after startup.
 - Content persists under `services.ghost.dataDir` (default `/var/lib/ghost`).
-- The host CA bundle is mounted from `/etc/ssl/certs/ca-bundle.crt` so Ghost's
-  Node runtime can trust internal HTTPS endpoints.
+- The host root CA file is mounted from `/etc/ssl/certs/homelab-root-ca.crt`
+  so Ghost's Node runtime can trust internal HTTPS endpoints.
 
 ## Exposed options
 
@@ -54,8 +54,9 @@ This module deploys Ghost behind Traefik using a checked-in Docker Compose file.
 
 ## TLS trust note
 
-- The module sets `NODE_EXTRA_CA_CERTS=/etc/ghost/host-ca-bundle.crt`.
-- The mounted CA bundle comes from the host path `/etc/ssl/certs/ca-bundle.crt`.
+- The module sets `NODE_EXTRA_CA_CERTS=/etc/ghost/homelab-root-ca.crt`.
+- The mounted root CA file comes from the host path
+  `/etc/ssl/certs/homelab-root-ca.crt`.
 - This is required when Ghost needs to verify internal HTTPS endpoints behind a
   private CA, such as its own ActivityPub self-check.
 
