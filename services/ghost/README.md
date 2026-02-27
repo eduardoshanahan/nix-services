@@ -26,6 +26,13 @@ This module deploys Ghost behind Traefik using a checked-in Docker Compose file.
 - `services.ghost.database.name`
 - `services.ghost.database.user`
 - `services.ghost.database.passwordFile`
+- `services.ghost.mail.enable`
+- `services.ghost.mail.from`
+- `services.ghost.mail.host`
+- `services.ghost.mail.port`
+- `services.ghost.mail.secure`
+- `services.ghost.mail.user`
+- `services.ghost.mail.passwordFile`
 - `services.ghost.tls`
 
 ## Database contract
@@ -33,6 +40,15 @@ This module deploys Ghost behind Traefik using a checked-in Docker Compose file.
 - Production use requires MySQL 8.
 - `services.ghost.database.passwordFile` must point to a runtime-provisioned file (for example `/run/secrets/ghost-db-password`) containing only the password on a single line.
 - The MySQL server, database, and user must already exist before Ghost is started.
+
+## Mail contract
+
+- `services.ghost.mail.passwordFile` must point to a runtime-provisioned file containing only the SMTP password on a single line.
+- When mail is enabled, the module writes `mail__options__auth__pass` into `/run/secrets/ghost.env` alongside the database password.
+- Gmail works with:
+  - `host = "smtp.gmail.com"`
+  - `port = 465`
+  - `secure = true`
 
 ## Image pinning strategy
 
@@ -57,10 +73,15 @@ services.ghost = {
     user = "ghost";
     passwordFile = "/run/secrets/ghost-db-password";
   };
+
+  mail = {
+    enable = true;
+    from = "eduardoshanahan@gmail.com";
+    host = "smtp.gmail.com";
+    port = 465;
+    secure = true;
+    user = "eduardoshanahan@gmail.com";
+    passwordFile = "/run/secrets/ghost-mail-password";
+  };
 };
 ```
-
-## Operational note
-
-This module intentionally covers the application and database secret path only.
-Mail delivery should be added as a separate follow-up before public launch.
