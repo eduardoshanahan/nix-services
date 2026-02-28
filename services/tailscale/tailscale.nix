@@ -60,7 +60,7 @@ in {
     advertiseRoutes = lib.mkOption {
       type = lib.types.listOf lib.types.str;
       default = [ ];
-      example = [ "192.168.1.0/24" ];
+      example = [ "198.51.100.0/24" ];
       description = "Subnet routes advertised by this node.";
     };
 

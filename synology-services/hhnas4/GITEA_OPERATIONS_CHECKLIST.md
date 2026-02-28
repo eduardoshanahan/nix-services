@@ -4,7 +4,7 @@ Purpose: post-deploy configuration and recurring checks for Gitea + registry.
 
 ## 1) Access & account safety
 
-- [ ] Confirm admin login works at `https://gitea.<homelab-domain>`.
+- [ ] Confirm admin login works at `https://gitea.internal.example`.
 - [ ] Enable 2FA on admin account.
 - [ ] Create a non-admin day-to-day user.
 - [ ] Keep admin account for maintenance only.
@@ -20,12 +20,12 @@ Purpose: post-deploy configuration and recurring checks for Gitea + registry.
 
 - [ ] Upload SSH key in Gitea user settings.
 - [ ] Verify auth:
-  - `ssh -p 2222 -T git@gitea.<homelab-domain>`
+  - `ssh -p 2222 -T git@gitea.internal.example`
 - [ ] Optional local SSH config:
 
 ```sshconfig
 Host gitea-hhlab
-  HostName gitea.<homelab-domain>
+  HostName gitea.internal.example
   Port 2222
   User git
   IdentityFile ~/.ssh/<your_key>
@@ -35,10 +35,10 @@ Host gitea-hhlab
 ## 4) Container registry validation
 
 - [ ] Login to registry:
-  - `docker login gitea.<homelab-domain>`
+  - `docker login gitea.internal.example`
 - [ ] Push a test image:
-  - `docker tag alpine:latest gitea.<homelab-domain>/<owner>/alpine-test:latest`
-  - `docker push gitea.<homelab-domain>/<owner>/alpine-test:latest`
+  - `docker tag alpine:latest gitea.internal.example/<owner>/alpine-test:latest`
+  - `docker push gitea.internal.example/<owner>/alpine-test:latest`
 - [ ] Pull it back from another machine to verify read path.
 
 ## 5) Backups
@@ -57,7 +57,7 @@ Host gitea-hhlab
 ## 7) Health checks
 
 - [ ] HTTPS check:
-  - `curl -skI https://gitea.<homelab-domain>/`
+  - `curl -skI https://gitea.internal.example/`
 - [ ] Backend check on NAS:
   - `curl -sSI http://127.0.0.1:3000/`
 - [ ] Compose status on NAS:
@@ -75,38 +75,38 @@ Host gitea-hhlab
 
 ```bash
 # SSH auth probe (expected: success message, no shell)
-ssh -p 2222 -T git@gitea.<homelab-domain>
+ssh -p 2222 -T git@gitea.internal.example
 
 # Clone
-git clone ssh://git@gitea.<homelab-domain>:2222/<owner>/<repo>.git
+git clone ssh://git@gitea.internal.example:2222/<owner>/<repo>.git
 
 # Existing repo remote
-git remote set-url origin ssh://git@gitea.<homelab-domain>:2222/<owner>/<repo>.git
+git remote set-url origin ssh://git@gitea.internal.example:2222/<owner>/<repo>.git
 ```
 
 ### Container registry
 
 ```bash
 # Login
-docker login gitea.<homelab-domain>
+docker login gitea.internal.example
 
 # Tag + push test image
 docker pull alpine:latest
-docker tag alpine:latest gitea.<homelab-domain>/<owner>/alpine-test:latest
-docker push gitea.<homelab-domain>/<owner>/alpine-test:latest
+docker tag alpine:latest gitea.internal.example/<owner>/alpine-test:latest
+docker push gitea.internal.example/<owner>/alpine-test:latest
 
 # Pull back
-docker pull gitea.<homelab-domain>/<owner>/alpine-test:latest
+docker pull gitea.internal.example/<owner>/alpine-test:latest
 ```
 
 ### Quick health checks
 
 ```bash
 # Public HTTPS path
-curl -skI https://gitea.<homelab-domain>/ | head -n 5
+curl -skI https://gitea.internal.example/ | head -n 5
 
 # SSH endpoint reachability
-ssh -o BatchMode=yes -o ConnectTimeout=8 -p 2222 -T git@gitea.<homelab-domain>
+ssh -o BatchMode=yes -o ConnectTimeout=8 -p 2222 -T git@gitea.internal.example
 
 # NAS backend + compose
 ssh hhnas4 "curl -sSI http://127.0.0.1:3000/ | head -n 5"

@@ -27,7 +27,7 @@ in {
       default = "0.0.0.0";
       description = ''
         Host IP address used for the published Loki port binding.
-        Set this to a LAN IP (for example `10.0.0.10`) to avoid broad exposure.
+        Set this to a host IP (for example `198.51.100.10`) to avoid broad exposure.
       '';
     };
 
