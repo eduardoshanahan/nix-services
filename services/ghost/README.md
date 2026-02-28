@@ -86,11 +86,11 @@ services.ghost = {
 
   mail = {
     enable = true;
-    from = "eduardoshanahan@gmail.com";
+    from = "ghost@example.com";
     host = "smtp.gmail.com";
     port = 465;
     secure = true;
-    user = "eduardoshanahan@gmail.com";
+    user = "ghost@example.com";
     passwordFile = "/run/secrets/ghost-mail-password";
   };
 };

@@ -15,8 +15,8 @@ resume without rediscovery.
   - compose path: `/volume1/docker/homelab/hhnas4/promtail/compose.yaml`
   - env path: `/volume1/docker/homelab/hhnas4/promtail/.env`
   - config path: `/volume1/docker/homelab/hhnas4/promtail/config.yml`
-- Public URL: `https://gitea.hhlab.home.arpa`
-- SSH Git endpoint: `gitea.hhlab.home.arpa:2222`
+- Public URL: `https://gitea.internal.example`
+- SSH Git endpoint: `gitea.internal.example:2222`
 - Container registry is enabled in Gitea.
 - Gitea metrics endpoint is enabled and intended for Prometheus scrape.
 - Gitea container logs are shipped by `promtail` with Loki job label
@@ -30,7 +30,7 @@ resume without rediscovery.
 - Docker is available at `/usr/local/bin/docker` (Container Manager path).
 - Docker socket access may require `sudo`; non-interactive `sudo -n` works in
   current setup for compose operations.
-- DSM reverse proxy must point `gitea.hhlab.home.arpa:443` to the correct NAS
+- DSM reverse proxy must point `gitea.internal.example:443` to the correct NAS
   backend target on port `3000`; wrong destination yields `502`.
 - Gitea internal SSH server must remain disabled in this setup:
   - `GITEA_SERVER_START_SSH_SERVER=false`
@@ -64,9 +64,9 @@ resume without rediscovery.
 - Backend from NAS:
   - `curl -sSI http://127.0.0.1:3000/`
 - Public HTTPS:
-  - `curl -skI https://gitea.hhlab.home.arpa/`
+  - `curl -skI https://gitea.internal.example/`
 - SSH endpoint reachability:
-  - `ssh -p 2222 -T git@gitea.hhlab.home.arpa`
+  - `ssh -p 2222 -T git@gitea.internal.example`
   - Expected without key setup: `Permission denied (publickey)`
 
 ## Follow-ups

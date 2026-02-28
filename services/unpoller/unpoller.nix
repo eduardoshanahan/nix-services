@@ -49,7 +49,7 @@ in {
     controller = {
       url = lib.mkOption {
         type = lib.types.str;
-        description = "UniFi controller URL (for example `https://ucg-max.hhlab.home.arpa`).";
+        description = "UniFi controller URL (for example `https://gateway.internal.example`).";
       };
 
       verifySsl = lib.mkOption {

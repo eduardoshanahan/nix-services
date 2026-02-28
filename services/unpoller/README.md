@@ -46,7 +46,7 @@ UP_UNIFI_CONTROLLER_0_PASS=<password>
 ```nix
 services.unpollerCompose = {
   enable = true;
-  controller.url = "https://ucg-max.hhlab.home.arpa";
+  controller.url = "https://gateway.internal.example";
   controller.verifySsl = true;
   secretFile = "/run/secrets/unpoller.env";
 

@@ -56,7 +56,7 @@ under `services.tailscaleCompose.stateDir`.
 services.tailscaleCompose = {
   enable = true;
   hostname = "rpi-box-01";
-  advertiseRoutes = [ "192.168.1.0/24" ];
+  advertiseRoutes = [ "198.51.100.0/24" ];
   acceptRoutes = true;
   acceptDns = false;
 };

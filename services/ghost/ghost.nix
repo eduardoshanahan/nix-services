@@ -205,7 +205,7 @@ in {
 
       from = lib.mkOption {
         type = lib.types.str;
-        default = "eduardoshanahan@gmail.com";
+        default = "ghost@example.com";
         description = "Sender address for Ghost mail.";
       };
 
@@ -229,7 +229,7 @@ in {
 
       user = lib.mkOption {
         type = lib.types.str;
-        default = "eduardoshanahan@gmail.com";
+        default = "ghost@example.com";
         description = "SMTP username used by Ghost.";
       };
 
