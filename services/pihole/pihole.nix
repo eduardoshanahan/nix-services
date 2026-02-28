@@ -10,6 +10,38 @@
   serviceName = "pihole";
   composeDir = "/etc/${serviceName}";
   dockerBin = "${config.virtualisation.docker.package}/bin/docker";
+  routeRecoveryScript = pkgs.writeShellScript "pihole-route-recovery" ''
+    set -euo pipefail
+
+    route_url="${if cfg.tls then "https" else "http"}://127.0.0.1/admin/"
+    curl_opts=(${lib.optionalString cfg.tls "-k"} -sS -o /dev/null -w "%{http_code}" -H "Host: ${cfg.hostname}")
+
+    # Give the recreated container a short window to finish exposing the admin route.
+    for _ in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20; do
+      code="$(${pkgs.curl}/bin/curl "''${curl_opts[@]}" "$route_url" || true)"
+      if [ "$code" != "404" ] && [ -n "$code" ]; then
+        exit 0
+      fi
+      /run/current-system/sw/bin/sleep 1
+    done
+
+    if ! /run/current-system/sw/bin/systemctl cat traefik.service >/dev/null 2>&1; then
+      exit 0
+    fi
+
+    /run/current-system/sw/bin/systemctl restart traefik.service
+
+    for _ in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20; do
+      code="$(${pkgs.curl}/bin/curl "''${curl_opts[@]}" "$route_url" || true)"
+      if [ "$code" != "404" ] && [ -n "$code" ]; then
+        exit 0
+      fi
+      /run/current-system/sw/bin/sleep 1
+    done
+
+    echo "pihole: Traefik route for ${cfg.hostname} still returned 404 after a Traefik restart" >&2
+    exit 1
+  '';
 in {
   options.services.pihole = {
     enable = lib.mkEnableOption "Pi-hole DNS sinkhole (Docker Compose)";
@@ -97,6 +129,7 @@ in {
         ];
 
         ExecStart = "${dockerBin} compose up -d";
+        ExecStartPost = routeRecoveryScript;
         ExecStop = "${dockerBin} compose down";
       };
     };
