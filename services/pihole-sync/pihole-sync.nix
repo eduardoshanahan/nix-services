@@ -12,7 +12,7 @@
     "sudo -n /run/current-system/sw/bin/docker exec ${cfg.sourceContainerName} sh -lc "
     + lib.escapeShellArg ''
       cd /tmp
-      archive="$(pihole-FTL --teleporter)"
+      archive="$(pihole-FTL --teleporter | tail -n 1)"
       cat "/tmp/$archive"
       rm -f "/tmp/$archive"
     '';
@@ -21,7 +21,7 @@
     "${dockerBin} exec ${cfg.targetContainerName} sh -lc "
     + lib.escapeShellArg ''
       cd /tmp
-      archive="$(pihole-FTL --teleporter)"
+      archive="$(pihole-FTL --teleporter | tail -n 1)"
       cat "/tmp/$archive"
       rm -f "/tmp/$archive"
     '';
@@ -40,6 +40,10 @@
 
     trap cleanup EXIT
 
+    install -d -m 0700 ${lib.escapeShellArg cfg.stateDir}
+    touch ${lib.escapeShellArg cfg.ssh.knownHostsFile}
+    chmod 0600 ${lib.escapeShellArg cfg.ssh.knownHostsFile}
+
     ${
       lib.optionalString cfg.backup.enable ''
         backup_stamp="$(date -u +%Y%m%dT%H%M%SZ)"
@@ -57,7 +61,7 @@
       ''
     }
 
-    ${pkgs.openssh}/bin/ssh -i ${lib.escapeShellArg cfg.ssh.identityFile} -o BatchMode=yes -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes ${lib.optionalString (cfg.ssh.knownHostsFile != null) "-o UserKnownHostsFile=${lib.escapeShellArg cfg.ssh.knownHostsFile}"} ${lib.escapeShellArg "${cfg.source.user}@${cfg.source.host}"} ${lib.escapeShellArg remoteExportCommand} > "$incoming_archive"
+    ${pkgs.openssh}/bin/ssh -i ${lib.escapeShellArg cfg.ssh.identityFile} -o BatchMode=yes -o IdentitiesOnly=yes -o StrictHostKeyChecking=${cfg.ssh.strictHostKeyChecking} -o UserKnownHostsFile=${lib.escapeShellArg cfg.ssh.knownHostsFile} ${lib.escapeShellArg "${cfg.source.user}@${cfg.source.host}"} ${lib.escapeShellArg remoteExportCommand} > "$incoming_archive"
 
     if [ ! -s "$incoming_archive" ]; then
       echo "pihole-sync: received empty Teleporter archive from source" >&2
@@ -120,11 +124,20 @@ in {
       };
 
       knownHostsFile = lib.mkOption {
-        type = lib.types.nullOr lib.types.str;
-        default = null;
+        type = lib.types.str;
+        default = "/var/lib/pihole-sync/known_hosts";
         description = ''
-          Optional absolute path to a dedicated known_hosts file for the source
-          host. When unset, the system OpenSSH defaults are used.
+          Absolute path to a dedicated known_hosts file for the source host.
+        '';
+      };
+
+      strictHostKeyChecking = lib.mkOption {
+        type = lib.types.enum [ "accept-new" "yes" "no" ];
+        default = "accept-new";
+        description = ''
+          SSH StrictHostKeyChecking mode used by the scheduled sync.
+          `accept-new` is the default so the first successful connection can
+          persist the source host key without interactive prompts.
         '';
       };
     };
@@ -148,6 +161,12 @@ in {
         description = "How many days of local pre-import backups to keep.";
       };
     };
+
+    stateDir = lib.mkOption {
+      type = lib.types.str;
+      default = "/var/lib/pihole-sync";
+      description = "Local state directory used by the sync job (for example for known_hosts).";
+    };
   };
 
   config = lib.mkIf cfg.enable {
@@ -165,8 +184,12 @@ in {
         message = "services.piholeSync.backup.directory must be an absolute path.";
       }
       {
-        assertion = cfg.ssh.knownHostsFile == null || lib.hasPrefix "/" cfg.ssh.knownHostsFile;
-        message = "services.piholeSync.ssh.knownHostsFile must be an absolute path when set.";
+        assertion = lib.hasPrefix "/" cfg.stateDir;
+        message = "services.piholeSync.stateDir must be an absolute path.";
+      }
+      {
+        assertion = lib.hasPrefix "/" cfg.ssh.knownHostsFile;
+        message = "services.piholeSync.ssh.knownHostsFile must be an absolute path.";
       }
     ];
 
@@ -174,6 +197,8 @@ in {
 
     systemd.tmpfiles.rules = lib.optionals cfg.backup.enable [
       "d ${cfg.backup.directory} 0700 root root - -"
+    ] ++ [
+      "d ${cfg.stateDir} 0700 root root - -"
     ];
 
     systemd.services.pihole-sync = {
