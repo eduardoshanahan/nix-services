@@ -69,6 +69,7 @@
       let
         traefikModule = import ./services/traefik/traefik.nix;
         piholeModule = import ./services/pihole/pihole.nix;
+        piholeSyncModule = import ./services/pihole-sync/pihole-sync.nix;
         piholeExporterModule = import ./services/pihole-exporter/pihole-exporter.nix;
         alertmanagerModule = import ./services/alertmanager/alertmanager.nix;
         diagramsNetModule = import ./services/diagrams-net/diagrams-net.nix;
@@ -87,6 +88,7 @@
         nixosModules = {
           traefik = traefikModule;
           pihole = piholeModule;
+          piholeSync = piholeSyncModule;
           piholeExporter = piholeExporterModule;
           alertmanager = alertmanagerModule;
           diagramsNet = diagramsNetModule;
@@ -105,6 +107,7 @@
         services = {
           traefik = traefikModule;
           pihole = piholeModule;
+          piholeSync = piholeSyncModule;
           piholeExporter = piholeExporterModule;
           alertmanager = alertmanagerModule;
           diagramsNet = diagramsNetModule;
