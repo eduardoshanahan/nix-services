@@ -59,6 +59,11 @@ This module expects:
 Store the private key as a runtime secret (for example via `sops-nix`) and pass
 its path with `services.piholeSync.ssh.identityFile`.
 
+The module stores SSH host keys in a local known-hosts file under
+`/var/lib/pihole-sync/known_hosts` by default and uses
+`StrictHostKeyChecking=accept-new` so the first scheduled run can persist the
+source host key without an interactive prompt.
+
 ## Example
 
 ```nix
