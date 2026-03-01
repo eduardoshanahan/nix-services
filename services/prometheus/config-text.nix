@@ -183,6 +183,10 @@
         targets = cfg.scrape.promtailTargets;
       })
       ++ (optionalJobLines {
+        name = "snmp-exporter";
+        targets = cfg.scrape.snmpExporterTargets;
+      })
+      ++ (optionalJobLines {
         name = "grafana";
         targets = cfg.scrape.grafanaTargets;
       })
