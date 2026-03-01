@@ -195,6 +195,10 @@
         targets = cfg.scrape.piholeExporterTargets;
       })
       ++ (optionalJobLines {
+        name = "cadvisor";
+        targets = cfg.scrape.cadvisorTargets;
+      })
+      ++ (optionalJobLines {
         name = "unpoller";
         targets = cfg.scrape.unpollerTargets;
       })

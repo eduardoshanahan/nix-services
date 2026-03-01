@@ -83,6 +83,7 @@
         unpollerModule = import ./services/unpoller/unpoller.nix;
         tailscaleModule = import ./services/tailscale/tailscale.nix;
         ghostModule = import ./services/ghost/ghost.nix;
+        cadvisorModule = import ./services/cadvisor/cadvisor.nix;
       in
       {
         nixosModules = {
@@ -102,6 +103,7 @@
           unpoller = unpollerModule;
           tailscale = tailscaleModule;
           ghost = ghostModule;
+          cadvisor = cadvisorModule;
         };
 
         services = {
@@ -121,6 +123,7 @@
           unpoller = unpollerModule;
           tailscale = tailscaleModule;
           ghost = ghostModule;
+          cadvisor = cadvisorModule;
         };
       }
     );

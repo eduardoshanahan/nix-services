@@ -251,6 +251,13 @@
         description = "Pi-hole exporter targets (`host:port`) to scrape.";
       };
 
+      cadvisorTargets = lib.mkOption {
+        type = lib.types.listOf lib.types.str;
+        default = [];
+        example = ["rpi-box-01-metrics.internal.example:8081"];
+        description = "cAdvisor targets (`host:port`) to scrape.";
+      };
+
       unpollerTargets = lib.mkOption {
         type = lib.types.listOf lib.types.str;
         default = [];
