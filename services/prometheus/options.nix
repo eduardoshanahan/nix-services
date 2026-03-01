@@ -237,6 +237,13 @@
         description = "Promtail targets (`host:port`) to scrape.";
       };
 
+      snmpExporterTargets = lib.mkOption {
+        type = lib.types.listOf lib.types.str;
+        default = [];
+        example = ["rpi-box-02-metrics.internal.example:9116"];
+        description = "SNMP exporter targets (`host:port`) to scrape.";
+      };
+
       piholeExporterTargets = lib.mkOption {
         type = lib.types.listOf lib.types.str;
         default = [];
