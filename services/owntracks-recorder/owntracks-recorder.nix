@@ -41,6 +41,10 @@ in {
         assertion = lib.hasPrefix "/" cfg.dataDir;
         message = "services.owntracksRecorder.dataDir must be an absolute path.";
       }
+      {
+        assertion = builtins.match "^[^[:space:]]+$" cfg.entryPoint != null;
+        message = "services.owntracksRecorder.entryPoint must not contain whitespace.";
+      }
     ];
 
     virtualisation.docker.enable = true;
@@ -77,7 +81,7 @@ in {
           "OWNTRACKS_RECORDER_ENTRYPOINTS=${
             if cfg.tls
             then "websecure"
-            else "web"
+            else cfg.entryPoint
           }"
           "OWNTRACKS_RECORDER_TLS=${
             if cfg.tls

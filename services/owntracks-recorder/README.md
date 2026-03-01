@@ -19,6 +19,7 @@ This module deploys OwnTracks Recorder behind Traefik using a checked-in Docker 
 - `services.owntracksRecorder.network`
 - `services.owntracksRecorder.dataDir`
 - `services.owntracksRecorder.httpPort`
+- `services.owntracksRecorder.entryPoint`
 - `services.owntracksRecorder.image.repository`
 - `services.owntracksRecorder.image.tag`
 - `services.owntracksRecorder.image.allowMutableTag`
@@ -33,6 +34,13 @@ https://<hostname>/pub
 ```
 
 If TLS is disabled for local testing, use `http://<hostname>/pub` instead.
+
+When using the recommended dedicated cleartext Traefik entrypoint, append the
+entrypoint port (for example `:8084`):
+
+```text
+http://<hostname>:8084/pub
+```
 
 ## Image pinning strategy
 
