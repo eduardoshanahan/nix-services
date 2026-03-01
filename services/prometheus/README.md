@@ -57,6 +57,7 @@ The module ships a baseline `homelab-core` rule group:
 - `services.prometheusCompose.scrape.promtailTargets`
 - `services.prometheusCompose.scrape.snmpExporterTargets`
 - `services.prometheusCompose.scrape.piholeExporterTargets`
+- `services.prometheusCompose.scrape.cadvisorTargets`
 - `services.prometheusCompose.scrape.unpollerTargets`
 - `services.prometheusCompose.scrape.giteaTargets`
 - `services.prometheusCompose.scrape.grafanaTargets`
@@ -123,6 +124,9 @@ services.prometheusCompose = {
     ];
     piholeExporterTargets = [
       "dns-node.internal.example:9617"
+    ];
+    cadvisorTargets = [
+      "rpi-box-01-metrics.internal.example:8081"
     ];
     unpollerTargets = [
       "rpi-box-02.internal.example:9130"
