@@ -83,6 +83,7 @@
         ghostModule = import ./services/ghost/ghost.nix;
         cadvisorModule = import ./services/cadvisor/cadvisor.nix;
         vikunjaComposeModule = import ./services/vikunja/vikunja.nix;
+        owntracksRecorderModule = import ./services/owntracks-recorder/owntracks-recorder.nix;
       in {
         nixosModules = {
           traefik = traefikModule;
@@ -103,6 +104,7 @@
           ghost = ghostModule;
           cadvisor = cadvisorModule;
           vikunjaCompose = vikunjaComposeModule;
+          owntracksRecorder = owntracksRecorderModule;
         };
 
         services = {
@@ -124,6 +126,7 @@
           ghost = ghostModule;
           cadvisor = cadvisorModule;
           vikunjaCompose = vikunjaComposeModule;
+          owntracksRecorder = owntracksRecorderModule;
         };
       }
     );
