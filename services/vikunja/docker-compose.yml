@@ -13,6 +13,8 @@ services:
 
     environment:
       - TZ
+      - HOME=/app/vikunja/files
+      - XDG_CACHE_HOME=/app/vikunja/files/.cache
       - VIKUNJA_SERVICE_PUBLICURL=${VIKUNJA_SERVICE_PUBLICURL}
       - VIKUNJA_SERVICE_ENABLEREGISTRATION=${VIKUNJA_SERVICE_ENABLEREGISTRATION}
       - VIKUNJA_DATABASE_TYPE=sqlite
