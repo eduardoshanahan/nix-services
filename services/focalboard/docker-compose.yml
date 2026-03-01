@@ -1,0 +1,40 @@
+services:
+  focalboard:
+    image: ${FOCALBOARD_IMAGE_REPOSITORY}:${FOCALBOARD_IMAGE_TAG}
+    container_name: ${FOCALBOARD_CONTAINER_NAME}
+    restart: unless-stopped
+    init: true
+    mem_limit: 512m
+    pids_limit: 256
+    cpus: "1.0"
+
+    expose:
+      - "8000"
+
+    environment:
+      - TZ
+
+    volumes:
+      - "${FOCALBOARD_DATA_DIR}:/opt/focalboard/data"
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=${FOCALBOARD_NETWORK}"
+      - "traefik.http.routers.focalboard.rule=Host(`${FOCALBOARD_HOSTNAME}`)"
+      - "traefik.http.services.focalboard.loadbalancer.server.port=8000"
+      - "traefik.http.routers.focalboard.entrypoints=${FOCALBOARD_ENTRYPOINTS}"
+      - "traefik.http.routers.focalboard.tls=${FOCALBOARD_TLS}"
+
+    networks:
+      - traefik
+
+networks:
+  traefik:
+    external: true
+    name: ${FOCALBOARD_NETWORK}
