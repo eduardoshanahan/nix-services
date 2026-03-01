@@ -886,25 +886,25 @@
         ];
         targets = [
           {
-            expr = "sum by (container_key, hostname, name) (label_join(label_replace(container_last_seen{job=\"cadvisor\",name!=\"\",image!=\"\"}, \"hostname\", \"$1\", \"instance\", \"([^.:]+).*\"), \"container_key\", \" / \", \"hostname\", \"name\"))";
+            expr = "max by (container_key, hostname, name) (label_join(label_replace(container_last_seen{job=\"cadvisor\",name!=\"\",image!=\"\"}, \"hostname\", \"$1\", \"instance\", \"([^.:]+).*\"), \"container_key\", \" / \", \"hostname\", \"name\"))";
             format = "table";
             instant = true;
             refId = "A";
           }
           {
-            expr = "label_join(label_replace(sum by (instance, name) (rate(container_cpu_usage_seconds_total{job=\"cadvisor\",name!=\"\",image!=\"\"}[5m])) * 100, \"hostname\", \"$1\", \"instance\", \"([^.:]+).*\"), \"container_key\", \" / \", \"hostname\", \"name\")";
+            expr = "sum by (container_key) (label_join(label_replace(sum by (instance, name) (rate(container_cpu_usage_seconds_total{job=\"cadvisor\",name!=\"\",image!=\"\"}[5m])) * 100, \"hostname\", \"$1\", \"instance\", \"([^.:]+).*\"), \"container_key\", \" / \", \"hostname\", \"name\"))";
             format = "table";
             instant = true;
             refId = "B";
           }
           {
-            expr = "label_join((100 * sum by (hostname, name) (label_replace(container_memory_working_set_bytes{job=\"cadvisor\",name!=\"\",image!=\"\"}, \"hostname\", \"$1\", \"instance\", \"([^.:]+).*\")) / on(hostname) group_left max by (hostname) (label_replace(node_memory_MemTotal_bytes{job=\"nodes\"}, \"hostname\", \"$1\", \"instance\", \"([^.:]+).*\"))), \"container_key\", \" / \", \"hostname\", \"name\")";
+            expr = "sum by (container_key) (label_join((100 * sum by (hostname, name) (label_replace(container_memory_working_set_bytes{job=\"cadvisor\",name!=\"\",image!=\"\"}, \"hostname\", \"$1\", \"instance\", \"([^.:]+).*\")) / on(hostname) group_left max by (hostname) (label_replace(node_memory_MemTotal_bytes{job=\"nodes\"}, \"hostname\", \"$1\", \"instance\", \"([^.:]+).*\"))), \"container_key\", \" / \", \"hostname\", \"name\"))";
             format = "table";
             instant = true;
             refId = "C";
           }
           {
-            expr = "label_join((100 * sum by (hostname, name) (label_replace(container_fs_usage_bytes{job=\"cadvisor\",name!=\"\",image!=\"\"}, \"hostname\", \"$1\", \"instance\", \"([^.:]+).*\")) / on(hostname) group_left max by (hostname) (label_replace(node_filesystem_size_bytes{job=\"nodes\",mountpoint=\"/\",fstype!~\"tmpfs|overlay\"}, \"hostname\", \"$1\", \"instance\", \"([^.:]+).*\"))), \"container_key\", \" / \", \"hostname\", \"name\")";
+            expr = "sum by (container_key) (label_join((100 * sum by (hostname, name) (label_replace(container_fs_usage_bytes{job=\"cadvisor\",name!=\"\",image!=\"\"}, \"hostname\", \"$1\", \"instance\", \"([^.:]+).*\")) / on(hostname) group_left max by (hostname) (label_replace(node_filesystem_size_bytes{job=\"nodes\",mountpoint=\"/\",fstype!~\"tmpfs|overlay\"}, \"hostname\", \"$1\", \"instance\", \"([^.:]+).*\"))), \"container_key\", \" / \", \"hostname\", \"name\"))";
             format = "table";
             instant = true;
             refId = "D";
