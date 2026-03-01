@@ -1,0 +1,51 @@
+services:
+  owntracks-recorder:
+    image: ${OWNTRACKS_RECORDER_IMAGE_REPOSITORY}:${OWNTRACKS_RECORDER_IMAGE_TAG}
+    container_name: ${OWNTRACKS_RECORDER_CONTAINER_NAME}
+    restart: unless-stopped
+    init: true
+    mem_limit: 256m
+    pids_limit: 128
+    cpus: "0.50"
+
+    expose:
+      - "${OWNTRACKS_RECORDER_HTTP_PORT}"
+
+    environment:
+      - TZ
+      - OTR_PORT=0
+      - OTR_HTTPHOST=0.0.0.0
+      - OTR_HTTPPORT=${OWNTRACKS_RECORDER_HTTP_PORT}
+      - OTR_STORAGEDIR=/store
+
+    volumes:
+      - "${OWNTRACKS_RECORDER_DATA_DIR}:/store"
+
+    healthcheck:
+      test: ["CMD-SHELL", "wget --spider -q http://127.0.0.1:${OWNTRACKS_RECORDER_HTTP_PORT}/ || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 6
+      start_period: 20s
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=${OWNTRACKS_RECORDER_NETWORK}"
+      - "traefik.http.routers.owntracks-recorder.rule=Host(`${OWNTRACKS_RECORDER_HOSTNAME}`)"
+      - "traefik.http.services.owntracks-recorder.loadbalancer.server.port=${OWNTRACKS_RECORDER_HTTP_PORT}"
+      - "traefik.http.routers.owntracks-recorder.entrypoints=${OWNTRACKS_RECORDER_ENTRYPOINTS}"
+      - "traefik.http.routers.owntracks-recorder.tls=${OWNTRACKS_RECORDER_TLS}"
+
+    networks:
+      - traefik
+
+networks:
+  traefik:
+    external: true
+    name: ${OWNTRACKS_RECORDER_NETWORK}
