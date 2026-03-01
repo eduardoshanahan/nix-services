@@ -28,6 +28,8 @@ This module deploys Vikunja behind Traefik using a checked-in Docker Compose fil
 - The module uses Vikunja's built-in SQLite support (`VIKUNJA_DATABASE_TYPE=sqlite`).
 - The SQLite database is stored at `/app/vikunja/files/vikunja.db` inside the container.
 - Uploaded files are stored under `/app/vikunja/files`.
+- The module sets `HOME` and `XDG_CACHE_HOME` into the writable data path so the container does not try to write under `/.cache`.
+- The host data directory is prepared as owner `1000:0` before startup to match the container user.
 - `VIKUNJA_SERVICE_PUBLICURL` is derived from `hostname` and `tls`.
 
 ## Image pinning strategy
