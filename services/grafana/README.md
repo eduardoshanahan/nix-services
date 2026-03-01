@@ -84,6 +84,7 @@ With `services.grafanaCompose.provisioning.dashboards.enableStarter = true`, the
 
 - `Homelab Overview`
 - `Nodes Detail`
+- `Container Fleet`
 - `DNS & Edge`
 - `NAS Detail`
 - `UniFi Overview`

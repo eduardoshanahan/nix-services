@@ -23,6 +23,7 @@
     (dashboards)
     starterDashboardJson
     nodesDetailDashboardJson
+    containerFleetDashboardJson
     dnsEdgeDashboardJson
     nasDetailDashboardJson
     nasFileActivityDashboardJson
@@ -226,6 +227,10 @@ in {
       text = nodesDetailDashboardJson;
       mode = "0444";
     };
+    environment.etc."${serviceName}/provisioning/dashboards/container-fleet.json" = lib.mkIf (cfg.provisioning.enable && cfg.provisioning.dashboards.enableStarter) {
+      text = containerFleetDashboardJson;
+      mode = "0444";
+    };
     environment.etc."${serviceName}/provisioning/dashboards/dns-edge.json" = lib.mkIf (cfg.provisioning.enable && cfg.provisioning.dashboards.enableStarter) {
       text = dnsEdgeDashboardJson;
       mode = "0444";
@@ -262,6 +267,7 @@ in {
         ++ lib.optionals (cfg.provisioning.enable && cfg.provisioning.dashboards.enableStarter) [
           config.environment.etc."${serviceName}/provisioning/dashboards/homelab-overview.json".source
           config.environment.etc."${serviceName}/provisioning/dashboards/nodes-detail.json".source
+          config.environment.etc."${serviceName}/provisioning/dashboards/container-fleet.json".source
           config.environment.etc."${serviceName}/provisioning/dashboards/dns-edge.json".source
           config.environment.etc."${serviceName}/provisioning/dashboards/nas-detail.json".source
           config.environment.etc."${serviceName}/provisioning/dashboards/gitea-overview.json".source
@@ -316,6 +322,7 @@ in {
           ++ lib.optionals (cfg.provisioning.enable && cfg.provisioning.dashboards.enableStarter) [
             "${pkgs.runtimeShell} -c 'test -s ${composeDir}/provisioning/dashboards/homelab-overview.json'"
             "${pkgs.runtimeShell} -c 'test -s ${composeDir}/provisioning/dashboards/nodes-detail.json'"
+            "${pkgs.runtimeShell} -c 'test -s ${composeDir}/provisioning/dashboards/container-fleet.json'"
             "${pkgs.runtimeShell} -c 'test -s ${composeDir}/provisioning/dashboards/dns-edge.json'"
             "${pkgs.runtimeShell} -c 'test -s ${composeDir}/provisioning/dashboards/nas-detail.json'"
             "${pkgs.runtimeShell} -c 'test -s ${composeDir}/provisioning/dashboards/gitea-overview.json'"
