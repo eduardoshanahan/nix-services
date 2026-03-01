@@ -757,6 +757,160 @@
           }
         ];
       }
+      {
+        id = 2;
+        type = "table";
+        title = "Container Usage by Container";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 18;
+          w = 24;
+          x = 0;
+          y = 14;
+        };
+        options = {
+          cellHeight = "sm";
+          footer = {
+            enablePagination = true;
+            reducer = [];
+            show = false;
+          };
+          showHeader = true;
+          sortBy = [
+            {
+              desc = false;
+              displayName = "Hostname";
+            }
+          ];
+        };
+        fieldConfig = {
+          defaults = {
+            custom = {
+              align = "auto";
+              cellOptions = {
+                type = "auto";
+              };
+              inspect = false;
+            };
+          };
+          overrides = [
+            {
+              matcher = {
+                id = "byName";
+                options = "CPU %";
+              };
+              properties = [
+                {
+                  id = "unit";
+                  value = "percent";
+                }
+                {
+                  id = "decimals";
+                  value = 1;
+                }
+              ];
+            }
+            {
+              matcher = {
+                id = "byName";
+                options = "Memory %";
+              };
+              properties = [
+                {
+                  id = "unit";
+                  value = "percent";
+                }
+                {
+                  id = "decimals";
+                  value = 1;
+                }
+              ];
+            }
+            {
+              matcher = {
+                id = "byName";
+                options = "Disk %";
+              };
+              properties = [
+                {
+                  id = "unit";
+                  value = "percent";
+                }
+                {
+                  id = "decimals";
+                  value = 1;
+                }
+              ];
+            }
+          ];
+        };
+        transformations = [
+          {
+            id = "joinByField";
+            options = {
+              byField = "container_key";
+              mode = "outer";
+            };
+          }
+          {
+            id = "organize";
+            options = {
+              excludeByName = {
+                "Time" = true;
+                "Time #A" = true;
+                "Time #B" = true;
+                "Time #C" = true;
+                "Time #D" = true;
+                "Value #A" = true;
+                "container_key" = true;
+              };
+              indexByName = {
+                "hostname" = 0;
+                "name" = 1;
+                "Value #B" = 2;
+                "Value #C" = 3;
+                "Value #D" = 4;
+              };
+              renameByName = {
+                "hostname" = "Hostname";
+                "name" = "Container";
+                "Value #B" = "CPU %";
+                "Value #C" = "Memory %";
+                "Value #D" = "Disk %";
+              };
+            };
+          }
+        ];
+        targets = [
+          {
+            expr = "sum by (container_key, hostname, name) (label_join(label_replace(container_last_seen{job=\"cadvisor\",name!=\"\",image!=\"\"}, \"hostname\", \"$1\", \"instance\", \"([^.:]+).*\"), \"container_key\", \" / \", \"hostname\", \"name\"))";
+            format = "table";
+            instant = true;
+            refId = "A";
+          }
+          {
+            expr = "label_join(label_replace(sum by (instance, name) (rate(container_cpu_usage_seconds_total{job=\"cadvisor\",name!=\"\",image!=\"\"}[5m])) * 100, \"hostname\", \"$1\", \"instance\", \"([^.:]+).*\"), \"container_key\", \" / \", \"hostname\", \"name\")";
+            format = "table";
+            instant = true;
+            refId = "B";
+          }
+          {
+            expr = "label_join((100 * sum by (hostname, name) (label_replace(container_memory_working_set_bytes{job=\"cadvisor\",name!=\"\",image!=\"\"}, \"hostname\", \"$1\", \"instance\", \"([^.:]+).*\")) / on(hostname) group_left max by (hostname) (label_replace(node_memory_MemTotal_bytes{job=\"nodes\"}, \"hostname\", \"$1\", \"instance\", \"([^.:]+).*\"))), \"container_key\", \" / \", \"hostname\", \"name\")";
+            format = "table";
+            instant = true;
+            refId = "C";
+          }
+          {
+            expr = "label_join((100 * sum by (hostname, name) (label_replace(container_fs_usage_bytes{job=\"cadvisor\",name!=\"\",image!=\"\"}, \"hostname\", \"$1\", \"instance\", \"([^.:]+).*\")) / on(hostname) group_left max by (hostname) (label_replace(node_filesystem_size_bytes{job=\"nodes\",mountpoint=\"/\",fstype!~\"tmpfs|overlay\"}, \"hostname\", \"$1\", \"instance\", \"([^.:]+).*\"))), \"container_key\", \" / \", \"hostname\", \"name\")";
+            format = "table";
+            instant = true;
+            refId = "D";
+          }
+        ];
+      }
     ];
   };
   dnsEdgeDashboardJson = builtins.toJSON {
