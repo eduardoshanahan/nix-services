@@ -83,6 +83,18 @@ in {
       description = "Additional flags passed to `tailscale up` through `TS_EXTRA_ARGS`.";
     };
 
+    firewallMode = lib.mkOption {
+      type = lib.types.nullOr (lib.types.enum [ "iptables" "nftables" ]);
+      default = null;
+      example = "nftables";
+      description = ''
+        Optional override for Tailscale's firewall backend inside the container.
+
+        Set this to `nftables` on hosts where the container defaults to
+        `iptables-legacy` but the host firewall stack is nftables-based.
+      '';
+    };
+
     openFirewall = lib.mkOption {
       type = lib.types.bool;
       default = true;
@@ -190,6 +202,8 @@ in {
           "TAILSCALE_IMAGE_TAG=${cfg.image.tag}"
           "TAILSCALE_EXTRA_ARGS=\"${tailscaleArgs}\""
           "TAILSCALE_ENV_FILE=/run/secrets/${serviceName}.env"
+        ] ++ lib.optionals (cfg.firewallMode != null) [
+          "TAILSCALE_FIREWALL_MODE=${cfg.firewallMode}"
         ];
 
         ExecStartPre = [

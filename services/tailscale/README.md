@@ -24,6 +24,7 @@ It supports subnet routing for remote access to a home LAN.
 - `services.tailscaleCompose.acceptRoutes`
 - `services.tailscaleCompose.acceptDns`
 - `services.tailscaleCompose.extraUpFlags`
+- `services.tailscaleCompose.firewallMode`
 - `services.tailscaleCompose.openFirewall`
 - `services.tailscaleCompose.udpPort`
 - `services.tailscaleCompose.enableIpForwarding`
@@ -43,6 +44,19 @@ tskey-auth-...
 Leave it unset when the node is already authenticated and state is persisted
 under `services.tailscaleCompose.stateDir`.
 
+## Firewall backend note
+
+If the Tailscale container is used as a subnet router and reports iptables
+errors while the host uses an nftables-based firewall stack, set:
+
+```nix
+services.tailscaleCompose.firewallMode = "nftables";
+```
+
+This forces the container to use `TS_DEBUG_FIREWALL_MODE=nftables`, which can
+fix cases where direct access to the subnet router works but forwarded traffic
+to other LAN hosts times out.
+
 ## Image pinning strategy
 
 - Default policy is pinned tags only.
@@ -59,5 +73,6 @@ services.tailscaleCompose = {
   advertiseRoutes = [ "198.51.100.0/24" ];
   acceptRoutes = true;
   acceptDns = false;
+  firewallMode = "nftables";
 };
 ```
