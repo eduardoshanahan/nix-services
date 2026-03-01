@@ -82,7 +82,7 @@
         tailscaleModule = import ./services/tailscale/tailscale.nix;
         ghostModule = import ./services/ghost/ghost.nix;
         cadvisorModule = import ./services/cadvisor/cadvisor.nix;
-        vikunjaModule = import ./services/vikunja/vikunja.nix;
+        vikunjaComposeModule = import ./services/vikunja/vikunja.nix;
       in {
         nixosModules = {
           traefik = traefikModule;
@@ -102,7 +102,7 @@
           tailscale = tailscaleModule;
           ghost = ghostModule;
           cadvisor = cadvisorModule;
-          vikunja = vikunjaModule;
+          vikunjaCompose = vikunjaComposeModule;
         };
 
         services = {
@@ -123,7 +123,7 @@
           tailscale = tailscaleModule;
           ghost = ghostModule;
           cadvisor = cadvisorModule;
-          vikunja = vikunjaModule;
+          vikunjaCompose = vikunjaComposeModule;
         };
       }
     );
