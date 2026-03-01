@@ -1,0 +1,45 @@
+services:
+  vikunja:
+    image: ${VIKUNJA_IMAGE_REPOSITORY}:${VIKUNJA_IMAGE_TAG}
+    container_name: ${VIKUNJA_CONTAINER_NAME}
+    restart: unless-stopped
+    init: true
+    mem_limit: 512m
+    pids_limit: 256
+    cpus: "1.0"
+
+    expose:
+      - "3456"
+
+    environment:
+      - TZ
+      - VIKUNJA_SERVICE_PUBLICURL=${VIKUNJA_SERVICE_PUBLICURL}
+      - VIKUNJA_SERVICE_ENABLEREGISTRATION=${VIKUNJA_SERVICE_ENABLEREGISTRATION}
+      - VIKUNJA_DATABASE_TYPE=sqlite
+      - VIKUNJA_DATABASE_PATH=/app/vikunja/files/vikunja.db
+      - VIKUNJA_FILES_BASE_PATH=/app/vikunja/files
+
+    volumes:
+      - "${VIKUNJA_DATA_DIR}:/app/vikunja/files"
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=${VIKUNJA_NETWORK}"
+      - "traefik.http.routers.vikunja.rule=Host(`${VIKUNJA_HOSTNAME}`)"
+      - "traefik.http.services.vikunja.loadbalancer.server.port=3456"
+      - "traefik.http.routers.vikunja.entrypoints=${VIKUNJA_ENTRYPOINTS}"
+      - "traefik.http.routers.vikunja.tls=${VIKUNJA_TLS}"
+
+    networks:
+      - traefik
+
+networks:
+  traefik:
+    external: true
+    name: ${VIKUNJA_NETWORK}
