@@ -83,7 +83,6 @@
         ghostModule = import ./services/ghost/ghost.nix;
         cadvisorModule = import ./services/cadvisor/cadvisor.nix;
         vikunjaComposeModule = import ./services/vikunja/vikunja.nix;
-        focalboardModule = import ./services/focalboard/focalboard.nix;
       in {
         nixosModules = {
           traefik = traefikModule;
@@ -104,7 +103,6 @@
           ghost = ghostModule;
           cadvisor = cadvisorModule;
           vikunjaCompose = vikunjaComposeModule;
-          focalboard = focalboardModule;
         };
 
         services = {
@@ -126,7 +124,6 @@
           ghost = ghostModule;
           cadvisor = cadvisorModule;
           vikunjaCompose = vikunjaComposeModule;
-          focalboard = focalboardModule;
         };
       }
     );
