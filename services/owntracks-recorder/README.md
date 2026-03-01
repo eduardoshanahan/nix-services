@@ -42,6 +42,30 @@ entrypoint port (for example `:8084`):
 http://<hostname>:8084/pub
 ```
 
+## Backup Guidance
+
+- Recorder keeps persistent state in `services.owntracksRecorder.dataDir`.
+- In the current homelab deployment on `rpi-box-02`, this is backed by the
+  USB-mounted host path `/srv/prometheus/owntracks`.
+- Include that directory in host-level backups if you want to retain:
+  - current device state under `last/`
+  - historical monthly records under `rec/`
+  - Recorder's LMDB metadata under `ghash/`
+- Restore is file-level: stop the service, restore the directory, then start the
+  service again.
+
+## Storage and backup
+
+- Recorder keeps persistent state in `services.owntracksRecorder.dataDir`.
+- In the current homelab deployment on `rpi-box-02`, this is backed by the
+  USB-mounted host path `/srv/prometheus/owntracks`.
+- Include that directory in host-level backups if you want to retain:
+  - current device state under `last/`
+  - historical monthly records under `rec/`
+  - Recorder's LMDB metadata under `ghash/`
+- Restore is file-level: stop the service, restore the directory, then start the
+  service again.
+
 ## Image pinning strategy
 
 - Default policy is pinned tags only.
