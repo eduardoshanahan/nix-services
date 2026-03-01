@@ -4,7 +4,7 @@
   pkgs,
   ...
 }: let
-  cfg = config.services.vikunja;
+  cfg = config.services.vikunjaCompose;
   serviceName = "vikunja";
   composeDir = "/etc/${serviceName}";
   dockerBin = "${config.virtualisation.docker.package}/bin/docker";
@@ -24,27 +24,27 @@ in {
     assertions = [
       {
         assertion = builtins.match hostnameRegex cfg.hostname != null;
-        message = "services.vikunja.hostname must be a valid DNS hostname.";
+        message = "services.vikunjaCompose.hostname must be a valid DNS hostname.";
       }
       {
         assertion = builtins.match networkRegex cfg.network != null;
-        message = "services.vikunja.network may only contain letters, numbers, `.`, `_`, and `-`.";
+        message = "services.vikunjaCompose.network may only contain letters, numbers, `.`, `_`, and `-`.";
       }
       {
         assertion = builtins.match "^[^[:space:]]+$" cfg.image.repository != null;
-        message = "services.vikunja.image.repository must not contain whitespace.";
+        message = "services.vikunjaCompose.image.repository must not contain whitespace.";
       }
       {
         assertion = builtins.match "^[^[:space:]]+$" cfg.image.tag != null;
-        message = "services.vikunja.image.tag must not contain whitespace.";
+        message = "services.vikunjaCompose.image.tag must not contain whitespace.";
       }
       {
         assertion = cfg.image.allowMutableTag || cfg.image.tag != "latest";
-        message = "services.vikunja.image.tag must be pinned (not `latest`) unless services.vikunja.image.allowMutableTag = true.";
+        message = "services.vikunjaCompose.image.tag must be pinned (not `latest`) unless services.vikunjaCompose.image.allowMutableTag = true.";
       }
       {
         assertion = lib.hasPrefix "/" cfg.dataDir;
-        message = "services.vikunja.dataDir must be an absolute path.";
+        message = "services.vikunjaCompose.dataDir must be an absolute path.";
       }
     ];
 

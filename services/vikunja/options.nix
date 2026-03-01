@@ -1,5 +1,5 @@
 {lib, ...}: {
-  options.services.vikunja = {
+  options.services.vikunjaCompose = {
     enable = lib.mkEnableOption "Vikunja service (Docker Compose)";
 
     containerName = lib.mkOption {
