@@ -37,6 +37,12 @@
       description = "Internal HTTP listen port used by OwnTracks Recorder.";
     };
 
+    entryPoint = lib.mkOption {
+      type = lib.types.str;
+      default = "webplain";
+      description = "Traefik entrypoint name used by the OwnTracks Recorder router when TLS is disabled.";
+    };
+
     image = {
       repository = lib.mkOption {
         type = lib.types.str;

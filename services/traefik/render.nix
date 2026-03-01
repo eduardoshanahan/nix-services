@@ -6,6 +6,7 @@
   tlsEnabled = cfg.tls.enable;
   httpToHttpsRedirectEnabled = cfg.httpToHttpsRedirect;
   metricsEnabled = cfg.metrics.enable;
+  plainHttpEnabled = cfg.plainHttp.enable;
   mkYamlList = {
     indent,
     items,
@@ -37,6 +38,9 @@
       "--metrics.prometheus.addEntryPointsLabels=true"
       "--metrics.prometheus.addRoutersLabels=true"
       "--metrics.prometheus.addServicesLabels=true"
+    ]
+    ++ lib.optionals plainHttpEnabled [
+      "--entryPoints.webplain.address=:${toString cfg.plainHttp.port}"
     ];
 
   portMappings =
@@ -46,6 +50,9 @@
     ]
     ++ lib.optionals metricsEnabled [
       "${toString cfg.metrics.port}:${toString cfg.metrics.port}"
+    ]
+    ++ lib.optionals plainHttpEnabled [
+      "${toString cfg.plainHttp.port}:${toString cfg.plainHttp.port}"
     ];
 
   tlsCertFile =
@@ -133,6 +140,7 @@ in {
     tlsEnabled
     httpToHttpsRedirectEnabled
     metricsEnabled
+    plainHttpEnabled
     tlsFilesCheck
     composeText
     tlsConfigText

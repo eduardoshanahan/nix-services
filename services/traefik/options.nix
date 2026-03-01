@@ -67,5 +67,15 @@ in {
       };
     };
 
+    plainHttp = {
+      enable = lib.mkEnableOption "additional cleartext HTTP entrypoint for selected internal-only services";
+
+      port = lib.mkOption {
+        type = lib.types.port;
+        default = 8084;
+        description = "Host/container TCP port used by the additional cleartext HTTP entrypoint.";
+      };
+    };
+
   };
 }
