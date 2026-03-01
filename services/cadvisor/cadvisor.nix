@@ -4,13 +4,13 @@
   pkgs,
   ...
 }: let
-  cfg = config.services.cadvisor;
+  cfg = config.services.cadvisorCompose;
   serviceName = "cadvisor";
   composeDir = "/etc/${serviceName}";
   dockerBin = "${config.virtualisation.docker.package}/bin/docker";
   portType = lib.types.ints.between 1 65535;
 in {
-  options.services.cadvisor = {
+  options.services.cadvisorCompose = {
     enable = lib.mkEnableOption "cAdvisor container metrics exporter (Docker Compose)";
 
     containerName = lib.mkOption {
@@ -72,19 +72,19 @@ in {
     assertions = [
       {
         assertion = builtins.match "^[^[:space:]]+$" cfg.image.repository != null;
-        message = "services.cadvisor.image.repository must not contain whitespace.";
+        message = "services.cadvisorCompose.image.repository must not contain whitespace.";
       }
       {
         assertion = builtins.match "^[^[:space:]]+$" cfg.image.tag != null;
-        message = "services.cadvisor.image.tag must not contain whitespace.";
+        message = "services.cadvisorCompose.image.tag must not contain whitespace.";
       }
       {
         assertion = cfg.image.allowMutableTag || cfg.image.tag != "latest";
-        message = "services.cadvisor.image.tag must be pinned (not `latest`) unless services.cadvisor.image.allowMutableTag = true.";
+        message = "services.cadvisorCompose.image.tag must be pinned (not `latest`) unless services.cadvisorCompose.image.allowMutableTag = true.";
       }
       {
         assertion = lib.hasPrefix "/" cfg.dockerDataRoot;
-        message = "services.cadvisor.dockerDataRoot must be an absolute path.";
+        message = "services.cadvisorCompose.dockerDataRoot must be an absolute path.";
       }
     ];
 
