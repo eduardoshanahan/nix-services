@@ -26,6 +26,7 @@ services:
       - TS_HOSTNAME=${TAILSCALE_HOSTNAME}
       - TS_USERSPACE=false
       - TS_EXTRA_ARGS=${TAILSCALE_EXTRA_ARGS}
+      - TS_DEBUG_FIREWALL_MODE=${TAILSCALE_FIREWALL_MODE:-}
 
     logging:
       driver: "json-file"
