@@ -4,7 +4,7 @@ repos:
     hooks:
       - id: gitleaks
         name: gitleaks (secrets scan)
-        args: ["--pre-commit", "--redact", "--verbose", "--no-banner"]
+        args: ["--pre-commit", "--config=.gitleaks.toml", "--redact", "--verbose", "--no-banner"]
 
   - repo: local
     hooks:

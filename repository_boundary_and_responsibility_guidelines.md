@@ -106,7 +106,7 @@ Example:
 
 ```nix
 inputs = {
-  nix-services.url = "github:eduardoshanahan/nix-services";
+  nix-services.url = "git+ssh://git@gitea.<homelab-domain>:2222/eduardo/nix-services.git?ref=main";
 };
 ```
 

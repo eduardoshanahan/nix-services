@@ -4,14 +4,6 @@
 config/local.env
 
 # -------------------------------------------------
-# Secrets and private overlays (never committed)
-# -------------------------------------------------
-secrets/
-private/
-hosts-private/
-!hosts-private/README.md
-
-# -------------------------------------------------
 # Nix build artifacts
 # -------------------------------------------------
 result
