@@ -60,7 +60,7 @@ to other LAN hosts times out.
 ## Image pinning strategy
 
 - Default policy is pinned tags only.
-- Default image is `tailscale/tailscale:v1.84.2`.
+- Default image is `tailscale/tailscale:v1.94.2`.
 - Mutable tags like `latest` are blocked unless
   `services.tailscaleCompose.image.allowMutableTag = true`.
 
