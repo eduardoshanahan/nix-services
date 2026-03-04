@@ -40,7 +40,11 @@
     // cfg.config.docker;
   volumeLines =
     [
-      "          - ${configDir}:/app/config:ro"
+      "          - ${configDir}/settings.yaml:/app/config/settings.yaml:ro"
+      "          - ${configDir}/services.yaml:/app/config/services.yaml:ro"
+      "          - ${configDir}/bookmarks.yaml:/app/config/bookmarks.yaml:ro"
+      "          - ${configDir}/widgets.yaml:/app/config/widgets.yaml:ro"
+      "          - ${configDir}/docker.yaml:/app/config/docker.yaml:ro"
     ]
     ++ lib.optional cfg.docker.enable "          - ${cfg.docker.socketPath}:/var/run/docker.sock:ro";
   composeYaml = ''
