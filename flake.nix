@@ -84,6 +84,7 @@
         cadvisorModule = import ./services/cadvisor/cadvisor.nix;
         vikunjaComposeModule = import ./services/vikunja/vikunja.nix;
         owntracksRecorderModule = import ./services/owntracks-recorder/owntracks-recorder.nix;
+        homepageDashboardModule = import ./services/homepage/homepage.nix;
       in {
         nixosModules = {
           traefik = traefikModule;
@@ -105,6 +106,7 @@
           cadvisor = cadvisorModule;
           vikunjaCompose = vikunjaComposeModule;
           owntracksRecorder = owntracksRecorderModule;
+          homepageDashboard = homepageDashboardModule;
         };
 
         services = {
@@ -127,6 +129,7 @@
           cadvisor = cadvisorModule;
           vikunjaCompose = vikunjaComposeModule;
           owntracksRecorder = owntracksRecorderModule;
+          homepageDashboard = homepageDashboardModule;
         };
       }
     );
