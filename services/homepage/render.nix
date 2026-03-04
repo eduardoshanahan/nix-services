@@ -38,6 +38,11 @@
       else {}
     )
     // cfg.config.docker;
+  volumeLines =
+    [
+      "          - ${configDir}:/app/config:ro"
+    ]
+    ++ lib.optional cfg.docker.enable "          - ${cfg.docker.socketPath}:/var/run/docker.sock:ro";
   composeYaml = ''
     services:
       homepage:
@@ -53,7 +58,7 @@
           - "3000"
 
         volumes:
-          - ${configDir}:/app/config:ro${lib.optionalString cfg.docker.enable "\n          - ${cfg.docker.socketPath}:/var/run/docker.sock:ro"}
+${lib.concatStringsSep "\n" volumeLines}
         environment:
           - HOMEPAGE_ALLOWED_HOSTS=${allowedHostsValue}
           - TZ=${cfg.timezone}
