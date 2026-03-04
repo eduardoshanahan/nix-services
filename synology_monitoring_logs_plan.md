@@ -301,12 +301,13 @@ The following were created on Synology under `/volume1/docker/homelab`:
 
 ### Git-tracked template copy
 
-Synology deployment templates are tracked under:
+Synology deployment templates are tracked in the sibling `synology-services`
+repository under:
 
-- `synology-services/nas-host-template/node-exporter/compose.yaml`
-- `synology-services/nas-host-template/node-exporter/.env.example`
-- `synology-services/nas-host-template/deploy.sh`
-- `synology-services/nas-host-template/DSM_MANUAL_CHECKLIST.md`
+- `../synology-services/nas-host-template/node-exporter/compose.yaml`
+- `../synology-services/nas-host-template/node-exporter/.env.example`
+- `../synology-services/nas-host-template/deploy.sh`
+- `../synology-services/nas-host-template/DSM_MANUAL_CHECKLIST.md`
 
 These artifacts are sanitized and intentionally contain no secret material.
 

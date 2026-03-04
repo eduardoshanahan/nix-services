@@ -43,7 +43,7 @@ They are not the day-to-day path for already-deployed stable services.
 | DNS/DHCP migration operations | split by scope | `nix-services`: service design/cutover constraints; `nix-pi`: operator execution checklist | Each side links to the other and avoids re-stating full procedure |
 | TLS enablement strategy | `nix-services` | `tls_enablement_plan_post_dns_traefik.md` | `nix-pi` only references and records host-specific execution notes |
 | Monitoring stack service behavior | `nix-services` | `monitoring_and_metrics_plan_prometheus_traefik.md`, service READMEs | `nix-pi` only keeps “what is enabled on host X” summary |
-| Synology service artifacts and runbooks | `nix-services` | `synology-services/**` | `nix-pi` should not duplicate Synology operational runbooks |
+| Synology service artifacts and runbooks | `synology-services` | sibling repo `../synology-services/**` | `nix-pi` should not duplicate Synology operational runbooks |
 | Public repo sanitization policy | `nix-services` | `PUBLIC_REPO_SANITIZATION_POLICY.md` | `nix-pi` should replace duplicate body with a pointer doc |
 | Reflash/rejoin runbook | `nix-pi` | `reflash_rejoin_node_runbook.md` | `nix-services` should replace its runbook with a pointer doc |
 | Codex response style policy | choose one owner (recommended: `nix-services`) | `response_style.md` | Other repo keeps a pointer only |

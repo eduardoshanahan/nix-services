@@ -62,8 +62,8 @@ this session so the next session can resume without re-discovery.
   - into `/etc/ghost/homelab-root-ca.crt`
 - The Ghost container uses:
   - `NODE_EXTRA_CA_CERTS=/etc/ghost/homelab-root-ca.crt`
-- Added the Synology MySQL stack for Ghost under:
-  - `synology-services/hhnas4/ghost-mysql/`
+- Added the Synology MySQL stack for Ghost under the sibling repo:
+  - `../synology-services/hhnas4/ghost-mysql/`
 
 ## Changes made in `nix-pi`
 

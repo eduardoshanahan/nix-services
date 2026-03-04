@@ -1,38 +1,15 @@
-# synology-services
+# synology-services (Moved)
 
-Sanitized, reproducible deployment artifacts for Synology hosts.
+The canonical Synology deployment artifacts now live in the sibling
+`synology-services` repository at:
 
-## Scope
+- `../synology-services/`
 
-- This directory intentionally contains no credentials, certificates, or host-private secrets.
-- Host-specific values are either parameterized in `.env.example` files or documented as manual DSM UI steps.
+This embedded copy is retained temporarily as a compatibility fallback while
+operator paths and references are being updated.
 
-## Layout
+## Current Rule
 
-- `nas-host-template/node-exporter/compose.yaml`
-- `nas-host-template/node-exporter/.env.example`
-- `nas-host-template/deploy.sh`
-- `nas-host-template/DSM_MANUAL_CHECKLIST.md`
-- `hhnas4/gitea/compose.yaml`
-- `hhnas4/ghost-mysql/compose.yaml`
-- `hhnas4/ghost-mysql/.env.example`
-- `hhnas4/ghost-mysql/deploy.sh`
-- `hhnas4/ghost-mysql/README.md`
-- `hhnas4/gitea/.env.example`
-- `hhnas4/promtail/compose.yaml`
-- `hhnas4/promtail/config.yml`
-- `hhnas4/promtail/.env.example`
-- `hhnas4/deploy.sh`
-- `hhnas4/README.md`
-
-## Reproducibility Contract
-
-- Container definitions, pinned image tags, ports, and restart policies must be git-tracked here.
-- Any unavoidable Synology DSM UI action must be documented in `DSM_MANUAL_CHECKLIST.md`.
-- Secret material must stay outside this repository.
-
-## Session Notes
-
-Host-specific operational notes for continuity across sessions:
-
-- `hhnas4/SESSION_NOTES.md`
+- Run Synology deploy scripts from the top-level `synology-services` repo.
+- Keep NAS runtime paths unchanged during the transition.
+- Treat this embedded location as deprecated.
