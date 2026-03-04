@@ -40,6 +40,11 @@ Quick pointer map:
   `docs/PROVISIONING.md`, `docs/SECRETS.md`.
 - Service behavior/options/operations: `nix-services` -> `services/*/README.md`
   and service plans in this repository.
+- Common service docs:
+  - `services/homepage/README.md`
+  - `services/uptime-kuma/README.md`
+  - `services/traefik/README.md`
+  - `services/grafana/README.md`
 
 ## Public Repo Hygiene
 
