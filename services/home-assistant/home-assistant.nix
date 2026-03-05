@@ -14,6 +14,48 @@
   managedProxyHeader = "# BEGIN NIX-SERVICES HOME-ASSISTANT REVERSE PROXY";
   managedProxyFooter = "# END NIX-SERVICES HOME-ASSISTANT REVERSE PROXY";
   proxyYamlLines = builtins.concatStringsSep "\n" (map (p: "    - ${p}") cfg.reverseProxy.trustedProxies);
+  ensureProxyConfigScript = pkgs.writeShellScript "home-assistant-ensure-proxy-config" ''
+    set -eu
+
+    if [ "${if cfg.reverseProxy.enable then "1" else "0"}" != "1" ]; then
+      exit 0
+    fi
+
+    cfgFile="${cfg.dataDir}/configuration.yaml"
+
+    if [ ! -f "$cfgFile" ]; then
+      cat >"$cfgFile" <<'EOF'
+# Loads default set of integrations. Do not remove.
+default_config:
+
+# Load frontend themes from the themes folder
+frontend:
+  themes: !include_dir_merge_named themes
+
+automation: !include automations.yaml
+script: !include scripts.yaml
+scene: !include scenes.yaml
+EOF
+    fi
+
+    if grep -q "^http:" "$cfgFile" && ! grep -q "${managedProxyHeader}" "$cfgFile"; then
+      echo "home-assistant: existing un-managed http: block found; leaving it unchanged" >&2
+      exit 0
+    fi
+
+    tmpFile="$(mktemp)"
+    sed "/${managedProxyHeader}/,/${managedProxyFooter}/d" "$cfgFile" > "$tmpFile"
+    cat >>"$tmpFile" <<EOF
+
+${managedProxyHeader}
+http:
+  use_x_forwarded_for: ${if cfg.reverseProxy.useXForwardedFor then "true" else "false"}
+  trusted_proxies:
+${proxyYamlLines}
+${managedProxyFooter}
+EOF
+    mv "$tmpFile" "$cfgFile"
+  '';
 in {
   imports = [
     ./options.nix
@@ -94,7 +136,7 @@ in {
 
         ExecStartPre = [
           "${pkgs.runtimeShell} -c 'mkdir -p ${cfg.dataDir} && chmod 0750 ${cfg.dataDir}'"
-          "${pkgs.runtimeShell} -c 'if [ \"${if cfg.reverseProxy.enable then "1" else "0"}\" = \"1\" ]; then cfgFile=${cfg.dataDir}/configuration.yaml; if [ ! -f \"$cfgFile\" ]; then cat >\"$cfgFile\" <<\"EOF\"\n# Loads default set of integrations. Do not remove.\ndefault_config:\n\n# Load frontend themes from the themes folder\nfrontend:\n  themes: !include_dir_merge_named themes\n\nautomation: !include automations.yaml\nscript: !include scripts.yaml\nscene: !include scenes.yaml\nEOF\nfi; if grep -q \"^http:\" \"$cfgFile\" && ! grep -q \"${managedProxyHeader}\" \"$cfgFile\"; then echo \"home-assistant: existing un-managed http: block found; leaving it unchanged\" >&2; else tmpFile=$(mktemp); sed \"/${managedProxyHeader}/,/${managedProxyFooter}/d\" \"$cfgFile\" > \"$tmpFile\"; cat >>\"$tmpFile\" <<\"EOF\"\n\n${managedProxyHeader}\nhttp:\n  use_x_forwarded_for: ${if cfg.reverseProxy.useXForwardedFor then "true" else "false"}\n  trusted_proxies:\n${proxyYamlLines}\n${managedProxyFooter}\nEOF\nmv \"$tmpFile\" \"$cfgFile\"; fi; fi'"
+          "${ensureProxyConfigScript}"
           "${pkgs.runtimeShell} -c 'test -s ${composeDir}/docker-compose.yml'"
           "${pkgs.runtimeShell} -c 'for i in $(seq 1 30); do ${dockerBin} info >/dev/null 2>&1 && exit 0; sleep 1; done; echo \"home-assistant: docker daemon is not ready\" >&2; exit 1'"
           "${pkgs.runtimeShell} -c '${dockerBin} compose config >/dev/null'"
