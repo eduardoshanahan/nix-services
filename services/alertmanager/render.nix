@@ -38,42 +38,44 @@
     chmod 0644 /run/alertmanager/alertmanager.yml
   '';
 
-  alertmanagerConfigTemplate = ''
-    global:
-    ${lib.optionalString emailEnabled ''
-        smtp_smarthost: "${cfg.notifications.email.smarthost}"
-        smtp_from: "${cfg.notifications.email.from}"
-        smtp_auth_username: "${cfg.notifications.email.authUsername}"
-        smtp_auth_password: "__SMTP_AUTH_PASSWORD__"
-        smtp_require_tls: ${
-        if cfg.notifications.email.requireTls
-        then "true"
-        else "false"
-      }
-    ''}
-
-    route:
-      receiver: "default"
-      group_by: ["alertname", "job", "instance"]
-      group_wait: 30s
-      group_interval: 5m
-      repeat_interval: 1h
-
-    receivers:
-      - name: "default"
-    ${lib.optionalString emailEnabled ''
-          email_configs:
-            - to: "${cfg.notifications.email.to}"
-              send_resolved: true
-    ''}
-    ${lib.optionalString telegramEnabled ''
-          telegram_configs:
-            - bot_token: "__TELEGRAM_BOT_TOKEN__"
-              chat_id: ${toString cfg.notifications.telegram.chatId}
-              parse_mode: "${cfg.notifications.telegram.parseMode}"
-              send_resolved: true
-    ''}
-  '';
+  alertmanagerConfigTemplate =
+    lib.concatStringsSep "\n" (
+      [
+        "global:"
+      ]
+      ++ lib.optionals emailEnabled [
+        "  smtp_smarthost: \"${cfg.notifications.email.smarthost}\""
+        "  smtp_from: \"${cfg.notifications.email.from}\""
+        "  smtp_auth_username: \"${cfg.notifications.email.authUsername}\""
+        "  smtp_auth_password: \"__SMTP_AUTH_PASSWORD__\""
+        "  smtp_require_tls: ${if cfg.notifications.email.requireTls then "true" else "false"}"
+      ]
+      ++ [
+        ""
+        "route:"
+        "  receiver: \"default\""
+        "  group_by: [\"alertname\", \"job\", \"instance\"]"
+        "  group_wait: 30s"
+        "  group_interval: 5m"
+        "  repeat_interval: 1h"
+        ""
+        "receivers:"
+        "  - name: \"default\""
+      ]
+      ++ lib.optionals emailEnabled [
+        "    email_configs:"
+        "      - to: \"${cfg.notifications.email.to}\""
+        "        send_resolved: true"
+      ]
+      ++ lib.optionals telegramEnabled [
+        "    telegram_configs:"
+        "      - bot_token: \"__TELEGRAM_BOT_TOKEN__\""
+        "        chat_id: ${toString cfg.notifications.telegram.chatId}"
+        "        parse_mode: \"${cfg.notifications.telegram.parseMode}\""
+        "        send_resolved: true"
+      ]
+      ++ [ "" ]
+    );
 in {
   inherit renderConfigScript alertmanagerConfigTemplate;
 }
