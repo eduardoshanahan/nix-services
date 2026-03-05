@@ -3,7 +3,6 @@ services:
     image: ${HOME_ASSISTANT_IMAGE_REPOSITORY}:${HOME_ASSISTANT_IMAGE_TAG}
     container_name: ${HOME_ASSISTANT_CONTAINER_NAME}
     restart: unless-stopped
-    init: true
     mem_limit: 2g
     pids_limit: 512
     cpus: "2.0"
