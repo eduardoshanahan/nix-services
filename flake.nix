@@ -86,7 +86,6 @@
         owntracksRecorderModule = import ./services/owntracks-recorder/owntracks-recorder.nix;
         homepageDashboardModule = import ./services/homepage/homepage.nix;
         smtpRelayModule = import ./services/smtp-relay/smtp-relay.nix;
-        solidtimeComposeModule = import ./services/solidtime/solidtime.nix;
       in {
         nixosModules = {
           traefik = traefikModule;
@@ -110,7 +109,6 @@
           owntracksRecorder = owntracksRecorderModule;
           homepageDashboard = homepageDashboardModule;
           smtpRelay = smtpRelayModule;
-          solidtimeCompose = solidtimeComposeModule;
         };
 
         services = {
@@ -135,7 +133,6 @@
           owntracksRecorder = owntracksRecorderModule;
           homepageDashboard = homepageDashboardModule;
           smtpRelay = smtpRelayModule;
-          solidtimeCompose = solidtimeComposeModule;
         };
       }
     );
