@@ -9,7 +9,7 @@ services:
       - "2368"
 
     env_file:
-      - /run/secrets/ghost.env
+      - ${GHOST_RUNTIME_ENV_FILE}
 
     environment:
       - TZ
@@ -54,10 +54,10 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=${GHOST_NETWORK}"
-      - "traefik.http.routers.ghost.rule=Host(`${GHOST_HOSTNAME}`)"
-      - "traefik.http.services.ghost.loadbalancer.server.port=2368"
-      - "traefik.http.routers.ghost.entrypoints=${GHOST_ENTRYPOINTS}"
-      - "traefik.http.routers.ghost.tls=${GHOST_TLS}"
+      - "traefik.http.routers.${GHOST_TRAEFIK_ROUTER_NAME}.rule=Host(`${GHOST_HOSTNAME}`)"
+      - "traefik.http.services.${GHOST_TRAEFIK_SERVICE_NAME}.loadbalancer.server.port=2368"
+      - "traefik.http.routers.${GHOST_TRAEFIK_ROUTER_NAME}.entrypoints=${GHOST_ENTRYPOINTS}"
+      - "traefik.http.routers.${GHOST_TRAEFIK_ROUTER_NAME}.tls=${GHOST_TLS}"
 
     networks:
       - traefik
