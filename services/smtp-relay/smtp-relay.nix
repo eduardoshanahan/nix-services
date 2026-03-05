@@ -187,13 +187,15 @@ in {
             "${pkgs.runtimeShell} -c 'test -s ${composeDir}/docker-compose.yml'"
             "${pkgs.runtimeShell} -c 'for i in $(seq 1 30); do ${dockerBin} info >/dev/null 2>&1 && exit 0; sleep 1; done; echo \"smtp-relay: docker daemon is not ready\" >&2; exit 1'"
             "${pkgs.runtimeShell} -c 'install -d -m 0700 /run/secrets'"
-            "${pkgs.runtimeShell} -c '${dockerBin} compose config >/dev/null'"
           ]
           ++ lib.optionals (cfg.upstream.passwordFile != null) [
             "${pkgs.runtimeShell} -c '${writeRelayPasswordEnv}'"
           ]
           ++ lib.optionals (cfg.upstream.passwordFile == null) [
             "${pkgs.runtimeShell} -c ': > /run/secrets/smtp-relay.env && chmod 0600 /run/secrets/smtp-relay.env'"
+          ]
+          ++ [
+            "${pkgs.runtimeShell} -c '${dockerBin} compose config >/dev/null'"
           ];
 
         ExecStart = "${dockerBin} compose up -d";
