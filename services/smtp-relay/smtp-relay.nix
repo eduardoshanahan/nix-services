@@ -176,7 +176,7 @@ in {
           "SMTP_RELAY_UPSTREAM_HOST=[${cfg.upstream.host}]:${toString cfg.upstream.port}"
           "SMTP_RELAY_UPSTREAM_USERNAME=${cfg.upstream.username}"
           "SMTP_RELAY_RUNTIME_ENV_FILE=/run/secrets/smtp-relay.env"
-          "SMTP_RELAY_ALLOWED_SENDER_DOMAINS=${lib.concatStringsSep "," cfg.allowedSenderDomains}"
+          "SMTP_RELAY_ALLOWED_SENDER_DOMAINS=${lib.concatStringsSep " " cfg.allowedSenderDomains}"
           "SMTP_RELAY_IMAGE_REPOSITORY=${cfg.image.repository}"
           "SMTP_RELAY_IMAGE_TAG=${cfg.image.tag}"
           "TZ=${cfg.timezone}"
