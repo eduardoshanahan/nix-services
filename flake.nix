@@ -85,6 +85,7 @@
         vikunjaComposeModule = import ./services/vikunja/vikunja.nix;
         owntracksRecorderModule = import ./services/owntracks-recorder/owntracks-recorder.nix;
         homepageDashboardModule = import ./services/homepage/homepage.nix;
+        smtpRelayModule = import ./services/smtp-relay/smtp-relay.nix;
       in {
         nixosModules = {
           traefik = traefikModule;
@@ -107,6 +108,7 @@
           vikunjaCompose = vikunjaComposeModule;
           owntracksRecorder = owntracksRecorderModule;
           homepageDashboard = homepageDashboardModule;
+          smtpRelay = smtpRelayModule;
         };
 
         services = {
@@ -130,6 +132,7 @@
           vikunjaCompose = vikunjaComposeModule;
           owntracksRecorder = owntracksRecorderModule;
           homepageDashboard = homepageDashboardModule;
+          smtpRelay = smtpRelayModule;
         };
       }
     );
