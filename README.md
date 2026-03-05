@@ -45,6 +45,7 @@ Quick pointer map:
   - `services/uptime-kuma/README.md`
   - `services/traefik/README.md`
   - `services/grafana/README.md`
+  - `services/smtp-relay/README.md`
 
 ## Public Repo Hygiene
 
