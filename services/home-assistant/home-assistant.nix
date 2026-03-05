@@ -10,6 +10,10 @@
   dockerBin = "${config.virtualisation.docker.package}/bin/docker";
   hostnameRegex = "^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)(\\.([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?))*$";
   networkRegex = "^[a-zA-Z0-9][a-zA-Z0-9_.-]*$";
+  proxyRegex = "^([0-9]{1,3}\\.){3}[0-9]{1,3}(/([0-9]|[1-2][0-9]|3[0-2]))?$";
+  managedProxyHeader = "# BEGIN NIX-SERVICES HOME-ASSISTANT REVERSE PROXY";
+  managedProxyFooter = "# END NIX-SERVICES HOME-ASSISTANT REVERSE PROXY";
+  proxyYamlLines = builtins.concatStringsSep "\n" (map (p: "    - ${p}") cfg.reverseProxy.trustedProxies);
 in {
   imports = [
     ./options.nix
@@ -40,6 +44,14 @@ in {
       {
         assertion = lib.hasPrefix "/" cfg.dataDir;
         message = "services.homeAssistant.dataDir must be an absolute path.";
+      }
+      {
+        assertion = (!cfg.reverseProxy.enable) || (cfg.reverseProxy.trustedProxies != []);
+        message = "services.homeAssistant.reverseProxy.trustedProxies must be non-empty when reverseProxy is enabled.";
+      }
+      {
+        assertion = builtins.all (p: builtins.match proxyRegex p != null) cfg.reverseProxy.trustedProxies;
+        message = "services.homeAssistant.reverseProxy.trustedProxies entries must be IPv4 addresses/CIDRs (for example 172.18.0.0/16).";
       }
     ];
 
@@ -82,6 +94,7 @@ in {
 
         ExecStartPre = [
           "${pkgs.runtimeShell} -c 'mkdir -p ${cfg.dataDir} && chmod 0750 ${cfg.dataDir}'"
+          "${pkgs.runtimeShell} -c 'if [ \"${if cfg.reverseProxy.enable then "1" else "0"}\" = \"1\" ]; then cfgFile=${cfg.dataDir}/configuration.yaml; if [ ! -f \"$cfgFile\" ]; then cat >\"$cfgFile\" <<\"EOF\"\n# Loads default set of integrations. Do not remove.\ndefault_config:\n\n# Load frontend themes from the themes folder\nfrontend:\n  themes: !include_dir_merge_named themes\n\nautomation: !include automations.yaml\nscript: !include scripts.yaml\nscene: !include scenes.yaml\nEOF\nfi; if grep -q \"^http:\" \"$cfgFile\" && ! grep -q \"${managedProxyHeader}\" \"$cfgFile\"; then echo \"home-assistant: existing un-managed http: block found; leaving it unchanged\" >&2; else tmpFile=$(mktemp); sed \"/${managedProxyHeader}/,/${managedProxyFooter}/d\" \"$cfgFile\" > \"$tmpFile\"; cat >>\"$tmpFile\" <<\"EOF\"\n\n${managedProxyHeader}\nhttp:\n  use_x_forwarded_for: ${if cfg.reverseProxy.useXForwardedFor then "true" else "false"}\n  trusted_proxies:\n${proxyYamlLines}\n${managedProxyFooter}\nEOF\nmv \"$tmpFile\" \"$cfgFile\"; fi; fi'"
           "${pkgs.runtimeShell} -c 'test -s ${composeDir}/docker-compose.yml'"
           "${pkgs.runtimeShell} -c 'for i in $(seq 1 30); do ${dockerBin} info >/dev/null 2>&1 && exit 0; sleep 1; done; echo \"home-assistant: docker daemon is not ready\" >&2; exit 1'"
           "${pkgs.runtimeShell} -c '${dockerBin} compose config >/dev/null'"

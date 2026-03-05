@@ -55,5 +55,26 @@
     };
 
     tls = lib.mkEnableOption "TLS on the Home Assistant Traefik router";
+
+    reverseProxy = {
+      enable = lib.mkOption {
+        type = lib.types.bool;
+        default = true;
+        description = "Configure Home Assistant reverse-proxy trust settings in `configuration.yaml`.";
+      };
+
+      useXForwardedFor = lib.mkOption {
+        type = lib.types.bool;
+        default = true;
+        description = "Set Home Assistant `http.use_x_forwarded_for`.";
+      };
+
+      trustedProxies = lib.mkOption {
+        type = lib.types.listOf lib.types.str;
+        default = [];
+        example = [ "172.18.0.0/16" ];
+        description = "List of trusted reverse proxy CIDRs/IPs for Home Assistant `http.trusted_proxies`.";
+      };
+    };
   };
 }
