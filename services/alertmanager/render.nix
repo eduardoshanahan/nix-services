@@ -41,11 +41,11 @@
   alertmanagerConfigTemplate = ''
     global:
     ${lib.optionalString emailEnabled ''
-      smtp_smarthost: "${cfg.notifications.email.smarthost}"
-      smtp_from: "${cfg.notifications.email.from}"
-      smtp_auth_username: "${cfg.notifications.email.authUsername}"
-      smtp_auth_password: "__SMTP_AUTH_PASSWORD__"
-      smtp_require_tls: ${
+        smtp_smarthost: "${cfg.notifications.email.smarthost}"
+        smtp_from: "${cfg.notifications.email.from}"
+        smtp_auth_username: "${cfg.notifications.email.authUsername}"
+        smtp_auth_password: "__SMTP_AUTH_PASSWORD__"
+        smtp_require_tls: ${
         if cfg.notifications.email.requireTls
         then "true"
         else "false"
@@ -62,16 +62,16 @@
     receivers:
       - name: "default"
     ${lib.optionalString emailEnabled ''
-        email_configs:
-          - to: "${cfg.notifications.email.to}"
-            send_resolved: true
+          email_configs:
+            - to: "${cfg.notifications.email.to}"
+              send_resolved: true
     ''}
     ${lib.optionalString telegramEnabled ''
-        telegram_configs:
-          - bot_token: "__TELEGRAM_BOT_TOKEN__"
-            chat_id: ${toString cfg.notifications.telegram.chatId}
-            parse_mode: "${cfg.notifications.telegram.parseMode}"
-            send_resolved: true
+          telegram_configs:
+            - bot_token: "__TELEGRAM_BOT_TOKEN__"
+              chat_id: ${toString cfg.notifications.telegram.chatId}
+              parse_mode: "${cfg.notifications.telegram.parseMode}"
+              send_resolved: true
     ''}
   '';
 in {
