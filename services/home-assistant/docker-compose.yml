@@ -1,0 +1,47 @@
+services:
+  home-assistant:
+    image: ${HOME_ASSISTANT_IMAGE_REPOSITORY}:${HOME_ASSISTANT_IMAGE_TAG}
+    container_name: ${HOME_ASSISTANT_CONTAINER_NAME}
+    restart: unless-stopped
+    init: true
+    mem_limit: 2g
+    pids_limit: 512
+    cpus: "2.0"
+
+    expose:
+      - "8123"
+
+    environment:
+      - TZ
+
+    volumes:
+      - ${HOME_ASSISTANT_DATA_DIR}:/config
+
+    healthcheck:
+      test: ["CMD-SHELL", "wget --spider -q http://127.0.0.1:8123/ || exit 1"]
+      interval: 30s
+      timeout: 8s
+      retries: 10
+      start_period: 60s
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=${HOME_ASSISTANT_NETWORK}"
+      - "traefik.http.routers.homeassistant.rule=Host(`${HOME_ASSISTANT_HOSTNAME}`)"
+      - "traefik.http.services.homeassistant.loadbalancer.server.port=8123"
+      - "traefik.http.routers.homeassistant.entrypoints=${HOME_ASSISTANT_ENTRYPOINTS}"
+      - "traefik.http.routers.homeassistant.tls=${HOME_ASSISTANT_TLS}"
+
+    networks:
+      - traefik
+
+networks:
+  traefik:
+    external: true
+    name: ${HOME_ASSISTANT_NETWORK}
