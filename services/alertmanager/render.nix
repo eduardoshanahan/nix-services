@@ -39,7 +39,7 @@
   '';
 
   alertmanagerConfigTemplate = ''
-        global:
+    global:
     ${lib.optionalString emailEnabled ''
       smtp_smarthost: "${cfg.notifications.email.smarthost}"
       smtp_from: "${cfg.notifications.email.from}"
@@ -52,26 +52,26 @@
       }
     ''}
 
-        route:
-          receiver: "default"
-          group_by: ["alertname", "job", "instance"]
-          group_wait: 30s
-          group_interval: 5m
-          repeat_interval: 1h
+    route:
+      receiver: "default"
+      group_by: ["alertname", "job", "instance"]
+      group_wait: 30s
+      group_interval: 5m
+      repeat_interval: 1h
 
-        receivers:
-          - name: "default"
+    receivers:
+      - name: "default"
     ${lib.optionalString emailEnabled ''
-      email_configs:
-        - to: "${cfg.notifications.email.to}"
-          send_resolved: true
+        email_configs:
+          - to: "${cfg.notifications.email.to}"
+            send_resolved: true
     ''}
     ${lib.optionalString telegramEnabled ''
-      telegram_configs:
-        - bot_token: "__TELEGRAM_BOT_TOKEN__"
-          chat_id: ${toString cfg.notifications.telegram.chatId}
-          parse_mode: "${cfg.notifications.telegram.parseMode}"
-          send_resolved: true
+        telegram_configs:
+          - bot_token: "__TELEGRAM_BOT_TOKEN__"
+            chat_id: ${toString cfg.notifications.telegram.chatId}
+            parse_mode: "${cfg.notifications.telegram.parseMode}"
+            send_resolved: true
     ''}
   '';
 in {
