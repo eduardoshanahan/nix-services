@@ -356,7 +356,7 @@ in {
       serviceConfig = {
         Type = "oneshot";
         RemainAfterExit = true;
-        TimeoutStartSec = 300;
+        TimeoutStartSec = 1800;
         Restart = "on-failure";
         RestartSec = 10;
         WorkingDirectory = composeDir;
