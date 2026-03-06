@@ -14,7 +14,7 @@ services:
       - GF_METRICS_DISABLE_TOTAL_STATS=false
 
     env_file:
-      - /run/secrets/grafana.env
+      - ${GRAFANA_ENV_FILE}
 
     volumes:
       - "${GRAFANA_DATA_DIR}:/var/lib/grafana"

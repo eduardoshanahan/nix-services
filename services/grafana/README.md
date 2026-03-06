@@ -23,6 +23,13 @@ This module deploys Grafana behind Traefik using a checked-in Docker Compose fil
 - `services.grafanaCompose.network`
 - `services.grafanaCompose.dataDir`
 - `services.grafanaCompose.adminPasswordFile`
+- `services.grafanaCompose.database.type` (`sqlite` or `postgres`)
+- `services.grafanaCompose.database.postgres.host`
+- `services.grafanaCompose.database.postgres.port`
+- `services.grafanaCompose.database.postgres.name`
+- `services.grafanaCompose.database.postgres.user`
+- `services.grafanaCompose.database.postgres.passwordFile`
+- `services.grafanaCompose.database.postgres.sslMode`
 - `services.grafanaCompose.image.repository`
 - `services.grafanaCompose.image.tag`
 - `services.grafanaCompose.image.allowMutableTag`

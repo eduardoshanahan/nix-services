@@ -6,7 +6,6 @@
 }: let
   cfg = config.services.grafanaCompose;
   runtimeSecrets = import ../../lib/runtime-secrets.nix {inherit lib;};
-  runtimeSecretEnv = import ../../lib/runtime-secret-env.nix {inherit lib pkgs;};
   serviceName = "grafana";
   composeDir = "/etc/${serviceName}";
   dockerBin = "${config.virtualisation.docker.package}/bin/docker";
@@ -31,6 +30,62 @@
     unifiOverviewDashboardJson
     ;
   inherit (scripts) backupScript healthcheckScript waitForHealthy;
+  runtimeEnvScript = pkgs.writeShellScript "${serviceName}-runtime-env" ''
+    set -euo pipefail
+    umask 0077
+
+    admin_secret_file=${lib.escapeShellArg (toString cfg.adminPasswordFile)}
+    db_type=${lib.escapeShellArg cfg.database.type}
+    db_secret_file=${lib.escapeShellArg (
+      if cfg.database.postgres.passwordFile == null
+      then ""
+      else toString cfg.database.postgres.passwordFile
+    )}
+    env_file="/run/secrets/${serviceName}.env"
+    tmp="$(mktemp -p /run/secrets ".${serviceName}.env.XXXXXX")"
+
+    install -d -m 0700 /run/secrets
+
+    if [[ ! -s "$admin_secret_file" ]]; then
+      echo "grafana: missing or empty admin password file: $admin_secret_file" >&2
+      exit 1
+    fi
+    admin_password="$(tr -d '\r\n' < "$admin_secret_file")"
+    if [[ -z "$admin_password" ]]; then
+      echo "grafana: admin password file is empty after trimming" >&2
+      exit 1
+    fi
+
+    escape_env() {
+      local value="$1"
+      value="''${value//\\/\\\\}"
+      value="''${value//\"/\\\"}"
+      printf '%s' "$value"
+    }
+
+    {
+      printf 'GF_SECURITY_ADMIN_PASSWORD="%s"\n' "$(escape_env "$admin_password")"
+      printf 'GF_DATABASE_TYPE="%s"\n' "${cfg.database.type}"
+      printf 'GF_DATABASE_HOST="%s:%s"\n' "${cfg.database.postgres.host}" "${toString cfg.database.postgres.port}"
+      printf 'GF_DATABASE_NAME="%s"\n' "${cfg.database.postgres.name}"
+      printf 'GF_DATABASE_USER="%s"\n' "${cfg.database.postgres.user}"
+      printf 'GF_DATABASE_SSL_MODE="%s"\n' "${cfg.database.postgres.sslMode}"
+      if [[ "$db_type" == "postgres" ]]; then
+        if [[ -z "$db_secret_file" || ! -s "$db_secret_file" ]]; then
+          echo "grafana: missing or empty database password file: $db_secret_file" >&2
+          exit 1
+        fi
+        db_password="$(tr -d '\r\n' < "$db_secret_file")"
+        if [[ -z "$db_password" ]]; then
+          echo "grafana: database password file is empty after trimming" >&2
+          exit 1
+        fi
+        printf 'GF_DATABASE_PASSWORD="%s"\n' "$(escape_env "$db_password")"
+      fi
+    } > "$tmp"
+    chmod 0600 "$tmp"
+    mv -f "$tmp" "$env_file"
+  '';
 in {
   options.services.grafanaCompose = {
     enable = lib.mkEnableOption "Grafana service (Docker Compose)";
@@ -69,6 +124,51 @@ in {
         Absolute path to a runtime-provisioned file containing the Grafana admin password.
       '';
       example = "/run/secrets/grafana-admin-password";
+    };
+
+    database = {
+      type = lib.mkOption {
+        type = lib.types.enum [ "sqlite" "postgres" ];
+        default = "sqlite";
+        description = "Grafana database backend.";
+      };
+
+      postgres = {
+        host = lib.mkOption {
+          type = lib.types.str;
+          default = "postgres.<homelab-domain>";
+          description = "PostgreSQL host for Grafana when `database.type = \"postgres\"`.";
+        };
+
+        port = lib.mkOption {
+          type = lib.types.port;
+          default = 5433;
+          description = "PostgreSQL port for Grafana.";
+        };
+
+        name = lib.mkOption {
+          type = lib.types.str;
+          default = "grafana";
+          description = "PostgreSQL database name for Grafana.";
+        };
+
+        user = lib.mkOption {
+          type = lib.types.str;
+          default = "grafana";
+          description = "PostgreSQL username for Grafana.";
+        };
+
+        passwordFile = runtimeSecrets.mkSecretFileOption {
+          description = "Absolute path to a runtime-provisioned file containing the PostgreSQL password for Grafana.";
+          example = "/run/secrets/grafana-db-password";
+        };
+
+        sslMode = lib.mkOption {
+          type = lib.types.enum [ "disable" "require" "verify-ca" "verify-full" ];
+          default = "disable";
+          description = "PostgreSQL SSL mode for Grafana.";
+        };
+      };
     };
 
     image = {
@@ -199,6 +299,22 @@ in {
         message = "services.grafanaCompose.adminPasswordFile must be set when enabling Grafana.";
       }
       {
+        assertion = cfg.database.type != "postgres" || cfg.database.postgres.passwordFile != null;
+        message = "services.grafanaCompose.database.postgres.passwordFile must be set when database.type = \"postgres\".";
+      }
+      {
+        assertion = cfg.database.type != "postgres" || builtins.match "^[^[:space:]]+$" cfg.database.postgres.host != null;
+        message = "services.grafanaCompose.database.postgres.host must not contain whitespace.";
+      }
+      {
+        assertion = cfg.database.type != "postgres" || builtins.match "^[^[:space:]]+$" cfg.database.postgres.name != null;
+        message = "services.grafanaCompose.database.postgres.name must not contain whitespace.";
+      }
+      {
+        assertion = cfg.database.type != "postgres" || builtins.match "^[^[:space:]]+$" cfg.database.postgres.user != null;
+        message = "services.grafanaCompose.database.postgres.user must not contain whitespace.";
+      }
+      {
         assertion = lib.hasPrefix "/" cfg.backup.targetDir;
         message = "services.grafanaCompose.backup.targetDir must be an absolute path.";
       }
@@ -307,6 +423,7 @@ in {
             else "false"
           }"
           "GRAFANA_DATA_DIR=${cfg.dataDir}"
+          "GRAFANA_ENV_FILE=/run/secrets/${serviceName}.env"
           "TZ=${cfg.timezone}"
         ];
 
@@ -333,11 +450,7 @@ in {
           ]
           ++ [
             "${pkgs.runtimeShell} -c 'for i in $(seq 1 30); do ${dockerBin} info >/dev/null 2>&1 && exit 0; sleep 1; done; echo \"grafana: docker daemon is not ready\" >&2; exit 1'"
-            (runtimeSecretEnv.mkRuntimeSecretEnvExecStartPre {
-              name = serviceName;
-              secretFile = cfg.adminPasswordFile;
-              envVar = "GF_SECURITY_ADMIN_PASSWORD";
-            })
+            runtimeEnvScript
             "${pkgs.runtimeShell} -c '${dockerBin} compose config >/dev/null'"
             "${pkgs.runtimeShell} -c '${dockerBin} network inspect ${cfg.network} >/dev/null 2>&1 || ${dockerBin} network create ${cfg.network}'"
           ];
