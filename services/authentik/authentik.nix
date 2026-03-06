@@ -321,7 +321,7 @@ in {
         ];
 
         ExecStartPre = [
-          "${pkgs.runtimeShell} -c 'install -d -m 0750 ${cfg.dataDir} ${cfg.dataDir}/media ${cfg.dataDir}/certs ${cfg.dataDir}/custom-templates'"
+          "${pkgs.runtimeShell} -c 'install -d -m 0750 ${cfg.dataDir} ${cfg.dataDir}/media ${cfg.dataDir}/certs ${cfg.dataDir}/custom-templates && chown -R 1000:1000 ${cfg.dataDir}'"
           "${pkgs.runtimeShell} -c 'test -s ${composeDir}/docker-compose.yml'"
           "${pkgs.runtimeShell} -c '${runtimeEnvScript}'"
           "${pkgs.runtimeShell} -c 'for i in $(seq 1 30); do ${dockerBin} info >/dev/null 2>&1 && exit 0; sleep 1; done; echo \"authentik: docker daemon is not ready\" >&2; exit 1'"
