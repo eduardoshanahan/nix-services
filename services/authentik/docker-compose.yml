@@ -1,0 +1,48 @@
+services:
+  authentik-server:
+    image: ${AUTHENTIK_IMAGE_REPOSITORY}:${AUTHENTIK_IMAGE_TAG}
+    container_name: ${AUTHENTIK_CONTAINER_NAME}-server
+    restart: unless-stopped
+    command: server
+    env_file:
+      - ${AUTHENTIK_RUNTIME_ENV_FILE}
+    environment:
+      - TZ=${TZ}
+    expose:
+      - "9000"
+      - "9443"
+    volumes:
+      - "${AUTHENTIK_DATA_DIR}/media:/media"
+      - "${AUTHENTIK_DATA_DIR}/custom-templates:/templates"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=${AUTHENTIK_NETWORK}"
+      - "traefik.http.routers.authentik.rule=Host(`${AUTHENTIK_HOSTNAME}`)"
+      - "traefik.http.services.authentik.loadbalancer.server.port=9000"
+      - "traefik.http.routers.authentik.entrypoints=${AUTHENTIK_ENTRYPOINTS}"
+      - "traefik.http.routers.authentik.tls=${AUTHENTIK_TLS}"
+    networks:
+      - traefik
+
+  authentik-worker:
+    image: ${AUTHENTIK_IMAGE_REPOSITORY}:${AUTHENTIK_IMAGE_TAG}
+    container_name: ${AUTHENTIK_CONTAINER_NAME}-worker
+    restart: unless-stopped
+    command: worker
+    user: root
+    env_file:
+      - ${AUTHENTIK_RUNTIME_ENV_FILE}
+    environment:
+      - TZ=${TZ}
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "${AUTHENTIK_DATA_DIR}/certs:/certs"
+      - "${AUTHENTIK_DATA_DIR}/media:/media"
+      - "${AUTHENTIK_DATA_DIR}/custom-templates:/templates"
+    networks:
+      - traefik
+
+networks:
+  traefik:
+    external: true
+    name: ${AUTHENTIK_NETWORK}
