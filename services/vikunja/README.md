@@ -21,6 +21,16 @@ This module deploys Vikunja behind Traefik using a checked-in Docker Compose fil
 - `services.vikunjaCompose.network`
 - `services.vikunjaCompose.dataDir`
 - `services.vikunjaCompose.enableRegistration`
+- `services.vikunjaCompose.auth.local.enable`
+- `services.vikunjaCompose.auth.openid.enable`
+- `services.vikunjaCompose.auth.openid.providerKey`
+- `services.vikunjaCompose.auth.openid.name`
+- `services.vikunjaCompose.auth.openid.authUrl`
+- `services.vikunjaCompose.auth.openid.clientIdFile`
+- `services.vikunjaCompose.auth.openid.clientSecretFile`
+- `services.vikunjaCompose.auth.openid.scopes`
+- `services.vikunjaCompose.auth.openid.usernameFallback`
+- `services.vikunjaCompose.auth.openid.emailFallback`
 - `services.vikunjaCompose.database.type`
 - `services.vikunjaCompose.database.sqlite.path`
 - `services.vikunjaCompose.database.postgres.host`
@@ -46,6 +56,8 @@ This module deploys Vikunja behind Traefik using a checked-in Docker Compose fil
 - The module sets `HOME` and `XDG_CACHE_HOME` into the writable data path so the container does not try to write under `/.cache`.
 - The host data directory is prepared as owner `1000:0` before startup to match the container user.
 - `VIKUNJA_SERVICE_PUBLICURL` is derived from `hostname` and `tls`.
+- Auth settings are rendered to `/etc/vikunja/config.yml`.
+- When OpenID is enabled, client credentials are read from runtime secret files mounted into the container.
 
 ## Postgres Example
 

@@ -42,6 +42,72 @@ in {
       description = "Allow self-service user registration.";
     };
 
+    auth = {
+      local.enable = lib.mkOption {
+        type = lib.types.bool;
+        default = true;
+        description = "Enable local username/password authentication.";
+      };
+
+      openid = {
+        enable = lib.mkOption {
+          type = lib.types.bool;
+          default = false;
+          description = "Enable OpenID Connect authentication providers.";
+        };
+
+        providerKey = lib.mkOption {
+          type = lib.types.str;
+          default = "authentik";
+          description = "Provider key used in Vikunja's OpenID provider map.";
+        };
+
+        name = lib.mkOption {
+          type = lib.types.str;
+          default = "Authentik";
+          description = "Display name shown on the login button.";
+        };
+
+        authUrl = lib.mkOption {
+          type = lib.types.str;
+          default = "https://authentik.<homelab-domain>/application/o/vikunja/";
+          description = "OIDC issuer/discovery URL.";
+        };
+
+        clientIdFile = runtimeSecrets.mkSecretFileOption {
+          description = ''
+            Absolute path to a runtime-provisioned file containing the OIDC client ID.
+          '';
+          example = "/run/secrets/vikunja-oidc-client-id";
+        };
+
+        clientSecretFile = runtimeSecrets.mkSecretFileOption {
+          description = ''
+            Absolute path to a runtime-provisioned file containing the OIDC client secret.
+          '';
+          example = "/run/secrets/vikunja-oidc-client-secret";
+        };
+
+        scopes = lib.mkOption {
+          type = lib.types.str;
+          default = "openid profile email";
+          description = "Space-separated OAuth scopes requested from the provider.";
+        };
+
+        usernameFallback = lib.mkOption {
+          type = lib.types.bool;
+          default = true;
+          description = "Allow deriving a username if the provider does not return one.";
+        };
+
+        emailFallback = lib.mkOption {
+          type = lib.types.bool;
+          default = true;
+          description = "Allow deriving an email address if the provider does not return one.";
+        };
+      };
+    };
+
     image = {
       repository = lib.mkOption {
         type = lib.types.str;

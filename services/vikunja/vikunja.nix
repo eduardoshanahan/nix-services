@@ -9,6 +9,7 @@
   serviceName = "vikunja";
   composeDir = "/etc/${serviceName}";
   dockerBin = "${config.virtualisation.docker.package}/bin/docker";
+  yamlFormat = pkgs.formats.yaml {};
   hostnameRegex = "^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)(\\.([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?))*$";
   networkRegex = "^[a-zA-Z0-9][a-zA-Z0-9_.-]*$";
   publicUrl = "${
@@ -16,6 +17,28 @@
     then "https"
     else "http"
   }://${cfg.hostname}/";
+  configYaml = {
+    auth =
+      {
+        local.enabled = cfg.auth.local.enable;
+      }
+      // lib.optionalAttrs cfg.auth.openid.enable {
+        openid = {
+          enabled = true;
+          providers = {
+            "${cfg.auth.openid.providerKey}" = {
+              name = cfg.auth.openid.name;
+              authurl = cfg.auth.openid.authUrl;
+              scope = cfg.auth.openid.scopes;
+              usernamefallback = cfg.auth.openid.usernameFallback;
+              emailfallback = cfg.auth.openid.emailFallback;
+              clientid.file = "/run/secrets/vikunja-oidc-client-id";
+              clientsecret.file = "/run/secrets/vikunja-oidc-client-secret";
+            };
+          };
+        };
+      };
+  };
 in {
   imports = [
     ./options.nix
@@ -67,11 +90,28 @@ in {
         assertion = cfg.database.type != "postgres" || builtins.match "^[^[:space:]]+$" cfg.database.postgres.user != null;
         message = "services.vikunjaCompose.database.postgres.user must not contain whitespace.";
       }
+      {
+        assertion = !cfg.auth.openid.enable || cfg.auth.openid.clientIdFile != null;
+        message = "services.vikunjaCompose.auth.openid.clientIdFile must be set when OpenID auth is enabled.";
+      }
+      {
+        assertion = !cfg.auth.openid.enable || cfg.auth.openid.clientSecretFile != null;
+        message = "services.vikunjaCompose.auth.openid.clientSecretFile must be set when OpenID auth is enabled.";
+      }
+      {
+        assertion = !cfg.auth.openid.enable || builtins.match "^[^[:space:]]+$" cfg.auth.openid.providerKey != null;
+        message = "services.vikunjaCompose.auth.openid.providerKey must not contain whitespace.";
+      }
+      {
+        assertion = !cfg.auth.openid.enable || builtins.match "^[^[:space:]]+$" cfg.auth.openid.authUrl != null;
+        message = "services.vikunjaCompose.auth.openid.authUrl must not contain whitespace.";
+      }
     ];
 
     virtualisation.docker.enable = true;
 
     environment.etc."${serviceName}/docker-compose.yml".source = ./docker-compose.yml;
+    environment.etc."${serviceName}/config.yml".source = yamlFormat.generate "${serviceName}-config.yml" configYaml;
 
     systemd.services.${serviceName} = {
       description = "Vikunja (Docker Compose)";
@@ -82,6 +122,7 @@ in {
       wants = ["network-online.target"];
       restartTriggers = [
         config.environment.etc."${serviceName}/docker-compose.yml".source
+        config.environment.etc."${serviceName}/config.yml".source
       ];
       startLimitBurst = 3;
       startLimitIntervalSec = 300;
@@ -124,6 +165,21 @@ in {
           "VIKUNJA_DATABASE_DATABASE=${cfg.database.postgres.name}"
           "VIKUNJA_DATABASE_USER=${cfg.database.postgres.user}"
           "VIKUNJA_DATABASE_SSLMODE=${cfg.database.postgres.sslMode}"
+          "VIKUNJA_AUTH_OPENID_ENABLED=${
+            if cfg.auth.openid.enable
+            then "true"
+            else "false"
+          }"
+          "VIKUNJA_OIDC_CLIENT_ID_FILE=${
+            if cfg.auth.openid.clientIdFile == null
+            then "/dev/null"
+            else toString cfg.auth.openid.clientIdFile
+          }"
+          "VIKUNJA_OIDC_CLIENT_SECRET_FILE=${
+            if cfg.auth.openid.clientSecretFile == null
+            then "/dev/null"
+            else toString cfg.auth.openid.clientSecretFile
+          }"
           "TZ=${cfg.timezone}"
         ];
 
@@ -131,6 +187,7 @@ in {
           [
             "${pkgs.runtimeShell} -c 'mkdir -p ${cfg.dataDir} && chown 1000:0 ${cfg.dataDir} && chmod 0750 ${cfg.dataDir}'"
             "${pkgs.runtimeShell} -c 'test -s ${composeDir}/docker-compose.yml'"
+            "${pkgs.runtimeShell} -c 'test -s ${composeDir}/config.yml'"
           ]
           ++ lib.optionals (cfg.database.type == "sqlite") [
             "${pkgs.runtimeShell} -c 'install -d -m 0700 /run/secrets; : > /run/secrets/${serviceName}.env; chmod 0600 /run/secrets/${serviceName}.env'"
