@@ -124,6 +124,7 @@
         printf 'GF_AUTH_GENERIC_OAUTH_TOKEN_URL="%s"\n' "${cfg.auth.genericOauth.tokenUrl}"
         printf 'GF_AUTH_GENERIC_OAUTH_API_URL="%s"\n' "${cfg.auth.genericOauth.apiUrl}"
         printf 'GF_AUTH_GENERIC_OAUTH_USE_PKCE="%s"\n' "${if cfg.auth.genericOauth.usePkce then "true" else "false"}"
+        printf 'GF_AUTH_GENERIC_OAUTH_TLS_SKIP_VERIFY_INSECURE="%s"\n' "${if cfg.auth.genericOauth.tlsSkipVerifyInsecure then "true" else "false"}"
       else
         printf 'GF_AUTH_GENERIC_OAUTH_ENABLED="false"\n'
       fi
@@ -293,6 +294,15 @@ in {
           type = lib.types.bool;
           default = true;
           description = "Enable PKCE for Generic OAuth.";
+        };
+
+        tlsSkipVerifyInsecure = lib.mkOption {
+          type = lib.types.bool;
+          default = false;
+          description = ''
+            Skip TLS certificate verification for Generic OAuth endpoints.
+            Keep disabled unless the IdP certificate chain is not trusted by Grafana.
+          '';
         };
       };
     };
