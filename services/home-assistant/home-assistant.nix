@@ -5,6 +5,7 @@
   ...
 }: let
   cfg = config.services.homeAssistant;
+  runtimeSecretEnv = import ../../lib/runtime-secret-env.nix {inherit lib pkgs;};
   serviceName = "home-assistant";
   composeDir = "/etc/${serviceName}";
   dockerBin = "${config.virtualisation.docker.package}/bin/docker";
@@ -13,6 +14,8 @@
   proxyRegex = "^([0-9]{1,3}\\.){3}[0-9]{1,3}(/([0-9]|[1-2][0-9]|3[0-2]))?$";
   managedProxyHeader = "# BEGIN NIX-SERVICES HOME-ASSISTANT REVERSE PROXY";
   managedProxyFooter = "# END NIX-SERVICES HOME-ASSISTANT REVERSE PROXY";
+  managedRecorderHeader = "# BEGIN NIX-SERVICES HOME-ASSISTANT RECORDER";
+  managedRecorderFooter = "# END NIX-SERVICES HOME-ASSISTANT RECORDER";
   proxyYamlLines = builtins.concatStringsSep "\n" (map (p: "    - ${p}") cfg.reverseProxy.trustedProxies);
   ensureProxyConfigScript = pkgs.writeShellScript "home-assistant-ensure-proxy-config" ''
     set -eu
@@ -54,6 +57,41 @@ http:
 ${proxyYamlLines}
 ${managedProxyFooter}
 EOF
+    mv "$tmpFile" "$cfgFile"
+  '';
+  ensureRecorderConfigScript = pkgs.writeShellScript "home-assistant-ensure-recorder-config" ''
+    set -eu
+
+    cfgFile="${cfg.dataDir}/configuration.yaml"
+
+    if [ ! -f "$cfgFile" ]; then
+      cat >"$cfgFile" <<'EOF'
+# Loads default set of integrations. Do not remove.
+default_config:
+
+# Load frontend themes from the themes folder
+frontend:
+  themes: !include_dir_merge_named themes
+
+automation: !include automations.yaml
+script: !include scripts.yaml
+scene: !include scenes.yaml
+EOF
+    fi
+
+    tmpFile="$(mktemp)"
+    sed "/${managedRecorderHeader}/,/${managedRecorderFooter}/d" "$cfgFile" > "$tmpFile"
+
+    if [ "${if cfg.recorder.dbUrlFile != null then "1" else "0"}" = "1" ]; then
+      cat >>"$tmpFile" <<EOF
+
+${managedRecorderHeader}
+recorder:
+  db_url: !env_var HOME_ASSISTANT_RECORDER_DB_URL
+${managedRecorderFooter}
+EOF
+    fi
+
     mv "$tmpFile" "$cfgFile"
   '';
 in {
@@ -131,17 +169,32 @@ in {
           "HOME_ASSISTANT_ENTRYPOINTS=${if cfg.tls then "websecure" else "web"}"
           "HOME_ASSISTANT_TLS=${if cfg.tls then "true" else "false"}"
           "HOME_ASSISTANT_DATA_DIR=${cfg.dataDir}"
+          "HOME_ASSISTANT_RECORDER_ENV_FILE=/run/secrets/${serviceName}.env"
           "TZ=${cfg.timezone}"
         ];
 
-        ExecStartPre = [
-          "${pkgs.runtimeShell} -c 'mkdir -p ${cfg.dataDir} && chmod 0750 ${cfg.dataDir}'"
-          "${ensureProxyConfigScript}"
-          "${pkgs.runtimeShell} -c 'test -s ${composeDir}/docker-compose.yml'"
-          "${pkgs.runtimeShell} -c 'for i in $(seq 1 30); do ${dockerBin} info >/dev/null 2>&1 && exit 0; sleep 1; done; echo \"home-assistant: docker daemon is not ready\" >&2; exit 1'"
-          "${pkgs.runtimeShell} -c '${dockerBin} compose config >/dev/null'"
-          "${pkgs.runtimeShell} -c '${dockerBin} network inspect ${cfg.network} >/dev/null 2>&1 || ${dockerBin} network create ${cfg.network}'"
-        ];
+        ExecStartPre =
+          [
+            "${pkgs.runtimeShell} -c 'mkdir -p ${cfg.dataDir} && chmod 0750 ${cfg.dataDir}'"
+            "${ensureProxyConfigScript}"
+            "${ensureRecorderConfigScript}"
+            "${pkgs.runtimeShell} -c 'test -s ${composeDir}/docker-compose.yml'"
+          ]
+          ++ lib.optionals (cfg.recorder.dbUrlFile == null) [
+            "${pkgs.runtimeShell} -c 'install -d -m 0700 /run/secrets; : > /run/secrets/${serviceName}.env; chmod 0600 /run/secrets/${serviceName}.env'"
+          ]
+          ++ lib.optionals (cfg.recorder.dbUrlFile != null) [
+            (runtimeSecretEnv.mkRuntimeSecretEnvExecStartPre {
+              name = serviceName;
+              secretFile = cfg.recorder.dbUrlFile;
+              envVar = "HOME_ASSISTANT_RECORDER_DB_URL";
+            })
+          ]
+          ++ [
+            "${pkgs.runtimeShell} -c 'for i in $(seq 1 30); do ${dockerBin} info >/dev/null 2>&1 && exit 0; sleep 1; done; echo \"home-assistant: docker daemon is not ready\" >&2; exit 1'"
+            "${pkgs.runtimeShell} -c '${dockerBin} compose config >/dev/null'"
+            "${pkgs.runtimeShell} -c '${dockerBin} network inspect ${cfg.network} >/dev/null 2>&1 || ${dockerBin} network create ${cfg.network}'"
+          ];
 
         ExecStart = "${dockerBin} compose up -d";
         ExecStop = "${dockerBin} compose down";

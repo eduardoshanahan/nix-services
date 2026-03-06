@@ -76,5 +76,16 @@
         description = "List of trusted reverse proxy CIDRs/IPs for Home Assistant `http.trusted_proxies`.";
       };
     };
+
+    recorder.dbUrlFile = lib.mkOption {
+      type = lib.types.nullOr lib.types.path;
+      default = null;
+      example = "/run/secrets/homeassistant-recorder-db-url";
+      description = ''
+        Optional file containing a single-line SQLAlchemy database URL for Home Assistant recorder.
+        When set, the module injects a managed `recorder.db_url` block in `configuration.yaml`
+        using `!env_var HOME_ASSISTANT_RECORDER_DB_URL` and provides that env var at runtime.
+      '';
+    };
   };
 }

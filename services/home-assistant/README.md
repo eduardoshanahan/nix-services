@@ -38,6 +38,7 @@ Docker Compose-backed Home Assistant deployment managed through a NixOS module.
 - `services.homeAssistant.reverseProxy.enable`
 - `services.homeAssistant.reverseProxy.useXForwardedFor`
 - `services.homeAssistant.reverseProxy.trustedProxies`
+- `services.homeAssistant.recorder.dbUrlFile`
 
 ## Validation
 
@@ -52,5 +53,8 @@ Docker Compose-backed Home Assistant deployment managed through a NixOS module.
 - When `reverseProxy.enable = true`, the module manages a marked reverse-proxy
   block in `configuration.yaml` unless an un-managed `http:` block already
   exists.
+- When `recorder.dbUrlFile` is set, the module manages a marked `recorder`
+  block in `configuration.yaml` and injects `HOME_ASSISTANT_RECORDER_DB_URL`
+  from a runtime secret env file.
 - Some auto-discovery integrations in Home Assistant may work best with host
   networking or additional network configuration.
