@@ -171,14 +171,14 @@ in {
             else "false"
           }"
           "VIKUNJA_OIDC_CLIENT_ID_FILE=${
-            if cfg.auth.openid.clientIdFile == null
+            if !cfg.auth.openid.enable
             then "/dev/null"
-            else toString cfg.auth.openid.clientIdFile
+            else "${cfg.dataDir}/.secrets/vikunja-oidc-client-id"
           }"
           "VIKUNJA_OIDC_CLIENT_SECRET_FILE=${
-            if cfg.auth.openid.clientSecretFile == null
+            if !cfg.auth.openid.enable
             then "/dev/null"
-            else toString cfg.auth.openid.clientSecretFile
+            else "${cfg.dataDir}/.secrets/vikunja-oidc-client-secret"
           }"
           "TZ=${cfg.timezone}"
         ];
@@ -198,6 +198,11 @@ in {
               secretFile = cfg.database.postgres.passwordFile;
               envVar = "VIKUNJA_DATABASE_PASSWORD";
             })
+          ]
+          ++ lib.optionals cfg.auth.openid.enable [
+            "${pkgs.runtimeShell} -c 'install -d -m 0700 -o 1000 -g 0 ${cfg.dataDir}/.secrets'"
+            "${pkgs.runtimeShell} -c 'install -m 0400 -o 1000 -g 0 ${toString cfg.auth.openid.clientIdFile} ${cfg.dataDir}/.secrets/vikunja-oidc-client-id'"
+            "${pkgs.runtimeShell} -c 'install -m 0400 -o 1000 -g 0 ${toString cfg.auth.openid.clientSecretFile} ${cfg.dataDir}/.secrets/vikunja-oidc-client-secret'"
           ]
           ++ [
             "${pkgs.runtimeShell} -c 'for i in $(seq 1 30); do ${dockerBin} info >/dev/null 2>&1 && exit 0; sleep 1; done; echo \"vikunja: docker daemon is not ready\" >&2; exit 1'"
