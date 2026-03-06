@@ -16,6 +16,7 @@ services:
 
     environment:
       - TZ
+      - SSL_CERT_FILE=/etc/vikunja/homelab-root-ca.crt
       - HOME=/app/vikunja/files
       - XDG_CACHE_HOME=/app/vikunja/files/.cache
       - VIKUNJA_SERVICE_PUBLICURL=${VIKUNJA_SERVICE_PUBLICURL}
@@ -31,6 +32,7 @@ services:
     volumes:
       - "${VIKUNJA_DATA_DIR}:/app/vikunja/files"
       - "/etc/vikunja/config.yml:/etc/vikunja/config.yml:ro"
+      - "/etc/vikunja/homelab-root-ca.crt:/etc/vikunja/homelab-root-ca.crt:ro"
       - "${VIKUNJA_OIDC_CLIENT_ID_FILE}:/run/secrets/vikunja-oidc-client-id:ro"
       - "${VIKUNJA_OIDC_CLIENT_SECRET_FILE}:/run/secrets/vikunja-oidc-client-secret:ro"
 
