@@ -8,8 +8,16 @@ services:
     expose:
       - "3001"
 
+    env_file:
+      - ${UPTIME_KUMA_DB_ENV_FILE}
+
     environment:
       - TZ
+      - UPTIME_KUMA_DB_TYPE=${UPTIME_KUMA_DB_TYPE}
+      - UPTIME_KUMA_DB_HOSTNAME=${UPTIME_KUMA_DB_HOSTNAME}
+      - UPTIME_KUMA_DB_PORT=${UPTIME_KUMA_DB_PORT}
+      - UPTIME_KUMA_DB_NAME=${UPTIME_KUMA_DB_NAME}
+      - UPTIME_KUMA_DB_USERNAME=${UPTIME_KUMA_DB_USERNAME}
 
     volumes:
       - "${UPTIME_KUMA_DATA_DIR}:/app/data"

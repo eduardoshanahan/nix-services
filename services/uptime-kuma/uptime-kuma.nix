@@ -5,6 +5,7 @@
   ...
 }: let
   cfg = config.services.uptimeKuma;
+  runtimeSecretEnv = import ../../lib/runtime-secret-env.nix {inherit lib pkgs;};
   serviceName = "uptime-kuma";
   composeDir = "/etc/${serviceName}";
   dockerBin = "${config.virtualisation.docker.package}/bin/docker";
@@ -45,6 +46,22 @@ in {
       {
         assertion = lib.hasPrefix "/" cfg.dataDir;
         message = "services.uptimeKuma.dataDir must be an absolute path.";
+      }
+      {
+        assertion = cfg.database.type != "mariadb" || cfg.database.mariadb.passwordFile != null;
+        message = "services.uptimeKuma.database.mariadb.passwordFile must be set when database.type = \"mariadb\".";
+      }
+      {
+        assertion = cfg.database.type != "mariadb" || builtins.match "^[^[:space:]]+$" cfg.database.mariadb.host != null;
+        message = "services.uptimeKuma.database.mariadb.host must not contain whitespace.";
+      }
+      {
+        assertion = cfg.database.type != "mariadb" || builtins.match "^[^[:space:]]+$" cfg.database.mariadb.name != null;
+        message = "services.uptimeKuma.database.mariadb.name must not contain whitespace.";
+      }
+      {
+        assertion = cfg.database.type != "mariadb" || builtins.match "^[^[:space:]]+$" cfg.database.mariadb.user != null;
+        message = "services.uptimeKuma.database.mariadb.user must not contain whitespace.";
       }
     ];
 
@@ -90,16 +107,35 @@ in {
             else "false"
           }"
           "UPTIME_KUMA_DATA_DIR=${cfg.dataDir}"
+          "UPTIME_KUMA_DB_ENV_FILE=/run/secrets/${serviceName}.env"
+          "UPTIME_KUMA_DB_TYPE=${cfg.database.type}"
+          "UPTIME_KUMA_DB_HOSTNAME=${cfg.database.mariadb.host}"
+          "UPTIME_KUMA_DB_PORT=${toString cfg.database.mariadb.port}"
+          "UPTIME_KUMA_DB_NAME=${cfg.database.mariadb.name}"
+          "UPTIME_KUMA_DB_USERNAME=${cfg.database.mariadb.user}"
           "TZ=${cfg.timezone}"
         ];
 
-        ExecStartPre = [
-          "${pkgs.runtimeShell} -c 'mkdir -p ${cfg.dataDir} && chown 1000:1000 ${cfg.dataDir} && chmod 0750 ${cfg.dataDir}'"
-          "${pkgs.runtimeShell} -c 'test -s ${composeDir}/docker-compose.yml'"
-          "${pkgs.runtimeShell} -c 'for i in $(seq 1 30); do ${dockerBin} info >/dev/null 2>&1 && exit 0; sleep 1; done; echo \"uptime-kuma: docker daemon is not ready\" >&2; exit 1'"
-          "${pkgs.runtimeShell} -c '${dockerBin} compose config >/dev/null'"
-          "${pkgs.runtimeShell} -c '${dockerBin} network inspect ${cfg.network} >/dev/null 2>&1 || ${dockerBin} network create ${cfg.network}'"
-        ];
+        ExecStartPre =
+          [
+            "${pkgs.runtimeShell} -c 'mkdir -p ${cfg.dataDir} && chown 1000:1000 ${cfg.dataDir} && chmod 0750 ${cfg.dataDir}'"
+            "${pkgs.runtimeShell} -c 'test -s ${composeDir}/docker-compose.yml'"
+          ]
+          ++ lib.optionals (cfg.database.type == "sqlite") [
+            "${pkgs.runtimeShell} -c 'install -d -m 0700 /run/secrets; : > /run/secrets/${serviceName}.env; chmod 0600 /run/secrets/${serviceName}.env'"
+          ]
+          ++ lib.optionals (cfg.database.type == "mariadb") [
+            (runtimeSecretEnv.mkRuntimeSecretEnvExecStartPre {
+              name = serviceName;
+              secretFile = cfg.database.mariadb.passwordFile;
+              envVar = "UPTIME_KUMA_DB_PASSWORD";
+            })
+          ]
+          ++ [
+            "${pkgs.runtimeShell} -c 'for i in $(seq 1 30); do ${dockerBin} info >/dev/null 2>&1 && exit 0; sleep 1; done; echo \"uptime-kuma: docker daemon is not ready\" >&2; exit 1'"
+            "${pkgs.runtimeShell} -c '${dockerBin} compose config >/dev/null'"
+            "${pkgs.runtimeShell} -c '${dockerBin} network inspect ${cfg.network} >/dev/null 2>&1 || ${dockerBin} network create ${cfg.network}'"
+          ];
 
         ExecStart = "${dockerBin} compose up -d";
         ExecStartPost = waitForHealthy;

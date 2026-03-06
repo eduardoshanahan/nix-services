@@ -21,6 +21,12 @@ This module deploys Uptime Kuma behind Traefik using a checked-in Docker Compose
 - `services.uptimeKuma.image.tag`
 - `services.uptimeKuma.image.allowMutableTag`
 - `services.uptimeKuma.tls`
+- `services.uptimeKuma.database.type` (`sqlite` or `mariadb`)
+- `services.uptimeKuma.database.mariadb.host`
+- `services.uptimeKuma.database.mariadb.port`
+- `services.uptimeKuma.database.mariadb.name`
+- `services.uptimeKuma.database.mariadb.user`
+- `services.uptimeKuma.database.mariadb.passwordFile`
 
 ## Image pinning strategy
 

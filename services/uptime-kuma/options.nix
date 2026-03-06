@@ -55,5 +55,45 @@
     };
 
     tls = lib.mkEnableOption "TLS on the Uptime Kuma Traefik router";
+
+    database = {
+      type = lib.mkOption {
+        type = lib.types.enum [ "sqlite" "mariadb" ];
+        default = "sqlite";
+        description = "Uptime Kuma database backend.";
+      };
+
+      mariadb = {
+        host = lib.mkOption {
+          type = lib.types.str;
+          default = "hhnas4.<homelab-domain>";
+          description = "MariaDB/MySQL host when `database.type = \"mariadb\"`.";
+        };
+
+        port = lib.mkOption {
+          type = lib.types.port;
+          default = 3306;
+          description = "MariaDB/MySQL port when `database.type = \"mariadb\"`.";
+        };
+
+        name = lib.mkOption {
+          type = lib.types.str;
+          default = "uptime_kuma";
+          description = "MariaDB/MySQL database name when `database.type = \"mariadb\"`.";
+        };
+
+        user = lib.mkOption {
+          type = lib.types.str;
+          default = "uptime_kuma";
+          description = "MariaDB/MySQL username when `database.type = \"mariadb\"`.";
+        };
+
+        passwordFile = lib.mkOption {
+          type = lib.types.nullOr lib.types.path;
+          default = null;
+          description = "File containing the MariaDB/MySQL password on one line.";
+        };
+      };
+    };
   };
 }
