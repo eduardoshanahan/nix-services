@@ -41,6 +41,17 @@
       then ""
       else toString cfg.database.postgres.passwordFile
     )}
+    oauth_client_id_file=${lib.escapeShellArg (
+      if cfg.auth.genericOauth.clientIdFile == null
+      then ""
+      else toString cfg.auth.genericOauth.clientIdFile
+    )}
+    oauth_client_secret_file=${lib.escapeShellArg (
+      if cfg.auth.genericOauth.clientSecretFile == null
+      then ""
+      else toString cfg.auth.genericOauth.clientSecretFile
+    )}
+    oauth_enabled=${if cfg.auth.genericOauth.enable then "true" else "false"}
     env_file="/run/secrets/${serviceName}.env"
     tmp="$(mktemp -p /run/secrets ".${serviceName}.env.XXXXXX")"
 
@@ -70,6 +81,7 @@
       printf 'GF_DATABASE_NAME="%s"\n' "${cfg.database.postgres.name}"
       printf 'GF_DATABASE_USER="%s"\n' "${cfg.database.postgres.user}"
       printf 'GF_DATABASE_SSL_MODE="%s"\n' "${cfg.database.postgres.sslMode}"
+      printf 'GF_SERVER_ROOT_URL="%s://%s/"\n' "${if cfg.tls then "https" else "http"}" "${cfg.hostname}"
       if [[ "$db_type" == "postgres" ]]; then
         if [[ -z "$db_secret_file" || ! -s "$db_secret_file" ]]; then
           echo "grafana: missing or empty database password file: $db_secret_file" >&2
@@ -81,6 +93,39 @@
           exit 1
         fi
         printf 'GF_DATABASE_PASSWORD="%s"\n' "$(escape_env "$db_password")"
+      fi
+      if [[ "$oauth_enabled" == "true" ]]; then
+        if [[ -z "$oauth_client_id_file" || ! -s "$oauth_client_id_file" ]]; then
+          echo "grafana: missing or empty OAuth client ID file: $oauth_client_id_file" >&2
+          exit 1
+        fi
+        if [[ -z "$oauth_client_secret_file" || ! -s "$oauth_client_secret_file" ]]; then
+          echo "grafana: missing or empty OAuth client secret file: $oauth_client_secret_file" >&2
+          exit 1
+        fi
+
+        oauth_client_id="$(tr -d '\r\n' < "$oauth_client_id_file")"
+        oauth_client_secret="$(tr -d '\r\n' < "$oauth_client_secret_file")"
+        if [[ -z "$oauth_client_id" ]]; then
+          echo "grafana: OAuth client ID is empty after trimming" >&2
+          exit 1
+        fi
+        if [[ -z "$oauth_client_secret" ]]; then
+          echo "grafana: OAuth client secret is empty after trimming" >&2
+          exit 1
+        fi
+
+        printf 'GF_AUTH_GENERIC_OAUTH_ENABLED="true"\n'
+        printf 'GF_AUTH_GENERIC_OAUTH_NAME="%s"\n' "${cfg.auth.genericOauth.name}"
+        printf 'GF_AUTH_GENERIC_OAUTH_CLIENT_ID="%s"\n' "$(escape_env "$oauth_client_id")"
+        printf 'GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET="%s"\n' "$(escape_env "$oauth_client_secret")"
+        printf 'GF_AUTH_GENERIC_OAUTH_SCOPES="%s"\n' "${cfg.auth.genericOauth.scopes}"
+        printf 'GF_AUTH_GENERIC_OAUTH_AUTH_URL="%s"\n' "${cfg.auth.genericOauth.authUrl}"
+        printf 'GF_AUTH_GENERIC_OAUTH_TOKEN_URL="%s"\n' "${cfg.auth.genericOauth.tokenUrl}"
+        printf 'GF_AUTH_GENERIC_OAUTH_API_URL="%s"\n' "${cfg.auth.genericOauth.apiUrl}"
+        printf 'GF_AUTH_GENERIC_OAUTH_USE_PKCE="%s"\n' "${if cfg.auth.genericOauth.usePkce then "true" else "false"}"
+      else
+        printf 'GF_AUTH_GENERIC_OAUTH_ENABLED="false"\n'
       fi
     } > "$tmp"
     chmod 0600 "$tmp"
@@ -196,6 +241,62 @@ in {
 
     tls = lib.mkEnableOption "TLS on the Grafana Traefik router";
 
+    auth = {
+      genericOauth = {
+        enable = lib.mkOption {
+          type = lib.types.bool;
+          default = false;
+          description = "Enable Grafana Generic OAuth authentication.";
+        };
+
+        name = lib.mkOption {
+          type = lib.types.str;
+          default = "Authentik";
+          description = "Display name shown on Grafana login button.";
+        };
+
+        clientIdFile = runtimeSecrets.mkSecretFileOption {
+          description = "Absolute path to a runtime-provisioned file containing the Generic OAuth client ID.";
+          example = "/run/secrets/grafana-oidc-client-id";
+        };
+
+        clientSecretFile = runtimeSecrets.mkSecretFileOption {
+          description = "Absolute path to a runtime-provisioned file containing the Generic OAuth client secret.";
+          example = "/run/secrets/grafana-oidc-client-secret";
+        };
+
+        scopes = lib.mkOption {
+          type = lib.types.str;
+          default = "openid profile email";
+          description = "OAuth scopes requested by Grafana.";
+        };
+
+        authUrl = lib.mkOption {
+          type = lib.types.str;
+          default = "https://authentik.<homelab-domain>/application/o/authorize/";
+          description = "OIDC authorization endpoint.";
+        };
+
+        tokenUrl = lib.mkOption {
+          type = lib.types.str;
+          default = "https://authentik.<homelab-domain>/application/o/token/";
+          description = "OIDC token endpoint.";
+        };
+
+        apiUrl = lib.mkOption {
+          type = lib.types.str;
+          default = "https://authentik.<homelab-domain>/application/o/userinfo/";
+          description = "OIDC user info endpoint.";
+        };
+
+        usePkce = lib.mkOption {
+          type = lib.types.bool;
+          default = true;
+          description = "Enable PKCE for Generic OAuth.";
+        };
+      };
+    };
+
     monitoring = {
       enable = lib.mkOption {
         type = lib.types.bool;
@@ -297,6 +398,14 @@ in {
       {
         assertion = cfg.adminPasswordFile != null;
         message = "services.grafanaCompose.adminPasswordFile must be set when enabling Grafana.";
+      }
+      {
+        assertion = !cfg.auth.genericOauth.enable || cfg.auth.genericOauth.clientIdFile != null;
+        message = "services.grafanaCompose.auth.genericOauth.clientIdFile must be set when Generic OAuth is enabled.";
+      }
+      {
+        assertion = !cfg.auth.genericOauth.enable || cfg.auth.genericOauth.clientSecretFile != null;
+        message = "services.grafanaCompose.auth.genericOauth.clientSecretFile must be set when Generic OAuth is enabled.";
       }
       {
         assertion = cfg.database.type != "postgres" || cfg.database.postgres.passwordFile != null;
