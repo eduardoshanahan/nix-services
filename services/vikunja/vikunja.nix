@@ -5,6 +5,7 @@
   ...
 }: let
   cfg = config.services.vikunjaCompose;
+  runtimeSecretEnv = import ../../lib/runtime-secret-env.nix {inherit lib pkgs;};
   serviceName = "vikunja";
   composeDir = "/etc/${serviceName}";
   dockerBin = "${config.virtualisation.docker.package}/bin/docker";
@@ -45,6 +46,26 @@ in {
       {
         assertion = lib.hasPrefix "/" cfg.dataDir;
         message = "services.vikunjaCompose.dataDir must be an absolute path.";
+      }
+      {
+        assertion = cfg.database.type != "sqlite" || lib.hasPrefix "/" cfg.database.sqlite.path;
+        message = "services.vikunjaCompose.database.sqlite.path must be an absolute path.";
+      }
+      {
+        assertion = cfg.database.type != "postgres" || cfg.database.postgres.passwordFile != null;
+        message = "services.vikunjaCompose.database.postgres.passwordFile must be set when database.type = \"postgres\".";
+      }
+      {
+        assertion = cfg.database.type != "postgres" || builtins.match "^[^[:space:]]+$" cfg.database.postgres.host != null;
+        message = "services.vikunjaCompose.database.postgres.host must not contain whitespace.";
+      }
+      {
+        assertion = cfg.database.type != "postgres" || builtins.match "^[^[:space:]]+$" cfg.database.postgres.name != null;
+        message = "services.vikunjaCompose.database.postgres.name must not contain whitespace.";
+      }
+      {
+        assertion = cfg.database.type != "postgres" || builtins.match "^[^[:space:]]+$" cfg.database.postgres.user != null;
+        message = "services.vikunjaCompose.database.postgres.user must not contain whitespace.";
       }
     ];
 
@@ -96,16 +117,36 @@ in {
             else "false"
           }"
           "VIKUNJA_DATA_DIR=${cfg.dataDir}"
+          "VIKUNJA_DATABASE_ENV_FILE=/run/secrets/${serviceName}.env"
+          "VIKUNJA_DATABASE_TYPE=${cfg.database.type}"
+          "VIKUNJA_DATABASE_PATH=${cfg.database.sqlite.path}"
+          "VIKUNJA_DATABASE_HOST=${cfg.database.postgres.host}:${toString cfg.database.postgres.port}"
+          "VIKUNJA_DATABASE_DATABASE=${cfg.database.postgres.name}"
+          "VIKUNJA_DATABASE_USER=${cfg.database.postgres.user}"
+          "VIKUNJA_DATABASE_SSLMODE=${cfg.database.postgres.sslMode}"
           "TZ=${cfg.timezone}"
         ];
 
-        ExecStartPre = [
-          "${pkgs.runtimeShell} -c 'mkdir -p ${cfg.dataDir} && chown 1000:0 ${cfg.dataDir} && chmod 0750 ${cfg.dataDir}'"
-          "${pkgs.runtimeShell} -c 'test -s ${composeDir}/docker-compose.yml'"
-          "${pkgs.runtimeShell} -c 'for i in $(seq 1 30); do ${dockerBin} info >/dev/null 2>&1 && exit 0; sleep 1; done; echo \"vikunja: docker daemon is not ready\" >&2; exit 1'"
-          "${pkgs.runtimeShell} -c '${dockerBin} compose config >/dev/null'"
-          "${pkgs.runtimeShell} -c '${dockerBin} network inspect ${cfg.network} >/dev/null 2>&1 || ${dockerBin} network create ${cfg.network}'"
-        ];
+        ExecStartPre =
+          [
+            "${pkgs.runtimeShell} -c 'mkdir -p ${cfg.dataDir} && chown 1000:0 ${cfg.dataDir} && chmod 0750 ${cfg.dataDir}'"
+            "${pkgs.runtimeShell} -c 'test -s ${composeDir}/docker-compose.yml'"
+          ]
+          ++ lib.optionals (cfg.database.type == "sqlite") [
+            "${pkgs.runtimeShell} -c 'install -d -m 0700 /run/secrets; : > /run/secrets/${serviceName}.env; chmod 0600 /run/secrets/${serviceName}.env'"
+          ]
+          ++ lib.optionals (cfg.database.type == "postgres") [
+            (runtimeSecretEnv.mkRuntimeSecretEnvExecStartPre {
+              name = serviceName;
+              secretFile = cfg.database.postgres.passwordFile;
+              envVar = "VIKUNJA_DATABASE_PASSWORD";
+            })
+          ]
+          ++ [
+            "${pkgs.runtimeShell} -c 'for i in $(seq 1 30); do ${dockerBin} info >/dev/null 2>&1 && exit 0; sleep 1; done; echo \"vikunja: docker daemon is not ready\" >&2; exit 1'"
+            "${pkgs.runtimeShell} -c '${dockerBin} compose config >/dev/null'"
+            "${pkgs.runtimeShell} -c '${dockerBin} network inspect ${cfg.network} >/dev/null 2>&1 || ${dockerBin} network create ${cfg.network}'"
+          ];
 
         ExecStart = "${dockerBin} compose up -d";
         ExecStop = "${dockerBin} compose down";

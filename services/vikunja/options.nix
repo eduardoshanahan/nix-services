@@ -1,4 +1,9 @@
-{lib, ...}: {
+{
+  lib,
+  ...
+}: let
+  runtimeSecrets = import ../../lib/runtime-secrets.nix {inherit lib;};
+in {
   options.services.vikunjaCompose = {
     enable = lib.mkEnableOption "Vikunja service (Docker Compose)";
 
@@ -28,7 +33,7 @@
     dataDir = lib.mkOption {
       type = lib.types.str;
       default = "/var/lib/vikunja";
-      description = "Persistent host path used for Vikunja attachments and SQLite data.";
+      description = "Persistent host path used for Vikunja attachments and local application data.";
     };
 
     enableRegistration = lib.mkOption {
@@ -57,6 +62,60 @@
           Allow mutable tags such as `latest`. Keep disabled to enforce pinned
           image tags by default.
         '';
+      };
+    };
+
+    database = {
+      type = lib.mkOption {
+        type = lib.types.enum [ "sqlite" "postgres" ];
+        default = "sqlite";
+        description = "Database backend used by Vikunja.";
+      };
+
+      sqlite.path = lib.mkOption {
+        type = lib.types.str;
+        default = "/app/vikunja/files/vikunja.db";
+        description = "SQLite database path inside the container (used when `database.type = \"sqlite\"`).";
+      };
+
+      postgres = {
+        host = lib.mkOption {
+          type = lib.types.str;
+          default = "postgres.<homelab-domain>";
+          description = "PostgreSQL host (used when `database.type = \"postgres\"`).";
+        };
+
+        port = lib.mkOption {
+          type = lib.types.port;
+          default = 5433;
+          description = "PostgreSQL port.";
+        };
+
+        name = lib.mkOption {
+          type = lib.types.str;
+          default = "vikunja";
+          description = "PostgreSQL database name.";
+        };
+
+        user = lib.mkOption {
+          type = lib.types.str;
+          default = "vikunja";
+          description = "PostgreSQL database user.";
+        };
+
+        passwordFile = runtimeSecrets.mkSecretFileOption {
+          description = ''
+            Absolute path to a runtime-provisioned file containing the PostgreSQL password
+            (single line, no trailing newline).
+          '';
+          example = "/run/secrets/vikunja-db-password";
+        };
+
+        sslMode = lib.mkOption {
+          type = lib.types.enum [ "disable" "require" "verify-ca" "verify-full" ];
+          default = "disable";
+          description = "PostgreSQL SSL mode for Vikunja.";
+        };
       };
     };
 
