@@ -251,6 +251,20 @@
         description = "Pi-hole exporter targets (`host:port`) to scrape.";
       };
 
+      piholeExporterScrapeInterval = lib.mkOption {
+        type = lib.types.str;
+        default = "30s";
+        example = "30s";
+        description = "Scrape interval for job `pihole-exporter`.";
+      };
+
+      piholeExporterScrapeTimeout = lib.mkOption {
+        type = lib.types.str;
+        default = "25s";
+        example = "25s";
+        description = "Scrape timeout for job `pihole-exporter`.";
+      };
+
       cadvisorTargets = lib.mkOption {
         type = lib.types.listOf lib.types.str;
         default = [];

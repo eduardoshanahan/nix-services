@@ -190,10 +190,20 @@
         name = "grafana";
         targets = cfg.scrape.grafanaTargets;
       })
-      ++ (optionalJobLines {
-        name = "pihole-exporter";
-        targets = cfg.scrape.piholeExporterTargets;
-      })
+      ++ lib.optionals (cfg.scrape.piholeExporterTargets != []) (
+        [
+          "  - job_name: \"pihole-exporter\""
+          "    scrape_interval: ${cfg.scrape.piholeExporterScrapeInterval}"
+          "    scrape_timeout: ${cfg.scrape.piholeExporterScrapeTimeout}"
+          "    static_configs:"
+          "      - targets:"
+        ]
+        ++ (mkTargetLines {
+          targets = cfg.scrape.piholeExporterTargets;
+          indent = "        ";
+        })
+        ++ [""]
+      )
       ++ (optionalJobLines {
         name = "cadvisor";
         targets = cfg.scrape.cadvisorTargets;
@@ -223,13 +233,22 @@
       "  - name: homelab-core"
       "    rules:"
       "      - alert: TargetDown"
-      "        expr: up == 0"
+      "        expr: up{job!=\"pihole-exporter\"} == 0"
       "        for: 2m"
       "        labels:"
       "          severity: critical"
       "        annotations:"
       "          summary: \"Target down ({{ $labels.job }})\""
       "          description: \"Scrape target {{ $labels.instance }} has been down for more than 2 minutes.\""
+      ""
+      "      - alert: PiHoleExporterTargetDown"
+      "        expr: up{job=\"pihole-exporter\"} == 0"
+      "        for: 10m"
+      "        labels:"
+      "          severity: warning"
+      "        annotations:"
+      "          summary: \"Pi-hole exporter target down\""
+      "          description: \"Pi-hole exporter target {{ $labels.instance }} has been down for more than 10 minutes.\""
       ""
       "      - alert: PrometheusConfigReloadFailed"
       "        expr: prometheus_config_last_reload_successful == 0"

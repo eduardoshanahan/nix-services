@@ -11,6 +11,24 @@
   serviceName = "pihole-exporter";
   composeDir = "/etc/${serviceName}";
   dockerBin = "${config.virtualisation.docker.package}/bin/docker";
+  healthcheckScript = pkgs.writeShellScript "pihole-exporter-healthcheck" ''
+    set -euo pipefail
+
+    probe_url="http://127.0.0.1:${toString cfg.listenPort}/metrics"
+
+    # Retry once before restart to avoid reacting to single transient failures.
+    if ${pkgs.curl}/bin/curl -fsS --max-time 8 "$probe_url" >/dev/null; then
+      exit 0
+    fi
+
+    sleep 2
+    if ${pkgs.curl}/bin/curl -fsS --max-time 8 "$probe_url" >/dev/null; then
+      exit 0
+    fi
+
+    echo "pihole-exporter healthcheck failed twice, restarting ${serviceName}.service" >&2
+    ${pkgs.systemd}/bin/systemctl restart ${serviceName}.service
+  '';
 in {
   options.services.piholeExporter = {
     enable = lib.mkEnableOption "Pi-hole Prometheus exporter (Docker Compose)";
@@ -79,6 +97,20 @@ in {
         description = "Container image tag.";
       };
     };
+
+    monitoring = {
+      enable = lib.mkOption {
+        type = lib.types.bool;
+        default = true;
+        description = "Enable periodic local /metrics health checks with auto-restart on repeated failures.";
+      };
+
+      interval = lib.mkOption {
+        type = lib.types.str;
+        default = "2m";
+        description = "How often to run the exporter healthcheck (for example `2m`).";
+      };
+    };
   };
 
   config = lib.mkIf cfg.enable {
@@ -128,6 +160,27 @@ in {
 
         ExecStart = "${dockerBin} compose up -d";
         ExecStop = "${dockerBin} compose down";
+      };
+    };
+
+    systemd.services."${serviceName}-healthcheck" = lib.mkIf cfg.monitoring.enable {
+      description = "Pi-hole exporter periodic healthcheck";
+      after = ["${serviceName}.service"];
+      requires = ["${serviceName}.service"];
+
+      serviceConfig = {
+        Type = "oneshot";
+        ExecStart = healthcheckScript;
+      };
+    };
+
+    systemd.timers."${serviceName}-healthcheck" = lib.mkIf cfg.monitoring.enable {
+      description = "Run Pi-hole exporter periodic healthcheck";
+      wantedBy = ["timers.target"];
+      timerConfig = {
+        OnBootSec = "2m";
+        OnUnitActiveSec = cfg.monitoring.interval;
+        Unit = "${serviceName}-healthcheck.service";
       };
     };
   };

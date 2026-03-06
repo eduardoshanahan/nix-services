@@ -7,6 +7,7 @@ This module deploys the `ekofr/pihole-exporter` container for Prometheus scrapin
 - Compose file is versioned at `services/pihole-exporter/docker-compose.yml`.
 - Pi-hole password is injected at runtime from `services.piholeExporter.pihole.passwordFile` into `/run/secrets/pihole-exporter.env`.
 - Exporter listens on host TCP port `services.piholeExporter.listenPort` (default `9617`).
+- Optional systemd healthcheck timer can probe local `/metrics` and restart the exporter service after repeated probe failures.
 
 ## Exposed options
 
@@ -21,3 +22,5 @@ This module deploys the `ekofr/pihole-exporter` container for Prometheus scrapin
 - `services.piholeExporter.pihole.passwordFile`
 - `services.piholeExporter.image.repository`
 - `services.piholeExporter.image.tag`
+- `services.piholeExporter.monitoring.enable`
+- `services.piholeExporter.monitoring.interval`
