@@ -88,6 +88,7 @@
         smtpRelayModule = import ./services/smtp-relay/smtp-relay.nix;
         homeAssistantModule = import ./services/home-assistant/home-assistant.nix;
         authentikComposeModule = import ./services/authentik/authentik.nix;
+        timeTaggerComposeModule = import ./services/timetagger/timetagger.nix;
       in {
         nixosModules = {
           traefik = traefikModule;
@@ -113,6 +114,7 @@
           smtpRelay = smtpRelayModule;
           homeAssistant = homeAssistantModule;
           authentikCompose = authentikComposeModule;
+          timeTaggerCompose = timeTaggerComposeModule;
         };
 
         services = {
@@ -139,6 +141,7 @@
           smtpRelay = smtpRelayModule;
           homeAssistant = homeAssistantModule;
           authentikCompose = authentikComposeModule;
+          timeTaggerCompose = timeTaggerComposeModule;
         };
       }
     );

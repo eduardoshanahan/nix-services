@@ -1,0 +1,39 @@
+services:
+  timetagger:
+    image: ${TIMETAGGER_IMAGE_REPOSITORY}:${TIMETAGGER_IMAGE_TAG}
+    container_name: ${TIMETAGGER_CONTAINER_NAME}
+    restart: unless-stopped
+    init: true
+
+    expose:
+      - "80"
+
+    environment:
+      - TIMETAGGER_BIND=0.0.0.0:80
+      - TIMETAGGER_DATADIR=/root/_timetagger
+      - TIMETAGGER_LOG_LEVEL=${TIMETAGGER_LOG_LEVEL}
+
+    volumes:
+      - "${TIMETAGGER_DATA_DIR}:/root/_timetagger:rw"
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=${TIMETAGGER_NETWORK}"
+      - "traefik.http.routers.timetagger.rule=Host(`${TIMETAGGER_HOSTNAME}`)"
+      - "traefik.http.services.timetagger.loadbalancer.server.port=80"
+      - "traefik.http.routers.timetagger.entrypoints=${TIMETAGGER_ENTRYPOINTS}"
+      - "traefik.http.routers.timetagger.tls=${TIMETAGGER_TLS}"
+
+    networks:
+      - traefik
+
+networks:
+  traefik:
+    external: true
+    name: ${TIMETAGGER_NETWORK}
