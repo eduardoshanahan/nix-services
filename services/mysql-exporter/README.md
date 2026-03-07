@@ -22,3 +22,7 @@ This module deploys `mysqld-exporter` via Docker Compose and exposes Prometheus 
 
 The module writes `/run/secrets/mysql-exporter.my.cnf` and passes it to
 `mysqld-exporter` via `--config.my-cnf`.
+
+By default the compose command disables `slave_status` collection
+(`--no-collect.slave_status`) to avoid requiring replication/super privileges
+for standard single-instance deployments.

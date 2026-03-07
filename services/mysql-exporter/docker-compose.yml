@@ -13,6 +13,7 @@ services:
     command:
       - --config.my-cnf=/etc/mysql-exporter.my.cnf
       - --mysqld.address=${MYSQL_EXPORTER_MYSQL_HOST}:${MYSQL_EXPORTER_MYSQL_PORT}
+      - --no-collect.slave_status
 
     ports:
       - "${MYSQL_EXPORTER_PORT}:9104"
