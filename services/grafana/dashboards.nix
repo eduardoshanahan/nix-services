@@ -4392,6 +4392,411 @@
       }
     ];
   };
+  alertingTriageDashboardJson = builtins.toJSON {
+    id = null;
+    uid = "alerting-triage";
+    title = "Alerting Triage";
+    tags = ["homelab" "alerts" "alertmanager" "operations"];
+    timezone = "browser";
+    schemaVersion = 39;
+    version = 1;
+    refresh = "30s";
+    time = {
+      from = "now-6h";
+      to = "now";
+    };
+    editable = true;
+    panels = [
+      {
+        id = 1;
+        type = "stat";
+        title = "Firing Alerts";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 6;
+          x = 0;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+        };
+        fieldConfig = {
+          defaults = {
+            decimals = 0;
+            thresholds = {
+              mode = "absolute";
+              steps = [
+                {
+                  color = "green";
+                  value = null;
+                }
+                {
+                  color = "red";
+                  value = 1;
+                }
+              ];
+            };
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "sum(ALERTS{alertstate=\"firing\"}) or vector(0)";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 2;
+        type = "stat";
+        title = "Pending Alerts";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 6;
+          x = 6;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+        };
+        fieldConfig = {
+          defaults = {
+            decimals = 0;
+            thresholds = {
+              mode = "absolute";
+              steps = [
+                {
+                  color = "green";
+                  value = null;
+                }
+                {
+                  color = "yellow";
+                  value = 1;
+                }
+              ];
+            };
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "sum(ALERTS{alertstate=\"pending\"}) or vector(0)";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 3;
+        type = "stat";
+        title = "Critical Alerts";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 6;
+          x = 12;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+        };
+        fieldConfig = {
+          defaults = {
+            decimals = 0;
+            thresholds = {
+              mode = "absolute";
+              steps = [
+                {
+                  color = "green";
+                  value = null;
+                }
+                {
+                  color = "red";
+                  value = 1;
+                }
+              ];
+            };
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "sum(ALERTS{alertstate=\"firing\",severity=\"critical\"}) or vector(0)";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 4;
+        type = "stat";
+        title = "Warning Alerts";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 6;
+          x = 18;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+        };
+        fieldConfig = {
+          defaults = {
+            decimals = 0;
+            thresholds = {
+              mode = "absolute";
+              steps = [
+                {
+                  color = "green";
+                  value = null;
+                }
+                {
+                  color = "yellow";
+                  value = 1;
+                }
+                {
+                  color = "red";
+                  value = 3;
+                }
+              ];
+            };
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "sum(ALERTS{alertstate=\"firing\",severity=\"warning\"}) or vector(0)";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 5;
+        type = "bargauge";
+        title = "Firing Alerts by Name";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 0;
+          y = 6;
+        };
+        options = {
+          orientation = "horizontal";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+          showUnfilled = true;
+        };
+        targets = [
+          {
+            expr = "sum by (alertname) (ALERTS{alertstate=\"firing\"})";
+            legendFormat = "{{alertname}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 6;
+        type = "timeseries";
+        title = "Firing Alerts by Severity";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 12;
+          y = 6;
+        };
+        fieldConfig = {
+          defaults = {
+            min = 0;
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "sum by (severity) (ALERTS{alertstate=\"firing\"})";
+            legendFormat = "{{severity}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 7;
+        type = "timeseries";
+        title = "Top Firing Alert Instances";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 0;
+          y = 14;
+        };
+        fieldConfig = {
+          defaults = {
+            min = 0;
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "topk(10, sum by (instance) (ALERTS{alertstate=\"firing\",instance!=\"\"}))";
+            legendFormat = "{{instance}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 8;
+        type = "timeseries";
+        title = "Target Down by Job";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 12;
+          y = 14;
+        };
+        fieldConfig = {
+          defaults = {
+            min = 0;
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "sum by (job) (up{job!=\"pihole-exporter\"} == bool 0)";
+            legendFormat = "{{job}}";
+            refId = "A";
+          }
+          {
+            expr = "sum by (job) (up{job=\"pihole-exporter\"} == bool 0)";
+            legendFormat = "{{job}}";
+            refId = "B";
+          }
+        ];
+      }
+      {
+        id = 9;
+        type = "timeseries";
+        title = "Alertmanager Notifications Sent/s";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 0;
+          y = 22;
+        };
+        fieldConfig = {
+          defaults = {
+            min = 0;
+            unit = "ops";
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "sum(rate(alertmanager_notifications_total{job=\"alertmanager\"}[5m])) or vector(0)";
+            legendFormat = "sent";
+            refId = "A";
+          }
+          {
+            expr = "sum(rate(alertmanager_notifications_failed_total{job=\"alertmanager\"}[5m])) or vector(0)";
+            legendFormat = "failed";
+            refId = "B";
+          }
+        ];
+      }
+      {
+        id = 10;
+        type = "timeseries";
+        title = "Prometheus Rule Evaluations / Failures";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 12;
+          y = 22;
+        };
+        fieldConfig = {
+          defaults = {
+            min = 0;
+            unit = "ops";
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "sum(rate(prometheus_rule_evaluations_total{job=\"prometheus\"}[5m])) or vector(0)";
+            legendFormat = "evaluations";
+            refId = "A";
+          }
+          {
+            expr = "sum(rate(prometheus_rule_evaluation_failures_total{job=\"prometheus\"}[5m])) or vector(0)";
+            legendFormat = "evaluation_failures";
+            refId = "B";
+          }
+        ];
+      }
+    ];
+  };
   unifiOverviewDashboardJson = builtins.toJSON {
     id = null;
     uid = "unifi-overview";

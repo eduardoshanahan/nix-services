@@ -97,6 +97,7 @@ With `services.grafanaCompose.provisioning.dashboards.enableStarter = true`, the
 - `Shared Infra`
 - `Monitoring Control Plane`
 - `Edge Service Reliability`
+- `Alerting Triage`
 - `UniFi Overview`
 - `NAS File Activity` (only when Loki datasource is configured)
 
@@ -127,6 +128,15 @@ With `services.grafanaCompose.provisioning.dashboards.enableStarter = true`, the
 - Response-code distribution and status-class traffic trend panels.
 - Coverage for routed services even when those services do not expose
   dedicated Prometheus exporters.
+
+`Alerting Triage` includes:
+
+- Immediate alert-state cards (`firing`, `pending`, `critical`, `warning`).
+- Alert breakdowns by alert name, severity, and instance.
+- Target-down rollups by scrape job.
+- Alert pipeline health panels:
+  - Alertmanager notifications sent/failed rate.
+  - Prometheus rule evaluations/failures rate.
 
 ## Healthcheck units
 
