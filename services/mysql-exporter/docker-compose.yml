@@ -5,10 +5,15 @@ services:
     restart: unless-stopped
 
     environment:
+      - MYSQLD_EXPORTER_PASSWORD
       - TZ
 
     env_file:
       - /run/secrets/mysql-exporter.env
+
+    command:
+      - --mysqld.address=${MYSQL_EXPORTER_MYSQL_HOST}:${MYSQL_EXPORTER_MYSQL_PORT}
+      - --mysqld.username=${MYSQL_EXPORTER_MYSQL_USERNAME}
 
     ports:
       - "${MYSQL_EXPORTER_PORT}:9104"

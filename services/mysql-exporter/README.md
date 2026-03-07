@@ -9,15 +9,17 @@ This module deploys `mysqld-exporter` via Docker Compose and exposes Prometheus 
 - `services.mysqlExporterCompose.network`
 - `services.mysqlExporterCompose.timezone`
 - `services.mysqlExporterCompose.listenPort`
-- `services.mysqlExporterCompose.dataSourceNameFile`
+- `services.mysqlExporterCompose.mysql.host`
+- `services.mysqlExporterCompose.mysql.port`
+- `services.mysqlExporterCompose.mysql.username`
+- `services.mysqlExporterCompose.mysql.passwordFile`
 - `services.mysqlExporterCompose.image.repository`
 - `services.mysqlExporterCompose.image.tag`
 
 ## Required secret
 
-- `services.mysqlExporterCompose.dataSourceNameFile` must point to a runtime file containing the exporter DSN, for example:
-  - `user:pass@(mysql.internal.example:3306)/`
+- `services.mysqlExporterCompose.mysql.passwordFile` must point to a runtime file containing the MySQL password.
 
 The module writes `/run/secrets/mysql-exporter.env` with:
 
-- `DATA_SOURCE_NAME="...dsn..."`
+- `MYSQLD_EXPORTER_PASSWORD="...password..."`
