@@ -98,6 +98,7 @@ With `services.grafanaCompose.provisioning.dashboards.enableStarter = true`, the
 - `Monitoring Control Plane`
 - `Edge Service Reliability`
 - `Alerting Triage`
+- `SMTP Relay Operations`
 - `UniFi Overview`
 - `NAS File Activity` (only when Loki datasource is configured)
 - `Logs Pipeline` (only when Loki datasource is configured)
@@ -138,6 +139,16 @@ With `services.grafanaCompose.provisioning.dashboards.enableStarter = true`, the
 - Alert pipeline health panels:
   - Alertmanager notifications sent/failed rate.
   - Prometheus rule evaluations/failures rate.
+
+`SMTP Relay Operations` includes:
+
+- Runtime health cards for relay systemd and container presence.
+- SMTP relay alert-state cards and alert-by-name panel.
+- Runtime usage/throughput panels from cAdvisor:
+  - CPU
+  - memory working set
+  - RX/TX network throughput
+- Condition trend panels aligned with existing SMTP relay alerts.
 
 `Logs Pipeline` includes:
 

@@ -5147,6 +5147,409 @@
       }
     ];
   };
+  smtpRelayOperationsDashboardJson = builtins.toJSON {
+    id = null;
+    uid = "smtp-relay-operations";
+    title = "SMTP Relay Operations";
+    tags = ["homelab" "smtp" "relay" "operations"];
+    timezone = "browser";
+    schemaVersion = 39;
+    version = 1;
+    refresh = "30s";
+    time = {
+      from = "now-6h";
+      to = "now";
+    };
+    editable = true;
+    panels = [
+      {
+        id = 1;
+        type = "stat";
+        title = "SMTP Relay systemd Active";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 6;
+          x = 0;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+        };
+        fieldConfig = {
+          defaults = {
+            min = 0;
+            max = 1;
+            thresholds = {
+              mode = "absolute";
+              steps = [
+                {
+                  color = "red";
+                  value = null;
+                }
+                {
+                  color = "green";
+                  value = 1;
+                }
+              ];
+            };
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "max(node_systemd_unit_state{job=\"nodes\",name=\"smtp-relay.service\",state=\"active\"}) or vector(0)";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 2;
+        type = "stat";
+        title = "SMTP Relay Container Seen (last 2m)";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 6;
+          x = 6;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+        };
+        fieldConfig = {
+          defaults = {
+            min = 0;
+            max = 1;
+            thresholds = {
+              mode = "absolute";
+              steps = [
+                {
+                  color = "red";
+                  value = null;
+                }
+                {
+                  color = "green";
+                  value = 1;
+                }
+              ];
+            };
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "max((time() - container_last_seen{job=\"cadvisor\",container_label_com_docker_compose_service=\"smtp-relay\"}) < bool 120) or vector(0)";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 3;
+        type = "stat";
+        title = "SMTP Relay Alerts Firing";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 6;
+          x = 12;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+        };
+        fieldConfig = {
+          defaults = {
+            thresholds = {
+              mode = "absolute";
+              steps = [
+                {
+                  color = "green";
+                  value = null;
+                }
+                {
+                  color = "red";
+                  value = 1;
+                }
+              ];
+            };
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "sum(ALERTS{alertname=~\"SmtpRelaySystemdDown|SmtpRelayContainerNotSeen\",alertstate=\"firing\"}) or vector(0)";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 4;
+        type = "stat";
+        title = "SMTP Relay CPU %";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 6;
+          x = 18;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+        };
+        fieldConfig = {
+          defaults = {
+            unit = "percent";
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "sum(rate(container_cpu_usage_seconds_total{job=\"cadvisor\",container_label_com_docker_compose_service=\"smtp-relay\"}[5m])) * 100";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 5;
+        type = "timeseries";
+        title = "SMTP Relay CPU %";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 8;
+          x = 0;
+          y = 6;
+        };
+        fieldConfig = {
+          defaults = {
+            unit = "percent";
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "sum(rate(container_cpu_usage_seconds_total{job=\"cadvisor\",container_label_com_docker_compose_service=\"smtp-relay\"}[5m])) * 100";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 6;
+        type = "timeseries";
+        title = "SMTP Relay Memory Working Set";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 8;
+          x = 8;
+          y = 6;
+        };
+        fieldConfig = {
+          defaults = {
+            unit = "bytes";
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "sum(container_memory_working_set_bytes{job=\"cadvisor\",container_label_com_docker_compose_service=\"smtp-relay\"})";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 7;
+        type = "timeseries";
+        title = "SMTP Relay Network Throughput";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 8;
+          x = 16;
+          y = 6;
+        };
+        fieldConfig = {
+          defaults = {
+            unit = "Bps";
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "sum(rate(container_network_receive_bytes_total{job=\"cadvisor\",container_label_com_docker_compose_service=\"smtp-relay\"}[5m]))";
+            legendFormat = "rx";
+            refId = "A";
+          }
+          {
+            expr = "sum(rate(container_network_transmit_bytes_total{job=\"cadvisor\",container_label_com_docker_compose_service=\"smtp-relay\"}[5m]))";
+            legendFormat = "tx";
+            refId = "B";
+          }
+        ];
+      }
+      {
+        id = 8;
+        type = "timeseries";
+        title = "SMTP Relay Conditions by Type";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 0;
+          y = 14;
+        };
+        fieldConfig = {
+          defaults = {
+            min = 0;
+            max = 1;
+            thresholds = {
+              mode = "absolute";
+              steps = [
+                {
+                  color = "green";
+                  value = null;
+                }
+                {
+                  color = "red";
+                  value = 1;
+                }
+              ];
+            };
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "(max(node_systemd_unit_state{job=\"nodes\",name=\"smtp-relay.service\",state=\"active\"}) or vector(0)) == bool 0";
+            legendFormat = "systemd_inactive";
+            refId = "A";
+          }
+          {
+            expr = "(max((time() - container_last_seen{job=\"cadvisor\",container_label_com_docker_compose_service=\"smtp-relay\"}) < bool 120) or vector(0)) == bool 0";
+            legendFormat = "container_not_seen";
+            refId = "B";
+          }
+        ];
+      }
+      {
+        id = 9;
+        type = "timeseries";
+        title = "SMTP Relay Alerts by Name";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 12;
+          y = 14;
+        };
+        fieldConfig = {
+          defaults = {
+            min = 0;
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "sum by (alertname) (ALERTS{alertname=~\"SmtpRelaySystemdDown|SmtpRelayContainerNotSeen\",alertstate=\"firing\"})";
+            legendFormat = "{{alertname}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 10;
+        type = "timeseries";
+        title = "SMTP Relay Condition Count";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 24;
+          x = 0;
+          y = 22;
+        };
+        fieldConfig = {
+          defaults = {
+            min = 0;
+            thresholds = {
+              mode = "absolute";
+              steps = [
+                {
+                  color = "green";
+                  value = null;
+                }
+                {
+                  color = "red";
+                  value = 1;
+                }
+              ];
+            };
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "(((max(node_systemd_unit_state{job=\"nodes\",name=\"smtp-relay.service\",state=\"active\"}) or vector(0)) == bool 0) + ((max((time() - container_last_seen{job=\"cadvisor\",container_label_com_docker_compose_service=\"smtp-relay\"}) < bool 120) or vector(0)) == bool 0))";
+            refId = "A";
+          }
+        ];
+      }
+    ];
+  };
   unifiOverviewDashboardJson = builtins.toJSON {
     id = null;
     uid = "unifi-overview";
