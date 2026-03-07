@@ -2492,6 +2492,58 @@
           }
         ];
       }
+      {
+        id = 15;
+        type = "stat";
+        title = "Shared Infra DB Alerts Firing";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 12;
+          x = 0;
+          y = 36;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+        };
+        targets = [
+          {
+            expr = "sum(ALERTS{alertstate=\"firing\",alertname=~\"PostgresExporterDatabaseDown|RedisExporterDatabaseDown|MysqlExporterDatabaseDown\"})";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 16;
+        type = "timeseries";
+        title = "Shared Infra DB Alerts by Type";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 12;
+          x = 12;
+          y = 36;
+        };
+        targets = [
+          {
+            expr = "sum by (alertname) (ALERTS{alertstate=\"firing\",alertname=~\"PostgresExporterDatabaseDown|RedisExporterDatabaseDown|MysqlExporterDatabaseDown\"})";
+            legendFormat = "{{alertname}}";
+            refId = "A";
+          }
+        ];
+      }
     ];
   };
   unifiOverviewDashboardJson = builtins.toJSON {
