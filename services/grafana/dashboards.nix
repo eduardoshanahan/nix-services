@@ -2514,20 +2514,10 @@
             fields = "";
             values = false;
           };
-          textMode = "value_and_name";
         };
         fieldConfig = {
           defaults = {
-            mappings = [
-              {
-                type = "value";
-                options = {
-                  "0" = {
-                    text = "OK";
-                  };
-                };
-              }
-            ];
+            decimals = 0;
             thresholds = {
               mode = "absolute";
               steps = [
@@ -2625,20 +2615,10 @@
             fields = "";
             values = false;
           };
-          textMode = "value_and_name";
         };
         fieldConfig = {
           defaults = {
-            mappings = [
-              {
-                type = "value";
-                options = {
-                  "0" = {
-                    text = "OK";
-                  };
-                };
-              }
-            ];
+            decimals = 0;
             thresholds = {
               mode = "absolute";
               steps = [
