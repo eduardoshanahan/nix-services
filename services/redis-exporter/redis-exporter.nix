@@ -107,7 +107,7 @@ in {
           "REDIS_EXPORTER_CONTAINER_NAME=${cfg.containerName}"
           "REDIS_EXPORTER_NETWORK=${cfg.network}"
           "REDIS_EXPORTER_PORT=${toString cfg.listenPort}"
-          "REDIS_EXPORTER_REDIS_ADDR=redis://${cfg.redis.host}:${toString cfg.redis.port}"
+          "REDIS_EXPORTER_REDIS_ADDR=${cfg.redis.host}:${toString cfg.redis.port}"
           "REDIS_USER=${cfg.redis.username}"
           "REDIS_EXPORTER_IMAGE_REPOSITORY=${cfg.image.repository}"
           "REDIS_EXPORTER_IMAGE_TAG=${cfg.image.tag}"

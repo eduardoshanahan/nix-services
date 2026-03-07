@@ -6,10 +6,48 @@
 }: let
   cfg = config.services.mysqlExporterCompose;
   runtimeSecrets = import ../../lib/runtime-secrets.nix {inherit lib;};
-  runtimeSecretEnv = import ../../lib/runtime-secret-env.nix {inherit lib pkgs;};
   serviceName = "mysql-exporter";
   composeDir = "/etc/${serviceName}";
   dockerBin = "${config.virtualisation.docker.package}/bin/docker";
+  runtimeMyCnfScript = pkgs.writeShellScript "${serviceName}-runtime-my-cnf" ''
+    set -euo pipefail
+    umask 0077
+
+    secret_file=${lib.escapeShellArg (toString cfg.mysql.passwordFile)}
+    mycnf_file="/run/secrets/${serviceName}.my.cnf"
+    tmp="$(mktemp -p /run/secrets ".${serviceName}.my.cnf.XXXXXX")"
+
+    install -d -m 0700 /run/secrets
+
+    if [[ ! -s "$secret_file" ]]; then
+      echo "mysql-exporter: missing or empty password file: $secret_file" >&2
+      exit 1
+    fi
+
+    mysql_password="$(tr -d '\r\n' < "$secret_file")"
+    if [[ -z "$mysql_password" ]]; then
+      echo "mysql-exporter: password file is empty after trimming" >&2
+      exit 1
+    fi
+
+    escape_cnf() {
+      local value="$1"
+      value="''${value//\\/\\\\}"
+      value="''${value//\"/\\\"}"
+      printf '%s' "$value"
+    }
+
+    {
+      printf '[client]\n'
+      printf 'user="%s"\n' "${cfg.mysql.username}"
+      printf 'password="%s"\n' "$(escape_cnf "$mysql_password")"
+      printf 'host="%s"\n' "${cfg.mysql.host}"
+      printf 'port=%s\n' "${toString cfg.mysql.port}"
+    } > "$tmp"
+
+    chmod 0600 "$tmp"
+    mv -f "$tmp" "$mycnf_file"
+  '';
 in {
   options.services.mysqlExporterCompose = {
     enable = lib.mkEnableOption "MySQL Prometheus exporter (Docker Compose)";
@@ -108,7 +146,7 @@ in {
           "MYSQL_EXPORTER_PORT=${toString cfg.listenPort}"
           "MYSQL_EXPORTER_MYSQL_HOST=${cfg.mysql.host}"
           "MYSQL_EXPORTER_MYSQL_PORT=${toString cfg.mysql.port}"
-          "MYSQL_EXPORTER_MYSQL_USERNAME=${cfg.mysql.username}"
+          "MYSQL_EXPORTER_MYCNF_PATH=/run/secrets/${serviceName}.my.cnf"
           "MYSQL_EXPORTER_IMAGE_REPOSITORY=${cfg.image.repository}"
           "MYSQL_EXPORTER_IMAGE_TAG=${cfg.image.tag}"
           "TZ=${cfg.timezone}"
@@ -116,11 +154,7 @@ in {
 
         ExecStartPre = [
           "${pkgs.runtimeShell} -c '${dockerBin} network inspect ${cfg.network} >/dev/null 2>&1 || ${dockerBin} network create ${cfg.network}'"
-          (runtimeSecretEnv.mkRuntimeSecretEnvExecStartPre {
-            name = serviceName;
-            secretFile = cfg.mysql.passwordFile;
-            envVar = "MYSQLD_EXPORTER_PASSWORD";
-          })
+          runtimeMyCnfScript
         ];
 
         ExecStart = "${dockerBin} compose up -d";

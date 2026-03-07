@@ -6,6 +6,7 @@ services:
 
     environment:
       - REDIS_ADDR=${REDIS_EXPORTER_REDIS_ADDR}
+      - REDIS_USER=${REDIS_USER}
       - TZ
 
     env_file:

@@ -2165,7 +2165,7 @@
       {
         id = 2;
         type = "stat";
-        title = "Redis Exporter Targets Up";
+        title = "Redis DB Up";
         datasource = {
           type = "prometheus";
           uid = "prometheus";
@@ -2187,7 +2187,7 @@
         };
         targets = [
           {
-            expr = "sum(up{job=\"redis-exporter\"})";
+            expr = "sum(redis_up{job=\"redis-exporter\"})";
             refId = "A";
           }
         ];
@@ -2195,7 +2195,7 @@
       {
         id = 3;
         type = "stat";
-        title = "MySQL Exporter Targets Up";
+        title = "MySQL DB Up";
         datasource = {
           type = "prometheus";
           uid = "prometheus";
@@ -2217,7 +2217,7 @@
         };
         targets = [
           {
-            expr = "sum(up{job=\"mysql-exporter\"})";
+            expr = "sum(mysql_up{job=\"mysql-exporter\"})";
             refId = "A";
           }
         ];
