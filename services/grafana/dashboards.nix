@@ -5933,6 +5933,334 @@
       }
     ];
   };
+  piholeOperationsDashboardJson = builtins.toJSON {
+    id = null;
+    uid = "pihole-operations";
+    title = "Pi-hole Operations";
+    tags = ["homelab" "dns" "pihole"];
+    timezone = "browser";
+    schemaVersion = 39;
+    version = 1;
+    refresh = "30s";
+    time = {
+      from = "now-6h";
+      to = "now";
+    };
+    editable = true;
+    panels = [
+      {
+        id = 1;
+        type = "stat";
+        title = "Pi-hole Exporter Targets Up";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 6;
+          x = 0;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+        };
+        targets = [
+          {
+            expr = "sum(up{job=\"pihole-exporter\"}) or vector(0)";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 2;
+        type = "stat";
+        title = "Pi-hole Status Up";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 6;
+          x = 6;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+        };
+        fieldConfig = {
+          defaults = {
+            min = 0;
+            max = 1;
+            thresholds = {
+              mode = "absolute";
+              steps = [
+                {
+                  color = "red";
+                  value = null;
+                }
+                {
+                  color = "green";
+                  value = 1;
+                }
+              ];
+            };
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "avg(pihole_status) or vector(0)";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 3;
+        type = "stat";
+        title = "Total Queries Today";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 6;
+          x = 12;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+        };
+        targets = [
+          {
+            expr = "sum(pihole_dns_queries_today) or vector(0)";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 4;
+        type = "stat";
+        title = "Ads Blocked % (avg)";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 6;
+          x = 18;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+        };
+        fieldConfig = {
+          defaults = {
+            unit = "percent";
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "avg(pihole_ads_percentage_today) or vector(0)";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 5;
+        type = "timeseries";
+        title = "Request Rate by Pi-hole";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 0;
+          y = 6;
+        };
+        fieldConfig = {
+          defaults = {
+            unit = "reqps";
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "max by (instance) (pihole_request_rate)";
+            legendFormat = "{{instance}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 6;
+        type = "timeseries";
+        title = "Queries Cached vs Forwarded";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 12;
+          y = 6;
+        };
+        fieldConfig = {
+          defaults = {
+            unit = "short";
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "sum by (instance) (pihole_queries_cached)";
+            legendFormat = "{{instance}} cached";
+            refId = "A";
+          }
+          {
+            expr = "sum by (instance) (pihole_queries_forwarded)";
+            legendFormat = "{{instance}} forwarded";
+            refId = "B";
+          }
+        ];
+      }
+      {
+        id = 7;
+        type = "timeseries";
+        title = "Unique Clients / Domains";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 0;
+          y = 14;
+        };
+        targets = [
+          {
+            expr = "sum(pihole_unique_clients)";
+            legendFormat = "unique_clients";
+            refId = "A";
+          }
+          {
+            expr = "sum(pihole_unique_domains)";
+            legendFormat = "unique_domains";
+            refId = "B";
+          }
+        ];
+      }
+      {
+        id = 8;
+        type = "timeseries";
+        title = "Blocked Domains / Ads Blocked Today";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 12;
+          y = 14;
+        };
+        targets = [
+          {
+            expr = "sum(pihole_domains_being_blocked)";
+            legendFormat = "domains_blocked";
+            refId = "A";
+          }
+          {
+            expr = "sum(pihole_ads_blocked_today)";
+            legendFormat = "ads_blocked_today";
+            refId = "B";
+          }
+        ];
+      }
+      {
+        id = 9;
+        type = "timeseries";
+        title = "Upstream Response Time by Destination";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 0;
+          y = 22;
+        };
+        fieldConfig = {
+          defaults = {
+            unit = "ms";
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "avg by (destination) (pihole_forward_destinations_responsetime)";
+            legendFormat = "{{destination}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 10;
+        type = "timeseries";
+        title = "Upstream Response Variance by Destination";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 12;
+          y = 22;
+        };
+        targets = [
+          {
+            expr = "avg by (destination) (pihole_forward_destinations_responsevariance)";
+            legendFormat = "{{destination}}";
+            refId = "A";
+          }
+        ];
+      }
+    ];
+  };
   unifiOverviewDashboardJson = builtins.toJSON {
     id = null;
     uid = "unifi-overview";

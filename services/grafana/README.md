@@ -100,6 +100,7 @@ With `services.grafanaCompose.provisioning.dashboards.enableStarter = true`, the
 - `Alerting Triage`
 - `SMTP Relay Operations`
 - `Service SLI`
+- `Pi-hole Operations`
 - `UniFi Overview`
 - `NAS File Activity` (only when Loki datasource is configured)
 - `Logs Pipeline` (only when Loki datasource is configured)
@@ -165,6 +166,18 @@ With `services.grafanaCompose.provisioning.dashboards.enableStarter = true`, the
   - success %
 - Global trend panels for success/error percentages and status-class request
   rates.
+
+`Pi-hole Operations` includes:
+
+- Pi-hole status and target-up cards.
+- DNS traffic/coverage cards (`queries today`, `ads blocked %`).
+- Query behavior panels:
+  - request rate by instance
+  - cached vs forwarded queries
+  - unique clients/domains
+- Upstream resolver quality panels:
+  - response time by destination
+  - response variance by destination
 
 `Logs Pipeline` includes:
 
