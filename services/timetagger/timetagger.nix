@@ -73,11 +73,8 @@ in {
 
       allowMutableTag = lib.mkOption {
         type = lib.types.bool;
-        default = false;
-        description = ''
-          Allow mutable tags such as `latest`. Keep disabled to enforce pinned
-          image tags by default.
-        '';
+        default = true;
+        description = "Allow mutable tags such as `latest`.";
       };
     };
 
