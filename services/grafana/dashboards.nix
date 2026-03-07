@@ -4632,7 +4632,7 @@
         };
         targets = [
           {
-            expr = "sum by (alertname) (ALERTS{alertstate=\"firing\"})";
+            expr = "sum by (alertname) (ALERTS{alertstate=\"firing\"}) or label_replace(vector(0), \"alertname\", \"none\", \"\", \"\")";
             legendFormat = "{{alertname}}";
             refId = "A";
           }
@@ -5502,7 +5502,7 @@
         };
         targets = [
           {
-            expr = "sum by (alertname) (ALERTS{alertname=~\"SmtpRelaySystemdDown|SmtpRelayContainerNotSeen\",alertstate=\"firing\"})";
+            expr = "sum by (alertname) (ALERTS{alertname=~\"SmtpRelaySystemdDown|SmtpRelayContainerNotSeen\",alertstate=\"firing\"}) or label_replace(vector(0), \"alertname\", \"none\", \"\", \"\")";
             legendFormat = "{{alertname}}";
             refId = "A";
           }
