@@ -7195,6 +7195,393 @@
       }
     ];
   };
+  applicationsReliabilityDashboardJson = builtins.toJSON {
+    id = null;
+    uid = "applications-reliability";
+    title = "Applications Reliability";
+    tags = ["homelab" "applications" "reliability" "sli"];
+    timezone = "browser";
+    schemaVersion = 39;
+    version = 1;
+    refresh = "30s";
+    time = {
+      from = "now-24h";
+      to = "now";
+    };
+    editable = true;
+    panels = [
+      {
+        id = 1;
+        type = "stat";
+        title = "Apps Receiving Traffic (15m)";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 6;
+          x = 0;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+        };
+        fieldConfig = {
+          defaults = {
+            min = 0;
+            decimals = 0;
+            unit = "short";
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "sum(sum by (service) (rate(traefik_service_requests_total{service=~\"authentik@docker|vikunja@docker|homeassistant@docker|timetagger@docker|homepage@docker|ghost-blog@docker|uptime-kuma@docker\"}[15m])) > bool 0) or vector(0)";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 2;
+        type = "stat";
+        title = "Services with 5xx (15m)";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 6;
+          x = 6;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+        };
+        fieldConfig = {
+          defaults = {
+            min = 0;
+            decimals = 0;
+            unit = "short";
+            thresholds = {
+              mode = "absolute";
+              steps = [
+                {
+                  color = "green";
+                  value = null;
+                }
+                {
+                  color = "orange";
+                  value = 1;
+                }
+                {
+                  color = "red";
+                  value = 3;
+                }
+              ];
+            };
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "sum(sum by (service) (rate(traefik_service_requests_total{service=~\"authentik@docker|vikunja@docker|homeassistant@docker|timetagger@docker|homepage@docker|ghost-blog@docker|uptime-kuma@docker\",code=~\"5..\"}[15m])) > bool 0) or vector(0)";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 3;
+        type = "stat";
+        title = "App Success Rate % (5m)";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 6;
+          x = 12;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+        };
+        fieldConfig = {
+          defaults = {
+            min = 0;
+            max = 100;
+            unit = "percent";
+            thresholds = {
+              mode = "absolute";
+              steps = [
+                {
+                  color = "red";
+                  value = null;
+                }
+                {
+                  color = "orange";
+                  value = 95;
+                }
+                {
+                  color = "green";
+                  value = 99;
+                }
+              ];
+            };
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "100 * (1 - ((sum(rate(traefik_service_requests_total{service=~\"authentik@docker|vikunja@docker|homeassistant@docker|timetagger@docker|homepage@docker|ghost-blog@docker|uptime-kuma@docker\",code=~\"5..\"}[5m])) or vector(0)) / clamp_min((sum(rate(traefik_service_requests_total{service=~\"authentik@docker|vikunja@docker|homeassistant@docker|timetagger@docker|homepage@docker|ghost-blog@docker|uptime-kuma@docker\"}[5m])) or vector(0)), 0.001)))";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 4;
+        type = "stat";
+        title = "SMTP Relay Container Seen";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 6;
+          x = 18;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+        };
+        fieldConfig = {
+          defaults = {
+            min = 0;
+            max = 1;
+            mappings = [
+              {
+                type = "value";
+                options = {
+                  "0" = {
+                    text = "NOT SEEN";
+                  };
+                  "1" = {
+                    text = "SEEN";
+                  };
+                };
+              }
+            ];
+            thresholds = {
+              mode = "absolute";
+              steps = [
+                {
+                  color = "red";
+                  value = null;
+                }
+                {
+                  color = "green";
+                  value = 1;
+                }
+              ];
+            };
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "max((time() - container_last_seen{job=\"cadvisor\",container_label_com_docker_compose_service=\"smtp-relay\"}) < bool 180) or vector(0)";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 5;
+        type = "timeseries";
+        title = "Request Rate by App Service (req/s)";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 0;
+          y = 6;
+        };
+        fieldConfig = {
+          defaults = {
+            min = 0;
+            unit = "reqps";
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "sum by (service) (rate(traefik_service_requests_total{service=~\"authentik@docker|vikunja@docker|homeassistant@docker|timetagger@docker|homepage@docker|ghost-blog@docker|uptime-kuma@docker\"}[5m]))";
+            legendFormat = "{{service}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 6;
+        type = "timeseries";
+        title = "5xx Rate by App Service (req/s)";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 12;
+          y = 6;
+        };
+        fieldConfig = {
+          defaults = {
+            min = 0;
+            unit = "reqps";
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "sum by (service) (rate(traefik_service_requests_total{service=~\"authentik@docker|vikunja@docker|homeassistant@docker|timetagger@docker|homepage@docker|ghost-blog@docker|uptime-kuma@docker\",code=~\"5..\"}[5m]))";
+            legendFormat = "{{service}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 7;
+        type = "timeseries";
+        title = "5xx Percentage by App Service";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 0;
+          y = 14;
+        };
+        fieldConfig = {
+          defaults = {
+            min = 0;
+            max = 100;
+            unit = "percent";
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "100 * (sum by (service) (rate(traefik_service_requests_total{service=~\"authentik@docker|vikunja@docker|homeassistant@docker|timetagger@docker|homepage@docker|ghost-blog@docker|uptime-kuma@docker\",code=~\"5..\"}[5m])) / clamp_min(sum by (service) (rate(traefik_service_requests_total{service=~\"authentik@docker|vikunja@docker|homeassistant@docker|timetagger@docker|homepage@docker|ghost-blog@docker|uptime-kuma@docker\"}[5m])), 0.001))";
+            legendFormat = "{{service}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 8;
+        type = "timeseries";
+        title = "P95 Request Duration by App Service";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 12;
+          y = 14;
+        };
+        fieldConfig = {
+          defaults = {
+            min = 0;
+            unit = "s";
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "histogram_quantile(0.95, sum by (service, le) (rate(traefik_service_request_duration_seconds_bucket{service=~\"authentik@docker|vikunja@docker|homeassistant@docker|timetagger@docker|homepage@docker|ghost-blog@docker|uptime-kuma@docker\"}[5m])))";
+            legendFormat = "{{service}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 9;
+        type = "timeseries";
+        title = "Application Container Seen Status";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 24;
+          x = 0;
+          y = 22;
+        };
+        fieldConfig = {
+          defaults = {
+            min = 0;
+            max = 1;
+            thresholds = {
+              mode = "absolute";
+              steps = [
+                {
+                  color = "red";
+                  value = null;
+                }
+                {
+                  color = "green";
+                  value = 1;
+                }
+              ];
+            };
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "max by (container_label_com_docker_compose_service) ((time() - container_last_seen{job=\"cadvisor\",container_label_com_docker_compose_service=~\"authentik-server|authentik-worker|vikunja|home-assistant|smtp-relay|timetagger|homepage|uptime-kuma\"}) < bool 180)";
+            legendFormat = "{{container_label_com_docker_compose_service}}";
+            refId = "A";
+          }
+        ];
+      }
+    ];
+  };
   unifiOverviewDashboardJson = builtins.toJSON {
     id = null;
     uid = "unifi-overview";

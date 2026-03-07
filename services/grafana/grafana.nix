@@ -37,6 +37,7 @@
     piholeOperationsDashboardJson
     synologySnmpOperationsDashboardJson
     githubProfileOperationsDashboardJson
+    applicationsReliabilityDashboardJson
     unifiOverviewDashboardJson
     ;
   inherit (scripts) backupScript healthcheckScript waitForHealthy;
@@ -528,6 +529,10 @@ in {
       text = githubProfileOperationsDashboardJson;
       mode = "0444";
     };
+    environment.etc."${serviceName}/provisioning/dashboards/applications-reliability.json" = lib.mkIf (cfg.provisioning.enable && cfg.provisioning.dashboards.enableStarter) {
+      text = applicationsReliabilityDashboardJson;
+      mode = "0444";
+    };
     environment.etc."${serviceName}/provisioning/dashboards/logs-pipeline.json" = lib.mkIf (cfg.provisioning.enable && cfg.provisioning.dashboards.enableStarter && cfg.provisioning.datasources.loki.url != null) {
       text = logsPipelineDashboardJson;
       mode = "0444";
@@ -565,6 +570,7 @@ in {
           config.environment.etc."${serviceName}/provisioning/dashboards/pihole-operations.json".source
           config.environment.etc."${serviceName}/provisioning/dashboards/synology-snmp-operations.json".source
           config.environment.etc."${serviceName}/provisioning/dashboards/github-profile-operations.json".source
+          config.environment.etc."${serviceName}/provisioning/dashboards/applications-reliability.json".source
           config.environment.etc."${serviceName}/provisioning/dashboards/unifi-overview.json".source
         ]
         ++ lib.optionals (cfg.provisioning.enable && cfg.provisioning.dashboards.enableStarter && cfg.provisioning.datasources.loki.url != null) [
@@ -631,6 +637,7 @@ in {
             "${pkgs.runtimeShell} -c 'test -s ${composeDir}/provisioning/dashboards/pihole-operations.json'"
             "${pkgs.runtimeShell} -c 'test -s ${composeDir}/provisioning/dashboards/synology-snmp-operations.json'"
             "${pkgs.runtimeShell} -c 'test -s ${composeDir}/provisioning/dashboards/github-profile-operations.json'"
+            "${pkgs.runtimeShell} -c 'test -s ${composeDir}/provisioning/dashboards/applications-reliability.json'"
             "${pkgs.runtimeShell} -c 'test -s ${composeDir}/provisioning/dashboards/unifi-overview.json'"
           ]
           ++ lib.optionals (cfg.provisioning.enable && cfg.provisioning.dashboards.enableStarter && cfg.provisioning.datasources.loki.url != null) [
