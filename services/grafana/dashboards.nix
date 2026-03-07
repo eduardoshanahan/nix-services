@@ -2565,6 +2565,26 @@
           x = 12;
           y = 36;
         };
+        fieldConfig = {
+          defaults = {
+            min = 0;
+            max = 1;
+            thresholds = {
+              mode = "absolute";
+              steps = [
+                {
+                  color = "green";
+                  value = null;
+                }
+                {
+                  color = "red";
+                  value = 1;
+                }
+              ];
+            };
+          };
+          overrides = [];
+        };
         targets = [
           {
             expr = "max(pg_up{job=\"postgres-exporter\"} == bool 0) or vector(0)";
@@ -2655,6 +2675,26 @@
           w = 12;
           x = 12;
           y = 42;
+        };
+        fieldConfig = {
+          defaults = {
+            min = 0;
+            max = 1;
+            thresholds = {
+              mode = "absolute";
+              steps = [
+                {
+                  color = "green";
+                  value = null;
+                }
+                {
+                  color = "red";
+                  value = 1;
+                }
+              ];
+            };
+          };
+          overrides = [];
         };
         targets = [
           {

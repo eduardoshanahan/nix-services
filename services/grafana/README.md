@@ -98,6 +98,12 @@ With `services.grafanaCompose.provisioning.dashboards.enableStarter = true`, the
 - `UniFi Overview`
 - `NAS File Activity` (only when Loki datasource is configured)
 
+`Shared Infra` includes:
+
+- Postgres / Redis / MySQL exporter connectivity and core runtime panels.
+- Shared-infra DB condition counters (healthy `0` -> `OK`, non-zero -> issue).
+- SMTP relay runtime and condition panels (container seen + systemd active).
+
 ## Healthcheck units
 
 - Service: `grafana-healthcheck.service`
