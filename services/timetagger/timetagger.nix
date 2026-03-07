@@ -49,6 +49,15 @@ in {
       description = "Application log level passed via TIMETAGGER_LOG_LEVEL.";
     };
 
+    credentials = lib.mkOption {
+      type = lib.types.str;
+      default = "";
+      description = ''
+        Login credentials in the format "user1:bcrypt_hash1,user2:bcrypt_hash2"
+        passed via TIMETAGGER_CREDENTIALS.
+      '';
+    };
+
     image = {
       repository = lib.mkOption {
         type = lib.types.str;
@@ -135,6 +144,7 @@ in {
           "TIMETAGGER_TLS=${if cfg.tls then "true" else "false"}"
           "TIMETAGGER_DATA_DIR=${cfg.dataDir}"
           "TIMETAGGER_LOG_LEVEL=${cfg.logLevel}"
+          "TIMETAGGER_CREDENTIALS=${cfg.credentials}"
           "TZ=${cfg.timezone}"
         ];
 
