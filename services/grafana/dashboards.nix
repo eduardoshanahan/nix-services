@@ -2117,6 +2117,323 @@
       }
     ];
   };
+  sharedInfraDashboardJson = builtins.toJSON {
+    id = null;
+    uid = "shared-infra";
+    title = "Shared Infra";
+    tags = ["homelab" "shared-infra" "postgres" "redis" "mysql"];
+    timezone = "browser";
+    schemaVersion = 39;
+    version = 1;
+    refresh = "30s";
+    time = {
+      from = "now-6h";
+      to = "now";
+    };
+    editable = true;
+    panels = [
+      {
+        id = 1;
+        type = "stat";
+        title = "Postgres Exporter Targets Up";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 8;
+          x = 0;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+        };
+        targets = [
+          {
+            expr = "sum(up{job=\"postgres-exporter\"})";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 2;
+        type = "stat";
+        title = "Redis Exporter Targets Up";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 8;
+          x = 8;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+        };
+        targets = [
+          {
+            expr = "sum(up{job=\"redis-exporter\"})";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 3;
+        type = "stat";
+        title = "MySQL Exporter Targets Up";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 8;
+          x = 16;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+        };
+        targets = [
+          {
+            expr = "sum(up{job=\"mysql-exporter\"})";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 4;
+        type = "timeseries";
+        title = "Postgres Connections by DB";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 8;
+          x = 0;
+          y = 6;
+        };
+        targets = [
+          {
+            expr = "sum by (datname) (pg_stat_database_numbackends{job=\"postgres-exporter\",datname!~\"template0|template1\"})";
+            legendFormat = "{{datname}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 5;
+        type = "timeseries";
+        title = "Redis Connected Clients";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 8;
+          x = 8;
+          y = 6;
+        };
+        targets = [
+          {
+            expr = "max by (instance) (redis_connected_clients{job=\"redis-exporter\"})";
+            legendFormat = "{{instance}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 6;
+        type = "timeseries";
+        title = "MySQL Threads Connected";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 8;
+          x = 16;
+          y = 6;
+        };
+        targets = [
+          {
+            expr = "max by (instance) (mysql_global_status_threads_connected{job=\"mysql-exporter\"})";
+            legendFormat = "{{instance}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 7;
+        type = "timeseries";
+        title = "Postgres TPS by DB";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 8;
+          x = 0;
+          y = 14;
+        };
+        targets = [
+          {
+            expr = "sum by (datname) (rate(pg_stat_database_xact_commit{job=\"postgres-exporter\",datname!~\"template0|template1\"}[5m]) + rate(pg_stat_database_xact_rollback{job=\"postgres-exporter\",datname!~\"template0|template1\"}[5m]))";
+            legendFormat = "{{datname}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 8;
+        type = "timeseries";
+        title = "Redis Commands Processed/s";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 8;
+          x = 8;
+          y = 14;
+        };
+        targets = [
+          {
+            expr = "sum by (instance) (rate(redis_commands_processed_total{job=\"redis-exporter\"}[5m]))";
+            legendFormat = "{{instance}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 9;
+        type = "timeseries";
+        title = "MySQL Queries/s";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 8;
+          x = 16;
+          y = 14;
+        };
+        targets = [
+          {
+            expr = "sum by (instance) ((rate(mysql_global_status_queries{job=\"mysql-exporter\"}[5m])) or (rate(mysql_global_status_questions{job=\"mysql-exporter\"}[5m])))";
+            legendFormat = "{{instance}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 10;
+        type = "timeseries";
+        title = "Postgres DB Size";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 8;
+          x = 0;
+          y = 22;
+        };
+        fieldConfig = {
+          defaults = {
+            unit = "bytes";
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "sum by (datname) (pg_database_size_bytes{job=\"postgres-exporter\",datname!~\"template0|template1\"})";
+            legendFormat = "{{datname}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 11;
+        type = "timeseries";
+        title = "Redis Memory Used";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 8;
+          x = 8;
+          y = 22;
+        };
+        fieldConfig = {
+          defaults = {
+            unit = "bytes";
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "max by (instance) (redis_memory_used_bytes{job=\"redis-exporter\"})";
+            legendFormat = "{{instance}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 12;
+        type = "timeseries";
+        title = "MySQL Threads Running";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 8;
+          x = 16;
+          y = 22;
+        };
+        targets = [
+          {
+            expr = "max by (instance) (mysql_global_status_threads_running{job=\"mysql-exporter\"})";
+            legendFormat = "{{instance}}";
+            refId = "A";
+          }
+        ];
+      }
+    ];
+  };
   unifiOverviewDashboardJson = builtins.toJSON {
     id = null;
     uid = "unifi-overview";

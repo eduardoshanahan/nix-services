@@ -94,6 +94,7 @@ With `services.grafanaCompose.provisioning.dashboards.enableStarter = true`, the
 - `Container Fleet`
 - `DNS & Edge`
 - `NAS Detail`
+- `Shared Infra`
 - `UniFi Overview`
 - `NAS File Activity` (only when Loki datasource is configured)
 
