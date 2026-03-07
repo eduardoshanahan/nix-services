@@ -99,6 +99,7 @@ With `services.grafanaCompose.provisioning.dashboards.enableStarter = true`, the
 - `Edge Service Reliability`
 - `Alerting Triage`
 - `SMTP Relay Operations`
+- `Service SLI`
 - `UniFi Overview`
 - `NAS File Activity` (only when Loki datasource is configured)
 - `Logs Pipeline` (only when Loki datasource is configured)
@@ -149,6 +150,21 @@ With `services.grafanaCompose.provisioning.dashboards.enableStarter = true`, the
   - memory working set
   - RX/TX network throughput
 - Condition trend panels aligned with existing SMTP relay alerts.
+
+`Service SLI` includes:
+
+- Global SLI cards from Traefik telemetry:
+  - request rate
+  - success %
+  - 5xx %
+  - p95 latency
+- Per-service ranking panels for:
+  - request rate
+  - 5xx %
+  - p95 latency
+  - success %
+- Global trend panels for success/error percentages and status-class request
+  rates.
 
 `Logs Pipeline` includes:
 

@@ -5550,6 +5550,389 @@
       }
     ];
   };
+  serviceSliDashboardJson = builtins.toJSON {
+    id = null;
+    uid = "service-sli";
+    title = "Service SLI";
+    tags = ["homelab" "sli" "traefik" "reliability"];
+    timezone = "browser";
+    schemaVersion = 39;
+    version = 1;
+    refresh = "30s";
+    time = {
+      from = "now-6h";
+      to = "now";
+    };
+    editable = true;
+    panels = [
+      {
+        id = 1;
+        type = "stat";
+        title = "Global Request Rate (req/s)";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 6;
+          x = 0;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+        };
+        fieldConfig = {
+          defaults = {
+            unit = "reqps";
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "sum(rate(traefik_service_requests_total{service!=\"noop@internal\"}[5m])) or vector(0)";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 2;
+        type = "stat";
+        title = "Global Success % (non-5xx)";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 6;
+          x = 6;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+        };
+        fieldConfig = {
+          defaults = {
+            unit = "percent";
+            thresholds = {
+              mode = "absolute";
+              steps = [
+                {
+                  color = "red";
+                  value = null;
+                }
+                {
+                  color = "yellow";
+                  value = 95;
+                }
+                {
+                  color = "green";
+                  value = 99;
+                }
+              ];
+            };
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "100 * (1 - ((sum(rate(traefik_service_requests_total{service!=\"noop@internal\",code=~\"5..\"}[5m])) or vector(0)) / clamp_min((sum(rate(traefik_service_requests_total{service!=\"noop@internal\"}[5m])) or vector(0)), 0.001)))";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 3;
+        type = "stat";
+        title = "Global 5xx %";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 6;
+          x = 12;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+        };
+        fieldConfig = {
+          defaults = {
+            unit = "percent";
+            thresholds = {
+              mode = "absolute";
+              steps = [
+                {
+                  color = "green";
+                  value = null;
+                }
+                {
+                  color = "yellow";
+                  value = 0.1;
+                }
+                {
+                  color = "red";
+                  value = 1;
+                }
+              ];
+            };
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "100 * ((sum(rate(traefik_service_requests_total{service!=\"noop@internal\",code=~\"5..\"}[5m])) or vector(0)) / clamp_min((sum(rate(traefik_service_requests_total{service!=\"noop@internal\"}[5m])) or vector(0)), 0.001))";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 4;
+        type = "stat";
+        title = "Global p95 Latency";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 6;
+          x = 18;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+        };
+        fieldConfig = {
+          defaults = {
+            unit = "s";
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "histogram_quantile(0.95, sum(rate(traefik_service_request_duration_seconds_bucket{service!=\"noop@internal\"}[5m])) by (le))";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 5;
+        type = "timeseries";
+        title = "Request Rate by Service (top 12)";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 0;
+          y = 6;
+        };
+        fieldConfig = {
+          defaults = {
+            unit = "reqps";
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "topk(12, sum by (service) (rate(traefik_service_requests_total{service!=\"noop@internal\"}[5m])))";
+            legendFormat = "{{service}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 6;
+        type = "timeseries";
+        title = "5xx % by Service (top 12)";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 12;
+          y = 6;
+        };
+        fieldConfig = {
+          defaults = {
+            unit = "percent";
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "topk(12, 100 * (sum by (service) (rate(traefik_service_requests_total{service!=\"noop@internal\",code=~\"5..\"}[5m])) / clamp_min(sum by (service) (rate(traefik_service_requests_total{service!=\"noop@internal\"}[5m])), 0.001)))";
+            legendFormat = "{{service}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 7;
+        type = "timeseries";
+        title = "p95 Latency by Service (top 12)";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 0;
+          y = 14;
+        };
+        fieldConfig = {
+          defaults = {
+            unit = "s";
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "topk(12, histogram_quantile(0.95, sum by (service, le) (rate(traefik_service_request_duration_seconds_bucket{service!=\"noop@internal\"}[5m]))))";
+            legendFormat = "{{service}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 8;
+        type = "timeseries";
+        title = "Success % by Service (top 12)";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 12;
+          y = 14;
+        };
+        fieldConfig = {
+          defaults = {
+            unit = "percent";
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "topk(12, 100 * (1 - (sum by (service) (rate(traefik_service_requests_total{service!=\"noop@internal\",code=~\"5..\"}[5m])) / clamp_min(sum by (service) (rate(traefik_service_requests_total{service!=\"noop@internal\"}[5m])), 0.001))))";
+            legendFormat = "{{service}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 9;
+        type = "timeseries";
+        title = "Global Success % / 5xx %";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 0;
+          y = 22;
+        };
+        fieldConfig = {
+          defaults = {
+            unit = "percent";
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "100 * (1 - ((sum(rate(traefik_service_requests_total{service!=\"noop@internal\",code=~\"5..\"}[5m])) or vector(0)) / clamp_min((sum(rate(traefik_service_requests_total{service!=\"noop@internal\"}[5m])) or vector(0)), 0.001)))";
+            legendFormat = "success_pct";
+            refId = "A";
+          }
+          {
+            expr = "100 * ((sum(rate(traefik_service_requests_total{service!=\"noop@internal\",code=~\"5..\"}[5m])) or vector(0)) / clamp_min((sum(rate(traefik_service_requests_total{service!=\"noop@internal\"}[5m])) or vector(0)), 0.001))";
+            legendFormat = "error_5xx_pct";
+            refId = "B";
+          }
+        ];
+      }
+      {
+        id = 10;
+        type = "timeseries";
+        title = "Global Request Rate by Status Class";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 12;
+          y = 22;
+        };
+        fieldConfig = {
+          defaults = {
+            unit = "reqps";
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "sum(rate(traefik_service_requests_total{service!=\"noop@internal\",code=~\"2..\"}[5m]))";
+            legendFormat = "2xx";
+            refId = "A";
+          }
+          {
+            expr = "sum(rate(traefik_service_requests_total{service!=\"noop@internal\",code=~\"3..\"}[5m]))";
+            legendFormat = "3xx";
+            refId = "B";
+          }
+          {
+            expr = "sum(rate(traefik_service_requests_total{service!=\"noop@internal\",code=~\"4..\"}[5m]))";
+            legendFormat = "4xx";
+            refId = "C";
+          }
+          {
+            expr = "sum(rate(traefik_service_requests_total{service!=\"noop@internal\",code=~\"5..\"}[5m]))";
+            legendFormat = "5xx";
+            refId = "D";
+          }
+        ];
+      }
+    ];
+  };
   unifiOverviewDashboardJson = builtins.toJSON {
     id = null;
     uid = "unifi-overview";
