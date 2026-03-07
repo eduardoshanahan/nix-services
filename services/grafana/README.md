@@ -95,6 +95,7 @@ With `services.grafanaCompose.provisioning.dashboards.enableStarter = true`, the
 - `DNS & Edge`
 - `NAS Detail`
 - `Shared Infra`
+- `Monitoring Control Plane`
 - `UniFi Overview`
 - `NAS File Activity` (only when Loki datasource is configured)
 
@@ -106,6 +107,17 @@ With `services.grafanaCompose.provisioning.dashboards.enableStarter = true`, the
   - `Any Exporter Down`
   - `Any Shared DB Degraded`
 - SMTP relay runtime and condition panels (container seen + systemd active).
+
+`Monitoring Control Plane` includes:
+
+- Dedicated core monitoring stack health cards (`prometheus`, `alertmanager`,
+  `grafana`, `loki`, `snmp-exporter`, `unpoller`).
+- Target-up count cards for core jobs (`nodes`, `traefik`, `promtail`,
+  `cadvisor`, `pihole-exporter`) and shared DB exporters.
+- Aggregate state cards for:
+  - `Core Jobs Down Count`
+  - `Core Alerts Firing`
+- A trend panel (`Core Target Up by Job`) to spot target churn by job group.
 
 ## Healthcheck units
 

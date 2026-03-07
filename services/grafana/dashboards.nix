@@ -3339,6 +3339,692 @@
       }
     ];
   };
+  monitoringControlPlaneDashboardJson = builtins.toJSON {
+    id = null;
+    uid = "monitoring-control-plane";
+    title = "Monitoring Control Plane";
+    tags = ["homelab" "monitoring" "control-plane"];
+    timezone = "browser";
+    schemaVersion = 39;
+    version = 1;
+    refresh = "30s";
+    time = {
+      from = "now-6h";
+      to = "now";
+    };
+    editable = true;
+    panels = [
+      {
+        id = 1;
+        type = "stat";
+        title = "Prometheus Up";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 4;
+          x = 0;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+        };
+        fieldConfig = {
+          defaults = {
+            min = 0;
+            max = 1;
+            thresholds = {
+              mode = "absolute";
+              steps = [
+                {
+                  color = "red";
+                  value = null;
+                }
+                {
+                  color = "green";
+                  value = 1;
+                }
+              ];
+            };
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "max(up{job=\"prometheus\"}) or vector(0)";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 2;
+        type = "stat";
+        title = "Alertmanager Up";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 4;
+          x = 4;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+        };
+        fieldConfig = {
+          defaults = {
+            min = 0;
+            max = 1;
+            thresholds = {
+              mode = "absolute";
+              steps = [
+                {
+                  color = "red";
+                  value = null;
+                }
+                {
+                  color = "green";
+                  value = 1;
+                }
+              ];
+            };
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "max(up{job=\"alertmanager\"}) or vector(0)";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 3;
+        type = "stat";
+        title = "Grafana Up";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 4;
+          x = 8;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+        };
+        fieldConfig = {
+          defaults = {
+            min = 0;
+            max = 1;
+            thresholds = {
+              mode = "absolute";
+              steps = [
+                {
+                  color = "red";
+                  value = null;
+                }
+                {
+                  color = "green";
+                  value = 1;
+                }
+              ];
+            };
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "max(up{job=\"grafana\"}) or vector(0)";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 4;
+        type = "stat";
+        title = "Loki Up";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 4;
+          x = 12;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+        };
+        fieldConfig = {
+          defaults = {
+            min = 0;
+            max = 1;
+            thresholds = {
+              mode = "absolute";
+              steps = [
+                {
+                  color = "red";
+                  value = null;
+                }
+                {
+                  color = "green";
+                  value = 1;
+                }
+              ];
+            };
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "max(up{job=\"loki\"}) or vector(0)";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 5;
+        type = "stat";
+        title = "SNMP Exporter Up";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 4;
+          x = 16;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+        };
+        fieldConfig = {
+          defaults = {
+            min = 0;
+            max = 1;
+            thresholds = {
+              mode = "absolute";
+              steps = [
+                {
+                  color = "red";
+                  value = null;
+                }
+                {
+                  color = "green";
+                  value = 1;
+                }
+              ];
+            };
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "max(up{job=\"snmp-exporter\"}) or vector(0)";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 6;
+        type = "stat";
+        title = "Unpoller Up";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 4;
+          x = 20;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+        };
+        fieldConfig = {
+          defaults = {
+            min = 0;
+            max = 1;
+            thresholds = {
+              mode = "absolute";
+              steps = [
+                {
+                  color = "red";
+                  value = null;
+                }
+                {
+                  color = "green";
+                  value = 1;
+                }
+              ];
+            };
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "max(up{job=\"unpoller\"}) or vector(0)";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 7;
+        type = "stat";
+        title = "Node Targets Up";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 4;
+          x = 0;
+          y = 6;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+        };
+        targets = [
+          {
+            expr = "sum(up{job=\"nodes\"}) or vector(0)";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 8;
+        type = "stat";
+        title = "Traefik Targets Up";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 4;
+          x = 4;
+          y = 6;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+        };
+        targets = [
+          {
+            expr = "sum(up{job=\"traefik\"}) or vector(0)";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 9;
+        type = "stat";
+        title = "Promtail Targets Up";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 4;
+          x = 8;
+          y = 6;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+        };
+        targets = [
+          {
+            expr = "sum(up{job=\"promtail\"}) or vector(0)";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 10;
+        type = "stat";
+        title = "cAdvisor Targets Up";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 4;
+          x = 12;
+          y = 6;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+        };
+        targets = [
+          {
+            expr = "sum(up{job=\"cadvisor\"}) or vector(0)";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 11;
+        type = "stat";
+        title = "Pi-hole Exporter Targets Up";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 4;
+          x = 16;
+          y = 6;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+        };
+        targets = [
+          {
+            expr = "sum(up{job=\"pihole-exporter\"}) or vector(0)";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 12;
+        type = "stat";
+        title = "Gitea Up";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 4;
+          x = 20;
+          y = 6;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+        };
+        fieldConfig = {
+          defaults = {
+            min = 0;
+            max = 1;
+            thresholds = {
+              mode = "absolute";
+              steps = [
+                {
+                  color = "red";
+                  value = null;
+                }
+                {
+                  color = "green";
+                  value = 1;
+                }
+              ];
+            };
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "max(up{job=\"gitea\"}) or vector(0)";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 13;
+        type = "stat";
+        title = "Shared Exporters Up";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 8;
+          x = 0;
+          y = 12;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+        };
+        targets = [
+          {
+            expr = "(sum(up{job=\"postgres-exporter\"}) or vector(0)) + (sum(up{job=\"redis-exporter\"}) or vector(0)) + (sum(up{job=\"mysql-exporter\"}) or vector(0))";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 14;
+        type = "stat";
+        title = "Core Jobs Down Count";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 8;
+          x = 8;
+          y = 12;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+        };
+        fieldConfig = {
+          defaults = {
+            decimals = 0;
+            thresholds = {
+              mode = "absolute";
+              steps = [
+                {
+                  color = "green";
+                  value = null;
+                }
+                {
+                  color = "red";
+                  value = 1;
+                }
+              ];
+            };
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "sum(up{job=~\"prometheus|alertmanager|grafana|loki|traefik|nodes|promtail|cadvisor|snmp-exporter|pihole-exporter|gitea|unpoller|postgres-exporter|redis-exporter|mysql-exporter|github-profile\"} == bool 0) or vector(0)";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 15;
+        type = "stat";
+        title = "Core Alerts Firing";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 8;
+          x = 16;
+          y = 12;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+        };
+        fieldConfig = {
+          defaults = {
+            decimals = 0;
+            thresholds = {
+              mode = "absolute";
+              steps = [
+                {
+                  color = "green";
+                  value = null;
+                }
+                {
+                  color = "red";
+                  value = 1;
+                }
+              ];
+            };
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "sum(ALERTS{alertstate=\"firing\",severity=~\"warning|critical\"}) or vector(0)";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 16;
+        type = "timeseries";
+        title = "Core Target Up by Job";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 24;
+          x = 0;
+          y = 18;
+        };
+        fieldConfig = {
+          defaults = {
+            min = 0;
+            thresholds = {
+              mode = "absolute";
+              steps = [
+                {
+                  color = "red";
+                  value = null;
+                }
+                {
+                  color = "green";
+                  value = 1;
+                }
+              ];
+            };
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "sum by (job) (up{job=~\"prometheus|alertmanager|grafana|loki|traefik|nodes|promtail|cadvisor|snmp-exporter|pihole-exporter|gitea|unpoller|postgres-exporter|redis-exporter|mysql-exporter|github-profile\"})";
+            legendFormat = "{{job}}";
+            refId = "A";
+          }
+        ];
+      }
+    ];
+  };
   unifiOverviewDashboardJson = builtins.toJSON {
     id = null;
     uid = "unifi-overview";
