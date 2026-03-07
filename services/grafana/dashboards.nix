@@ -3219,6 +3219,124 @@
           }
         ];
       }
+      {
+        id = 28;
+        type = "stat";
+        title = "Any Exporter Down";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 12;
+          x = 0;
+          y = 78;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+        };
+        fieldConfig = {
+          defaults = {
+            decimals = 0;
+            mappings = [
+              {
+                type = "value";
+                options = {
+                  "0" = {
+                    text = "NO";
+                  };
+                };
+              }
+            ];
+            thresholds = {
+              mode = "absolute";
+              steps = [
+                {
+                  color = "green";
+                  value = null;
+                }
+                {
+                  color = "red";
+                  value = 1;
+                }
+              ];
+            };
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "((max(up{job=\"postgres-exporter\"} == bool 0) or vector(0)) + (max(up{job=\"redis-exporter\"} == bool 0) or vector(0)) + (max(up{job=\"mysql-exporter\"} == bool 0) or vector(0)))";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 29;
+        type = "stat";
+        title = "Any Shared DB Degraded";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 12;
+          x = 12;
+          y = 78;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+        };
+        fieldConfig = {
+          defaults = {
+            decimals = 0;
+            mappings = [
+              {
+                type = "value";
+                options = {
+                  "0" = {
+                    text = "NO";
+                  };
+                };
+              }
+            ];
+            thresholds = {
+              mode = "absolute";
+              steps = [
+                {
+                  color = "green";
+                  value = null;
+                }
+                {
+                  color = "red";
+                  value = 1;
+                }
+              ];
+            };
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "(((max(up{job=\"postgres-exporter\"}) or vector(0)) * (max(pg_up{job=\"postgres-exporter\"} == bool 0) or vector(0))) + ((max(up{job=\"redis-exporter\"}) or vector(0)) * (max(redis_up{job=\"redis-exporter\"} == bool 0) or vector(0))) + ((max(up{job=\"mysql-exporter\"}) or vector(0)) * (max(mysql_up{job=\"mysql-exporter\"} == bool 0) or vector(0))))";
+            refId = "A";
+          }
+        ];
+      }
     ];
   };
   unifiOverviewDashboardJson = builtins.toJSON {

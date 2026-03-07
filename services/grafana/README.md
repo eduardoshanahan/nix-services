@@ -102,6 +102,9 @@ With `services.grafanaCompose.provisioning.dashboards.enableStarter = true`, the
 
 - Postgres / Redis / MySQL exporter connectivity and core runtime panels.
 - Shared-infra DB condition counters (healthy `0` -> `OK`, non-zero -> issue).
+- Compact aggregate summary cards:
+  - `Any Exporter Down`
+  - `Any Shared DB Degraded`
 - SMTP relay runtime and condition panels (container seen + systemd active).
 
 ## Healthcheck units
