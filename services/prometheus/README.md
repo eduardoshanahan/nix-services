@@ -56,6 +56,9 @@ The module ships a baseline `homelab-core` rule group:
 - `services.prometheusCompose.scrape.traefikTargets`
 - `services.prometheusCompose.scrape.promtailTargets`
 - `services.prometheusCompose.scrape.snmpExporterTargets`
+- `services.prometheusCompose.scrape.postgresExporterTargets`
+- `services.prometheusCompose.scrape.redisExporterTargets`
+- `services.prometheusCompose.scrape.mysqlExporterTargets`
 - `services.prometheusCompose.scrape.piholeExporterTargets`
 - `services.prometheusCompose.scrape.cadvisorTargets`
 - `services.prometheusCompose.scrape.unpollerTargets`
@@ -118,6 +121,15 @@ services.prometheusCompose = {
     ];
     snmpExporterTargets = [
       "rpi-box-02-metrics.internal.example:9116"
+    ];
+    postgresExporterTargets = [
+      "rpi-box-02-metrics.internal.example:9187"
+    ];
+    redisExporterTargets = [
+      "rpi-box-02-metrics.internal.example:9121"
+    ];
+    mysqlExporterTargets = [
+      "rpi-box-02-metrics.internal.example:9104"
     ];
     grafanaTargets = [
       "grafana:3000"

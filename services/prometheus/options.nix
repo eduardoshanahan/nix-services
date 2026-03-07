@@ -244,6 +244,27 @@
         description = "SNMP exporter targets (`host:port`) to scrape.";
       };
 
+      postgresExporterTargets = lib.mkOption {
+        type = lib.types.listOf lib.types.str;
+        default = [];
+        example = ["rpi-box-02-metrics.internal.example:9187"];
+        description = "PostgreSQL exporter targets (`host:port`) to scrape.";
+      };
+
+      redisExporterTargets = lib.mkOption {
+        type = lib.types.listOf lib.types.str;
+        default = [];
+        example = ["rpi-box-02-metrics.internal.example:9121"];
+        description = "Redis exporter targets (`host:port`) to scrape.";
+      };
+
+      mysqlExporterTargets = lib.mkOption {
+        type = lib.types.listOf lib.types.str;
+        default = [];
+        example = ["rpi-box-02-metrics.internal.example:9104"];
+        description = "MySQL exporter targets (`host:port`) to scrape.";
+      };
+
       piholeExporterTargets = lib.mkOption {
         type = lib.types.listOf lib.types.str;
         default = [];

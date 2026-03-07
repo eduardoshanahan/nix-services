@@ -187,6 +187,18 @@
         targets = cfg.scrape.snmpExporterTargets;
       })
       ++ (optionalJobLines {
+        name = "postgres-exporter";
+        targets = cfg.scrape.postgresExporterTargets;
+      })
+      ++ (optionalJobLines {
+        name = "redis-exporter";
+        targets = cfg.scrape.redisExporterTargets;
+      })
+      ++ (optionalJobLines {
+        name = "mysql-exporter";
+        targets = cfg.scrape.mysqlExporterTargets;
+      })
+      ++ (optionalJobLines {
         name = "grafana";
         targets = cfg.scrape.grafanaTargets;
       })

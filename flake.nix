@@ -78,6 +78,9 @@
         lokiModule = import ./services/loki/loki.nix;
         promtailModule = import ./services/promtail/promtail.nix;
         snmpExporterModule = import ./services/snmp-exporter/snmp-exporter.nix;
+        postgresExporterModule = import ./services/postgres-exporter/postgres-exporter.nix;
+        redisExporterModule = import ./services/redis-exporter/redis-exporter.nix;
+        mysqlExporterModule = import ./services/mysql-exporter/mysql-exporter.nix;
         unpollerModule = import ./services/unpoller/unpoller.nix;
         tailscaleModule = import ./services/tailscale/tailscale.nix;
         ghostModule = import ./services/ghost/ghost.nix;
@@ -105,6 +108,9 @@
           loki = lokiModule;
           promtail = promtailModule;
           snmpExporter = snmpExporterModule;
+          postgresExporterCompose = postgresExporterModule;
+          redisExporterCompose = redisExporterModule;
+          mysqlExporterCompose = mysqlExporterModule;
           unpoller = unpollerModule;
           tailscale = tailscaleModule;
           ghost = ghostModule;
@@ -133,6 +139,9 @@
           loki = lokiModule;
           promtail = promtailModule;
           snmpExporter = snmpExporterModule;
+          postgresExporterCompose = postgresExporterModule;
+          redisExporterCompose = redisExporterModule;
+          mysqlExporterCompose = mysqlExporterModule;
           unpoller = unpollerModule;
           tailscale = tailscaleModule;
           ghost = ghostModule;

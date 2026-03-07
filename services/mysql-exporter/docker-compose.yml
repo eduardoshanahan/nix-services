@@ -1,0 +1,28 @@
+services:
+  mysql-exporter:
+    image: ${MYSQL_EXPORTER_IMAGE_REPOSITORY}:${MYSQL_EXPORTER_IMAGE_TAG}
+    container_name: ${MYSQL_EXPORTER_CONTAINER_NAME}
+    restart: unless-stopped
+
+    environment:
+      - TZ
+
+    env_file:
+      - /run/secrets/mysql-exporter.env
+
+    ports:
+      - "${MYSQL_EXPORTER_PORT}:9104"
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+    networks:
+      - traefik
+
+networks:
+  traefik:
+    external: true
+    name: ${MYSQL_EXPORTER_NETWORK}
