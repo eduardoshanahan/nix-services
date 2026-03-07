@@ -314,6 +314,34 @@
         description = "GitHub profile exporter targets (`host:port`) to scrape.";
       };
 
+      authentikTargets = lib.mkOption {
+        type = lib.types.listOf lib.types.str;
+        default = [];
+        example = ["authentik-server:9300" "authentik-worker:9300"];
+        description = "Authentik metrics targets (`host:port`) to scrape.";
+      };
+
+      authentikMetricsPath = lib.mkOption {
+        type = lib.types.str;
+        default = "/metrics";
+        example = "/metrics";
+        description = "Metrics path for job `authentik`.";
+      };
+
+      vikunjaTargets = lib.mkOption {
+        type = lib.types.listOf lib.types.str;
+        default = [];
+        example = ["vikunja:3456"];
+        description = "Vikunja metrics targets (`host:port`) to scrape.";
+      };
+
+      vikunjaMetricsPath = lib.mkOption {
+        type = lib.types.str;
+        default = "/api/v1/metrics";
+        example = "/api/v1/metrics";
+        description = "Metrics path for job `vikunja`.";
+      };
+
       grafanaTargets = lib.mkOption {
         type = lib.types.listOf lib.types.str;
         default = [];

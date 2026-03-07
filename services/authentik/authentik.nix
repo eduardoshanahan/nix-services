@@ -80,6 +80,9 @@
       }"
       printf 'AUTHENTIK_LOG_LEVEL="%s"\n' "${cfg.logLevel}"
       printf 'AUTHENTIK_BOOTSTRAP_EMAIL="%s"\n' "${cfg.bootstrap.email}"
+      if [[ "${if cfg.metrics.enable then "true" else "false"}" == "true" ]]; then
+        printf 'AUTHENTIK_LISTEN__METRICS="%s"\n' "${cfg.metrics.listenAddress}"
+      fi
       if [[ -n "$bootstrap_password_file" ]]; then
         bootstrap_password="$(read_secret_trimmed "$bootstrap_password_file" "bootstrap password")"
         printf 'AUTHENTIK_BOOTSTRAP_PASSWORD="%s"\n' "$(escape_env "$bootstrap_password")"
@@ -230,6 +233,21 @@ in {
       default = "info";
       description = "Authentik log verbosity.";
     };
+
+    metrics = {
+      enable = lib.mkOption {
+        type = lib.types.bool;
+        default = false;
+        description = "Enable Authentik Prometheus metrics endpoint.";
+      };
+
+      listenAddress = lib.mkOption {
+        type = lib.types.str;
+        default = "0.0.0.0:9300";
+        example = "0.0.0.0:9300";
+        description = "Listen address for `AUTHENTIK_LISTEN__METRICS` when metrics are enabled.";
+      };
+    };
   };
 
   config = lib.mkIf cfg.enable {
@@ -269,6 +287,10 @@ in {
       {
         assertion = builtins.match "^[^[:space:]]+$" cfg.database.postgres.user != null;
         message = "services.authentikCompose.database.postgres.user must not contain whitespace.";
+      }
+      {
+        assertion = builtins.match "^[^[:space:]]+$" cfg.metrics.listenAddress != null;
+        message = "services.authentikCompose.metrics.listenAddress must not contain whitespace.";
       }
       {
         assertion = (cfg.bootstrap.passwordFile == null) || (cfg.bootstrap.tokenFile == null);

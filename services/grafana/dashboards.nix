@@ -4147,7 +4147,7 @@
         };
         targets = [
           {
-            expr = "sum(up{job=~\"prometheus|alertmanager|grafana|loki|traefik|nodes|promtail|cadvisor|snmp-exporter|pihole-exporter|gitea|unpoller|postgres-exporter|redis-exporter|mysql-exporter|github-profile\"} == bool 0) or vector(0)";
+            expr = "sum(up{job=~\"prometheus|alertmanager|grafana|loki|traefik|nodes|promtail|cadvisor|snmp-exporter|pihole-exporter|gitea|unpoller|postgres-exporter|redis-exporter|mysql-exporter|github-profile|authentik|vikunja\"} == bool 0) or vector(0)";
             refId = "A";
           }
         ];
@@ -4236,7 +4236,7 @@
         };
         targets = [
           {
-            expr = "sum by (job) (up{job=~\"prometheus|alertmanager|grafana|loki|traefik|nodes|promtail|cadvisor|snmp-exporter|pihole-exporter|gitea|unpoller|postgres-exporter|redis-exporter|mysql-exporter|github-profile\"})";
+            expr = "sum by (job) (up{job=~\"prometheus|alertmanager|grafana|loki|traefik|nodes|promtail|cadvisor|snmp-exporter|pihole-exporter|gitea|unpoller|postgres-exporter|redis-exporter|mysql-exporter|github-profile|authentik|vikunja\"})";
             legendFormat = "{{job}}";
             refId = "A";
           }
@@ -7576,6 +7576,401 @@
           {
             expr = "max by (container_label_com_docker_compose_service) ((time() - container_last_seen{job=\"cadvisor\",container_label_com_docker_compose_service=~\"authentik-server|authentik-worker|vikunja|home-assistant|smtp-relay|timetagger|homepage|uptime-kuma\"}) < bool 180)";
             legendFormat = "{{container_label_com_docker_compose_service}}";
+            refId = "A";
+          }
+        ];
+      }
+    ];
+  };
+  appInternalsDashboardJson = builtins.toJSON {
+    id = null;
+    uid = "app-internals";
+    title = "App Internals";
+    tags = ["homelab" "applications" "internals" "authentik" "vikunja"];
+    timezone = "browser";
+    schemaVersion = 39;
+    version = 1;
+    refresh = "30s";
+    time = {
+      from = "now-24h";
+      to = "now";
+    };
+    editable = true;
+    panels = [
+      {
+        id = 1;
+        type = "stat";
+        title = "Authentik Metrics Targets Up";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 6;
+          x = 0;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+        };
+        fieldConfig = {
+          defaults = {
+            min = 0;
+            decimals = 0;
+            unit = "short";
+            thresholds = {
+              mode = "absolute";
+              steps = [
+                {
+                  color = "red";
+                  value = null;
+                }
+                {
+                  color = "green";
+                  value = 1;
+                }
+              ];
+            };
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "sum(up{job=\"authentik\"}) or vector(0)";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 2;
+        type = "stat";
+        title = "Vikunja Metrics Targets Up";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 6;
+          x = 6;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+        };
+        fieldConfig = {
+          defaults = {
+            min = 0;
+            decimals = 0;
+            unit = "short";
+            thresholds = {
+              mode = "absolute";
+              steps = [
+                {
+                  color = "red";
+                  value = null;
+                }
+                {
+                  color = "green";
+                  value = 1;
+                }
+              ];
+            };
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "sum(up{job=\"vikunja\"}) or vector(0)";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 3;
+        type = "stat";
+        title = "Authentik Samples Scraped";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 6;
+          x = 12;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+        };
+        fieldConfig = {
+          defaults = {
+            min = 0;
+            decimals = 0;
+            unit = "short";
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "sum(scrape_samples_scraped{job=\"authentik\"}) or vector(0)";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 4;
+        type = "stat";
+        title = "Vikunja Samples Scraped";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 6;
+          x = 18;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+        };
+        fieldConfig = {
+          defaults = {
+            min = 0;
+            decimals = 0;
+            unit = "short";
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "sum(scrape_samples_scraped{job=\"vikunja\"}) or vector(0)";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 5;
+        type = "timeseries";
+        title = "Authentik Up by Instance";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 0;
+          y = 6;
+        };
+        fieldConfig = {
+          defaults = {
+            min = 0;
+            max = 1;
+            thresholds = {
+              mode = "absolute";
+              steps = [
+                {
+                  color = "red";
+                  value = null;
+                }
+                {
+                  color = "green";
+                  value = 1;
+                }
+              ];
+            };
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "up{job=\"authentik\"} or label_replace(vector(0), \"instance\", \"none\", \"\", \"\")";
+            legendFormat = "{{instance}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 6;
+        type = "timeseries";
+        title = "Vikunja Up by Instance";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 12;
+          y = 6;
+        };
+        fieldConfig = {
+          defaults = {
+            min = 0;
+            max = 1;
+            thresholds = {
+              mode = "absolute";
+              steps = [
+                {
+                  color = "red";
+                  value = null;
+                }
+                {
+                  color = "green";
+                  value = 1;
+                }
+              ];
+            };
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "up{job=\"vikunja\"} or label_replace(vector(0), \"instance\", \"none\", \"\", \"\")";
+            legendFormat = "{{instance}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 7;
+        type = "timeseries";
+        title = "Scrape Samples by Instance";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 0;
+          y = 14;
+        };
+        fieldConfig = {
+          defaults = {
+            min = 0;
+            unit = "short";
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "scrape_samples_scraped{job=~\"authentik|vikunja\"}";
+            legendFormat = "{{job}} {{instance}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 8;
+        type = "timeseries";
+        title = "Scrape Duration by Instance";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 12;
+          y = 14;
+        };
+        fieldConfig = {
+          defaults = {
+            min = 0;
+            unit = "s";
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "scrape_duration_seconds{job=~\"authentik|vikunja\"}";
+            legendFormat = "{{job}} {{instance}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 9;
+        type = "timeseries";
+        title = "Process CPU Usage (core seconds/s)";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 0;
+          y = 22;
+        };
+        fieldConfig = {
+          defaults = {
+            min = 0;
+            unit = "short";
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "sum by (job, instance) (rate(process_cpu_seconds_total{job=~\"authentik|vikunja\"}[5m])) or label_replace(vector(0), \"job\", \"none\", \"\", \"\")";
+            legendFormat = "{{job}} {{instance}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 10;
+        type = "timeseries";
+        title = "Process RSS Memory (bytes)";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 12;
+          y = 22;
+        };
+        fieldConfig = {
+          defaults = {
+            min = 0;
+            unit = "bytes";
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "max by (job, instance) (process_resident_memory_bytes{job=~\"authentik|vikunja\"}) or label_replace(vector(0), \"job\", \"none\", \"\", \"\")";
+            legendFormat = "{{job}} {{instance}}";
             refId = "A";
           }
         ];

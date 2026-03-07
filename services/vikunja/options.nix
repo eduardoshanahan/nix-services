@@ -42,6 +42,14 @@ in {
       description = "Allow self-service user registration.";
     };
 
+    metrics = {
+      enable = lib.mkOption {
+        type = lib.types.bool;
+        default = false;
+        description = "Enable Vikunja Prometheus metrics endpoint.";
+      };
+    };
+
     auth = {
       local.enable = lib.mkOption {
         type = lib.types.bool;

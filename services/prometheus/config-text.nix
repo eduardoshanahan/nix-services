@@ -25,6 +25,25 @@
       ++ [""]
     );
 
+  optionalJobLinesWithMetricsPath = {
+    name,
+    metricsPath,
+    targets,
+  }:
+    lib.optionals (targets != []) (
+      [
+        "  - job_name: \"${name}\""
+        "    metrics_path: ${metricsPath}"
+        "    static_configs:"
+        "      - targets:"
+      ]
+      ++ (mkTargetLines {
+        inherit targets;
+        indent = "        ";
+      })
+      ++ [""]
+    );
+
   synologySnmpJobLines = lib.optionals (cfg.scrape.synologySnmpTargets != [] && cfg.scrape.synologySnmpExporterAddress != null) (
     [
       "  - job_name: \"synology-snmp\""
@@ -232,6 +251,16 @@
         name = "github-profile";
         targets = cfg.scrape.githubProfileTargets;
       })
+      ++ (optionalJobLinesWithMetricsPath {
+        name = "authentik";
+        metricsPath = cfg.scrape.authentikMetricsPath;
+        targets = cfg.scrape.authentikTargets;
+      })
+      ++ (optionalJobLinesWithMetricsPath {
+        name = "vikunja";
+        metricsPath = cfg.scrape.vikunjaMetricsPath;
+        targets = cfg.scrape.vikunjaTargets;
+      })
       ++ (optionalJobLines {
         name = "alertmanager";
         targets = cfg.scrape.alertmanagerTargets;
@@ -333,6 +362,42 @@
       "        annotations:"
       "          summary: \"Application container not seen: {{ $labels.container_label_com_docker_compose_service }}\""
       "          description: \"cAdvisor has not seen container {{ $labels.container_label_com_docker_compose_service }} in the last 3 minutes for more than 5 minutes.\""
+      ""
+      "      - alert: AuthentikMetricsDown"
+      "        expr: (max(up{job=\"authentik\"}) or vector(0)) == 0"
+      "        for: 5m"
+      "        labels:"
+      "          severity: critical"
+      "        annotations:"
+      "          summary: \"Authentik metrics endpoint down\""
+      "          description: \"Prometheus cannot scrape Authentik metrics targets for more than 5 minutes.\""
+      ""
+      "      - alert: VikunjaMetricsDown"
+      "        expr: (max(up{job=\"vikunja\"}) or vector(0)) == 0"
+      "        for: 5m"
+      "        labels:"
+      "          severity: critical"
+      "        annotations:"
+      "          summary: \"Vikunja metrics endpoint down\""
+      "          description: \"Prometheus cannot scrape Vikunja metrics targets for more than 5 minutes.\""
+      ""
+      "      - alert: AuthentikMetricsLowSampleVolume"
+      "        expr: ((max(up{job=\"authentik\"}) or vector(0)) == 1) and ((max(scrape_samples_scraped{job=\"authentik\"}) or vector(0)) < 20)"
+      "        for: 15m"
+      "        labels:"
+      "          severity: warning"
+      "        annotations:"
+      "          summary: \"Authentik metrics sample volume unexpectedly low\""
+      "          description: \"Authentik metrics target is up but scrape sample volume stayed below 20 for more than 15 minutes.\""
+      ""
+      "      - alert: VikunjaMetricsLowSampleVolume"
+      "        expr: ((max(up{job=\"vikunja\"}) or vector(0)) == 1) and ((max(scrape_samples_scraped{job=\"vikunja\"}) or vector(0)) < 20)"
+      "        for: 15m"
+      "        labels:"
+      "          severity: warning"
+      "        annotations:"
+      "          summary: \"Vikunja metrics sample volume unexpectedly low\""
+      "          description: \"Vikunja metrics target is up but scrape sample volume stayed below 20 for more than 15 minutes.\""
       ""
       "      - alert: SynologyHighCpuUsage"
       "        expr: (100 - ssCpuIdle{job=\"synology-snmp-system\"}) > 90"

@@ -159,6 +159,11 @@ in {
             then "true"
             else "false"
           }"
+          "VIKUNJA_METRICS_ENABLED=${
+            if cfg.metrics.enable
+            then "true"
+            else "false"
+          }"
           "VIKUNJA_DATA_DIR=${cfg.dataDir}"
           "VIKUNJA_DATABASE_ENV_FILE=/run/secrets/${serviceName}.env"
           "VIKUNJA_DATABASE_TYPE=${cfg.database.type}"

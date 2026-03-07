@@ -11,6 +11,7 @@ services:
     expose:
       - "9000"
       - "9443"
+      - "9300"
     volumes:
       - "${AUTHENTIK_DATA_DIR}/media:/media"
       - "${AUTHENTIK_DATA_DIR}/custom-templates:/templates"
@@ -34,6 +35,8 @@ services:
       - ${AUTHENTIK_RUNTIME_ENV_FILE}
     environment:
       - TZ=${TZ}
+    expose:
+      - "9300"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
       - "${AUTHENTIK_DATA_DIR}/certs:/certs"
