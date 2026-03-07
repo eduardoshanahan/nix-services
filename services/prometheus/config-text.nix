@@ -335,7 +335,7 @@
       "          description: \"mysqld-exporter can be scraped but DB connectivity is failing (mysql_up=0) for more than 3 minutes.\""
       ""
       "      - alert: SmtpRelaySystemdDown"
-      "        expr: max(node_systemd_unit_state{job=\"nodes\",name=\"smtp-relay.service\",state=\"active\"}) == 0"
+      "        expr: (max(node_systemd_unit_state{job=\"nodes\",name=\"smtp-relay.service\",state=\"active\"}) or vector(0)) == 0"
       "        for: 3m"
       "        labels:"
       "          severity: warning"

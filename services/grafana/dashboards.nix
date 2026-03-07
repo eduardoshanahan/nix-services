@@ -2579,7 +2579,7 @@
         };
         targets = [
           {
-            expr = "((max(node_systemd_unit_state{job=\"nodes\",name=\"smtp-relay.service\",state=\"active\"}) == bool 0) + ((max((time() - container_last_seen{job=\"cadvisor\",container_label_com_docker_compose_service=\"smtp-relay\"}) < bool 120) or vector(0)) == bool 0))";
+            expr = "(((max(node_systemd_unit_state{job=\"nodes\",name=\"smtp-relay.service\",state=\"active\"}) or vector(0)) == bool 0) + ((max((time() - container_last_seen{job=\"cadvisor\",container_label_com_docker_compose_service=\"smtp-relay\"}) < bool 120) or vector(0)) == bool 0))";
             refId = "A";
           }
         ];
@@ -2600,7 +2600,7 @@
         };
         targets = [
           {
-            expr = "max(node_systemd_unit_state{job=\"nodes\",name=\"smtp-relay.service\",state=\"active\"}) == bool 0";
+            expr = "(max(node_systemd_unit_state{job=\"nodes\",name=\"smtp-relay.service\",state=\"active\"}) or vector(0)) == bool 0";
             legendFormat = "systemd_inactive";
             refId = "A";
           }
