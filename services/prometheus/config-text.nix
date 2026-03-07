@@ -29,6 +29,7 @@
     name,
     metricsPath,
     targets,
+    dropUpMetric ? false,
   }:
     lib.optionals (targets != []) (
       [
@@ -41,6 +42,12 @@
         inherit targets;
         indent = "        ";
       })
+      ++ lib.optionals dropUpMetric [
+        "    metric_relabel_configs:"
+        "      - source_labels: [__name__]"
+        "        regex: up"
+        "        action: drop"
+      ]
       ++ [""]
     );
 
@@ -255,11 +262,13 @@
         name = "authentik";
         metricsPath = cfg.scrape.authentikMetricsPath;
         targets = cfg.scrape.authentikTargets;
+        dropUpMetric = true;
       })
       ++ (optionalJobLinesWithMetricsPath {
         name = "vikunja";
         metricsPath = cfg.scrape.vikunjaMetricsPath;
         targets = cfg.scrape.vikunjaTargets;
+        dropUpMetric = true;
       })
       ++ (optionalJobLines {
         name = "alertmanager";
