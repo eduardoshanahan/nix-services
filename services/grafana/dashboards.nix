@@ -2155,9 +2155,43 @@
             values = false;
           };
         };
+        fieldConfig = {
+          defaults = {
+            decimals = 0;
+            min = 0;
+            max = 1;
+            mappings = [
+              {
+                type = "value";
+                options = {
+                  "0" = {
+                    text = "DOWN";
+                  };
+                  "1" = {
+                    text = "UP";
+                  };
+                };
+              }
+            ];
+            thresholds = {
+              mode = "absolute";
+              steps = [
+                {
+                  color = "red";
+                  value = null;
+                }
+                {
+                  color = "green";
+                  value = 1;
+                }
+              ];
+            };
+          };
+          overrides = [];
+        };
         targets = [
           {
-            expr = "sum(pg_up{job=\"postgres-exporter\"})";
+            expr = "max(pg_up{job=\"postgres-exporter\"}) or vector(0)";
             refId = "A";
           }
         ];
@@ -2185,9 +2219,43 @@
             values = false;
           };
         };
+        fieldConfig = {
+          defaults = {
+            decimals = 0;
+            min = 0;
+            max = 1;
+            mappings = [
+              {
+                type = "value";
+                options = {
+                  "0" = {
+                    text = "DOWN";
+                  };
+                  "1" = {
+                    text = "UP";
+                  };
+                };
+              }
+            ];
+            thresholds = {
+              mode = "absolute";
+              steps = [
+                {
+                  color = "red";
+                  value = null;
+                }
+                {
+                  color = "green";
+                  value = 1;
+                }
+              ];
+            };
+          };
+          overrides = [];
+        };
         targets = [
           {
-            expr = "sum(redis_up{job=\"redis-exporter\"})";
+            expr = "max(redis_up{job=\"redis-exporter\"}) or vector(0)";
             refId = "A";
           }
         ];
@@ -2215,9 +2283,43 @@
             values = false;
           };
         };
+        fieldConfig = {
+          defaults = {
+            decimals = 0;
+            min = 0;
+            max = 1;
+            mappings = [
+              {
+                type = "value";
+                options = {
+                  "0" = {
+                    text = "DOWN";
+                  };
+                  "1" = {
+                    text = "UP";
+                  };
+                };
+              }
+            ];
+            thresholds = {
+              mode = "absolute";
+              steps = [
+                {
+                  color = "red";
+                  value = null;
+                }
+                {
+                  color = "green";
+                  value = 1;
+                }
+              ];
+            };
+          };
+          overrides = [];
+        };
         targets = [
           {
-            expr = "sum(mysql_up{job=\"mysql-exporter\"})";
+            expr = "max(mysql_up{job=\"mysql-exporter\"}) or vector(0)";
             refId = "A";
           }
         ];
@@ -2243,6 +2345,13 @@
             refId = "A";
           }
         ];
+        fieldConfig = {
+          defaults = {
+            min = 0;
+            unit = "short";
+          };
+          overrides = [];
+        };
       }
       {
         id = 5;
@@ -2265,6 +2374,13 @@
             refId = "A";
           }
         ];
+        fieldConfig = {
+          defaults = {
+            min = 0;
+            unit = "short";
+          };
+          overrides = [];
+        };
       }
       {
         id = 6;
@@ -2287,6 +2403,13 @@
             refId = "A";
           }
         ];
+        fieldConfig = {
+          defaults = {
+            min = 0;
+            unit = "short";
+          };
+          overrides = [];
+        };
       }
       {
         id = 7;
@@ -2309,6 +2432,13 @@
             refId = "A";
           }
         ];
+        fieldConfig = {
+          defaults = {
+            min = 0;
+            unit = "reqps";
+          };
+          overrides = [];
+        };
       }
       {
         id = 8;
@@ -2331,6 +2461,13 @@
             refId = "A";
           }
         ];
+        fieldConfig = {
+          defaults = {
+            min = 0;
+            unit = "reqps";
+          };
+          overrides = [];
+        };
       }
       {
         id = 9;
@@ -2353,6 +2490,13 @@
             refId = "A";
           }
         ];
+        fieldConfig = {
+          defaults = {
+            min = 0;
+            unit = "reqps";
+          };
+          overrides = [];
+        };
       }
       {
         id = 10;
@@ -2431,6 +2575,13 @@
             refId = "A";
           }
         ];
+        fieldConfig = {
+          defaults = {
+            min = 0;
+            unit = "short";
+          };
+          overrides = [];
+        };
       }
       {
         id = 13;
@@ -2454,6 +2605,40 @@
             fields = "";
             values = false;
           };
+        };
+        fieldConfig = {
+          defaults = {
+            decimals = 0;
+            min = 0;
+            max = 1;
+            mappings = [
+              {
+                type = "value";
+                options = {
+                  "0" = {
+                    text = "NOT SEEN";
+                  };
+                  "1" = {
+                    text = "SEEN";
+                  };
+                };
+              }
+            ];
+            thresholds = {
+              mode = "absolute";
+              steps = [
+                {
+                  color = "red";
+                  value = null;
+                }
+                {
+                  color = "green";
+                  value = 1;
+                }
+              ];
+            };
+          };
+          overrides = [];
         };
         targets = [
           {
@@ -2484,6 +2669,40 @@
             fields = "";
             values = false;
           };
+        };
+        fieldConfig = {
+          defaults = {
+            decimals = 0;
+            min = 0;
+            max = 1;
+            mappings = [
+              {
+                type = "value";
+                options = {
+                  "0" = {
+                    text = "INACTIVE";
+                  };
+                  "1" = {
+                    text = "ACTIVE";
+                  };
+                };
+              }
+            ];
+            thresholds = {
+              mode = "absolute";
+              steps = [
+                {
+                  color = "red";
+                  value = null;
+                }
+                {
+                  color = "green";
+                  value = 1;
+                }
+              ];
+            };
+          };
+          overrides = [];
         };
         targets = [
           {
