@@ -2432,6 +2432,66 @@
           }
         ];
       }
+      {
+        id = 13;
+        type = "stat";
+        title = "SMTP Relay Container Seen (last 2m)";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 12;
+          x = 0;
+          y = 30;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+        };
+        targets = [
+          {
+            expr = "max((time() - container_last_seen{job=\"cadvisor\",container_label_com_docker_compose_service=\"smtp-relay\"}) < bool 120)";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 14;
+        type = "stat";
+        title = "SMTP Relay systemd Active";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 12;
+          x = 12;
+          y = 30;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+        };
+        targets = [
+          {
+            expr = "max(node_systemd_unit_state{job=\"nodes\",name=\"smtp-relay.service\",state=\"active\"})";
+            refId = "A";
+          }
+        ];
+      }
     ];
   };
   unifiOverviewDashboardJson = builtins.toJSON {
