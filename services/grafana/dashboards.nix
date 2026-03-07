@@ -2514,6 +2514,35 @@
             fields = "";
             values = false;
           };
+          textMode = "value_and_name";
+        };
+        fieldConfig = {
+          defaults = {
+            mappings = [
+              {
+                type = "value";
+                options = {
+                  "0" = {
+                    text = "OK";
+                  };
+                };
+              }
+            ];
+            thresholds = {
+              mode = "absolute";
+              steps = [
+                {
+                  color = "green";
+                  value = null;
+                }
+                {
+                  color = "red";
+                  value = 1;
+                }
+              ];
+            };
+          };
+          overrides = [];
         };
         targets = [
           {
@@ -2576,6 +2605,35 @@
             fields = "";
             values = false;
           };
+          textMode = "value_and_name";
+        };
+        fieldConfig = {
+          defaults = {
+            mappings = [
+              {
+                type = "value";
+                options = {
+                  "0" = {
+                    text = "OK";
+                  };
+                };
+              }
+            ];
+            thresholds = {
+              mode = "absolute";
+              steps = [
+                {
+                  color = "green";
+                  value = null;
+                }
+                {
+                  color = "red";
+                  value = 1;
+                }
+              ];
+            };
+          };
+          overrides = [];
         };
         targets = [
           {
