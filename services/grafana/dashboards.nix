@@ -4797,6 +4797,356 @@
       }
     ];
   };
+  logsPipelineDashboardJson = builtins.toJSON {
+    id = null;
+    uid = "logs-pipeline";
+    title = "Logs Pipeline";
+    tags = ["homelab" "logs" "loki" "promtail"];
+    timezone = "browser";
+    schemaVersion = 39;
+    version = 1;
+    refresh = "30s";
+    time = {
+      from = "now-6h";
+      to = "now";
+    };
+    editable = true;
+    panels = [
+      {
+        id = 1;
+        type = "stat";
+        title = "Promtail Sent Entries/s";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 6;
+          x = 0;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+        };
+        targets = [
+          {
+            expr = "sum(rate(promtail_sent_entries_total[5m])) or vector(0)";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 2;
+        type = "stat";
+        title = "Promtail Dropped Entries/s";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 6;
+          x = 6;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+        };
+        fieldConfig = {
+          defaults = {
+            thresholds = {
+              mode = "absolute";
+              steps = [
+                {
+                  color = "green";
+                  value = null;
+                }
+                {
+                  color = "red";
+                  value = 0.001;
+                }
+              ];
+            };
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "sum(rate(promtail_dropped_entries_total[5m])) or vector(0)";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 3;
+        type = "stat";
+        title = "Promtail Retry Rate/s";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 6;
+          x = 12;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+        };
+        fieldConfig = {
+          defaults = {
+            thresholds = {
+              mode = "absolute";
+              steps = [
+                {
+                  color = "green";
+                  value = null;
+                }
+                {
+                  color = "yellow";
+                  value = 0.01;
+                }
+                {
+                  color = "red";
+                  value = 0.1;
+                }
+              ];
+            };
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "sum(rate(promtail_batch_retries_total[5m])) or vector(0)";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 4;
+        type = "stat";
+        title = "Loki Received Lines/s";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 6;
+          x = 18;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+        };
+        targets = [
+          {
+            expr = "sum(rate(loki_distributor_lines_received_total[5m])) or vector(0)";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 5;
+        type = "timeseries";
+        title = "Promtail Sent vs Dropped Entries/s";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 0;
+          y = 6;
+        };
+        targets = [
+          {
+            expr = "sum(rate(promtail_sent_entries_total[5m]))";
+            legendFormat = "sent";
+            refId = "A";
+          }
+          {
+            expr = "sum(rate(promtail_dropped_entries_total[5m]))";
+            legendFormat = "dropped";
+            refId = "B";
+          }
+        ];
+      }
+      {
+        id = 6;
+        type = "timeseries";
+        title = "Promtail Retry Rate/s";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 12;
+          y = 6;
+        };
+        targets = [
+          {
+            expr = "sum(rate(promtail_batch_retries_total[5m]))";
+            legendFormat = "retries";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 7;
+        type = "timeseries";
+        title = "Promtail Push Request Duration p95";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 0;
+          y = 14;
+        };
+        fieldConfig = {
+          defaults = {
+            unit = "s";
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "histogram_quantile(0.95, sum(rate(promtail_request_duration_seconds_bucket[5m])) by (le))";
+            legendFormat = "p95";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 8;
+        type = "timeseries";
+        title = "Loki Lines Received vs Discarded";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 12;
+          y = 14;
+        };
+        targets = [
+          {
+            expr = "sum(rate(loki_distributor_lines_received_total[5m]))";
+            legendFormat = "received";
+            refId = "A";
+          }
+          {
+            expr = "sum(rate(loki_discarded_samples_total[5m]))";
+            legendFormat = "discarded";
+            refId = "B";
+          }
+        ];
+      }
+      {
+        id = 9;
+        type = "timeseries";
+        title = "Gitea Log Volume (events/s)";
+        datasource = {
+          type = "loki";
+          uid = "loki";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 0;
+          y = 22;
+        };
+        targets = [
+          {
+            expr = "sum(rate({job=\"synology-gitea\"}[5m])) or on() vector(0)";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 10;
+        type = "timeseries";
+        title = "Gitea Error-like Logs (events/s)";
+        datasource = {
+          type = "loki";
+          uid = "loki";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 12;
+          y = 22;
+        };
+        targets = [
+          {
+            expr = "sum(rate({job=\"synology-gitea\"} |~ \"(?i)(error|fatal|panic|exception|fail)\"[5m])) or on() vector(0)";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 11;
+        type = "logs";
+        title = "Gitea Logs (Raw)";
+        datasource = {
+          type = "loki";
+          uid = "loki";
+        };
+        gridPos = {
+          h = 12;
+          w = 24;
+          x = 0;
+          y = 30;
+        };
+        options = {
+          showCommonLabels = false;
+          showLabels = true;
+          showTime = true;
+          sortOrder = "Descending";
+        };
+        targets = [
+          {
+            expr = "{job=\"synology-gitea\"}";
+            refId = "A";
+          }
+        ];
+      }
+    ];
+  };
   unifiOverviewDashboardJson = builtins.toJSON {
     id = null;
     uid = "unifi-overview";

@@ -100,6 +100,7 @@ With `services.grafanaCompose.provisioning.dashboards.enableStarter = true`, the
 - `Alerting Triage`
 - `UniFi Overview`
 - `NAS File Activity` (only when Loki datasource is configured)
+- `Logs Pipeline` (only when Loki datasource is configured)
 
 `Shared Infra` includes:
 
@@ -137,6 +138,15 @@ With `services.grafanaCompose.provisioning.dashboards.enableStarter = true`, the
 - Alert pipeline health panels:
   - Alertmanager notifications sent/failed rate.
   - Prometheus rule evaluations/failures rate.
+
+`Logs Pipeline` includes:
+
+- Promtail shipping health (`sent`, `dropped`, `retries`, push duration p95).
+- Loki ingest health (`received` vs `discarded` lines).
+- Gitea log signal panels from Loki:
+  - total log volume
+  - error-like log rate
+  - raw logs panel for direct triage.
 
 ## Healthcheck units
 

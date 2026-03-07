@@ -31,6 +31,7 @@
     monitoringControlPlaneDashboardJson
     edgeServiceReliabilityDashboardJson
     alertingTriageDashboardJson
+    logsPipelineDashboardJson
     unifiOverviewDashboardJson
     ;
   inherit (scripts) backupScript healthcheckScript waitForHealthy;
@@ -502,6 +503,10 @@ in {
       text = alertingTriageDashboardJson;
       mode = "0444";
     };
+    environment.etc."${serviceName}/provisioning/dashboards/logs-pipeline.json" = lib.mkIf (cfg.provisioning.enable && cfg.provisioning.dashboards.enableStarter && cfg.provisioning.datasources.loki.url != null) {
+      text = logsPipelineDashboardJson;
+      mode = "0444";
+    };
     environment.etc."${serviceName}/provisioning/dashboards/unifi-overview.json" = lib.mkIf (cfg.provisioning.enable && cfg.provisioning.dashboards.enableStarter) {
       text = unifiOverviewDashboardJson;
       mode = "0444";
@@ -534,6 +539,7 @@ in {
         ]
         ++ lib.optionals (cfg.provisioning.enable && cfg.provisioning.dashboards.enableStarter && cfg.provisioning.datasources.loki.url != null) [
           config.environment.etc."${serviceName}/provisioning/dashboards/nas-file-activity.json".source
+          config.environment.etc."${serviceName}/provisioning/dashboards/logs-pipeline.json".source
         ]
         ++ [
           config.environment.etc."${serviceName}/docker-compose.yml".source
@@ -594,6 +600,7 @@ in {
           ]
           ++ lib.optionals (cfg.provisioning.enable && cfg.provisioning.dashboards.enableStarter && cfg.provisioning.datasources.loki.url != null) [
             "${pkgs.runtimeShell} -c 'test -s ${composeDir}/provisioning/dashboards/nas-file-activity.json'"
+            "${pkgs.runtimeShell} -c 'test -s ${composeDir}/provisioning/dashboards/logs-pipeline.json'"
           ]
           ++ [
             "${pkgs.runtimeShell} -c 'for i in $(seq 1 30); do ${dockerBin} info >/dev/null 2>&1 && exit 0; sleep 1; done; echo \"grafana: docker daemon is not ready\" >&2; exit 1'"
