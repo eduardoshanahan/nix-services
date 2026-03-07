@@ -96,6 +96,7 @@ With `services.grafanaCompose.provisioning.dashboards.enableStarter = true`, the
 - `NAS Detail`
 - `Shared Infra`
 - `Monitoring Control Plane`
+- `Edge Service Reliability`
 - `UniFi Overview`
 - `NAS File Activity` (only when Loki datasource is configured)
 
@@ -118,6 +119,14 @@ With `services.grafanaCompose.provisioning.dashboards.enableStarter = true`, the
   - `Core Jobs Down Count`
   - `Core Alerts Firing`
 - A trend panel (`Core Target Up by Job`) to spot target churn by job group.
+
+`Edge Service Reliability` includes:
+
+- Traefik edge request/5xx summary cards and service-count cards.
+- Top services by request rate, 5xx rate, and 5xx percentage.
+- Response-code distribution and status-class traffic trend panels.
+- Coverage for routed services even when those services do not expose
+  dedicated Prometheus exporters.
 
 ## Healthcheck units
 

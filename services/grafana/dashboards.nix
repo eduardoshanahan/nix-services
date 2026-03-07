@@ -4025,6 +4025,373 @@
       }
     ];
   };
+  edgeServiceReliabilityDashboardJson = builtins.toJSON {
+    id = null;
+    uid = "edge-service-reliability";
+    title = "Edge Service Reliability";
+    tags = ["homelab" "edge" "traefik" "availability"];
+    timezone = "browser";
+    schemaVersion = 39;
+    version = 1;
+    refresh = "30s";
+    time = {
+      from = "now-6h";
+      to = "now";
+    };
+    editable = true;
+    panels = [
+      {
+        id = 1;
+        type = "stat";
+        title = "Edge Request Rate (req/s)";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 6;
+          x = 0;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+        };
+        fieldConfig = {
+          defaults = {
+            unit = "reqps";
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "sum(rate(traefik_service_requests_total{service!=\"noop@internal\"}[5m])) or vector(0)";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 2;
+        type = "stat";
+        title = "Edge 5xx Rate (req/s)";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 6;
+          x = 6;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+        };
+        fieldConfig = {
+          defaults = {
+            unit = "reqps";
+            thresholds = {
+              mode = "absolute";
+              steps = [
+                {
+                  color = "green";
+                  value = null;
+                }
+                {
+                  color = "yellow";
+                  value = 0.01;
+                }
+                {
+                  color = "red";
+                  value = 0.1;
+                }
+              ];
+            };
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "sum(rate(traefik_service_requests_total{service!=\"noop@internal\",code=~\"5..\"}[5m])) or vector(0)";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 3;
+        type = "stat";
+        title = "Services Receiving Traffic";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 6;
+          x = 12;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+        };
+        targets = [
+          {
+            expr = "sum(sum by (service) (rate(traefik_service_requests_total{service!=\"noop@internal\"}[5m])) > bool 0) or vector(0)";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 4;
+        type = "stat";
+        title = "Services with 5xx";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 6;
+          x = 18;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+        };
+        fieldConfig = {
+          defaults = {
+            thresholds = {
+              mode = "absolute";
+              steps = [
+                {
+                  color = "green";
+                  value = null;
+                }
+                {
+                  color = "red";
+                  value = 1;
+                }
+              ];
+            };
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "sum(sum by (service) (rate(traefik_service_requests_total{service!=\"noop@internal\",code=~\"5..\"}[5m])) > bool 0) or vector(0)";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 5;
+        type = "timeseries";
+        title = "Request Rate by Service (top 12)";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 0;
+          y = 6;
+        };
+        fieldConfig = {
+          defaults = {
+            unit = "reqps";
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "topk(12, sum by (service) (rate(traefik_service_requests_total{service!=\"noop@internal\"}[5m])))";
+            legendFormat = "{{service}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 6;
+        type = "timeseries";
+        title = "5xx Rate by Service (top 12)";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 12;
+          y = 6;
+        };
+        fieldConfig = {
+          defaults = {
+            unit = "reqps";
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "topk(12, sum by (service) (rate(traefik_service_requests_total{service!=\"noop@internal\",code=~\"5..\"}[5m])))";
+            legendFormat = "{{service}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 7;
+        type = "timeseries";
+        title = "5xx Percentage by Service (top 12)";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 0;
+          y = 14;
+        };
+        fieldConfig = {
+          defaults = {
+            unit = "percent";
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "topk(12, 100 * (sum by (service) (rate(traefik_service_requests_total{service!=\"noop@internal\",code=~\"5..\"}[5m])) / clamp_min(sum by (service) (rate(traefik_service_requests_total{service!=\"noop@internal\"}[5m])), 0.001)))";
+            legendFormat = "{{service}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 8;
+        type = "timeseries";
+        title = "HTTP Response Codes (all services)";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 12;
+          y = 14;
+        };
+        fieldConfig = {
+          defaults = {
+            unit = "reqps";
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "sum by (code) (rate(traefik_service_requests_total{service!=\"noop@internal\"}[5m]))";
+            legendFormat = "{{code}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 9;
+        type = "timeseries";
+        title = "Top Services by 4xx Rate";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 0;
+          y = 22;
+        };
+        fieldConfig = {
+          defaults = {
+            unit = "reqps";
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "topk(10, sum by (service) (rate(traefik_service_requests_total{service!=\"noop@internal\",code=~\"4..\"}[5m])))";
+            legendFormat = "{{service}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 10;
+        type = "timeseries";
+        title = "Total Traffic by Status Class";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 12;
+          y = 22;
+        };
+        fieldConfig = {
+          defaults = {
+            unit = "reqps";
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "sum(rate(traefik_service_requests_total{service!=\"noop@internal\",code=~\"2..\"}[5m]))";
+            legendFormat = "2xx";
+            refId = "A";
+          }
+          {
+            expr = "sum(rate(traefik_service_requests_total{service!=\"noop@internal\",code=~\"3..\"}[5m]))";
+            legendFormat = "3xx";
+            refId = "B";
+          }
+          {
+            expr = "sum(rate(traefik_service_requests_total{service!=\"noop@internal\",code=~\"4..\"}[5m]))";
+            legendFormat = "4xx";
+            refId = "C";
+          }
+          {
+            expr = "sum(rate(traefik_service_requests_total{service!=\"noop@internal\",code=~\"5..\"}[5m]))";
+            legendFormat = "5xx";
+            refId = "D";
+          }
+        ];
+      }
+    ];
+  };
   unifiOverviewDashboardJson = builtins.toJSON {
     id = null;
     uid = "unifi-overview";
