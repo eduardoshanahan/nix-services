@@ -39,6 +39,13 @@ in {
     };
 
     redis = {
+      username = lib.mkOption {
+        type = lib.types.str;
+        default = "default";
+        description = "Redis ACL username used by exporter.";
+        example = "redis-admin";
+      };
+
       host = lib.mkOption {
         type = lib.types.str;
         description = "Redis hostname reachable from exporter container.";
@@ -101,6 +108,7 @@ in {
           "REDIS_EXPORTER_NETWORK=${cfg.network}"
           "REDIS_EXPORTER_PORT=${toString cfg.listenPort}"
           "REDIS_EXPORTER_REDIS_ADDR=redis://${cfg.redis.host}:${toString cfg.redis.port}"
+          "REDIS_USER=${cfg.redis.username}"
           "REDIS_EXPORTER_IMAGE_REPOSITORY=${cfg.image.repository}"
           "REDIS_EXPORTER_IMAGE_TAG=${cfg.image.tag}"
           "TZ=${cfg.timezone}"

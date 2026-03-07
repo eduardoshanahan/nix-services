@@ -9,6 +9,7 @@ This module deploys `redis_exporter` via Docker Compose and exposes Prometheus m
 - `services.redisExporterCompose.network`
 - `services.redisExporterCompose.timezone`
 - `services.redisExporterCompose.listenPort`
+- `services.redisExporterCompose.redis.username`
 - `services.redisExporterCompose.redis.host`
 - `services.redisExporterCompose.redis.port`
 - `services.redisExporterCompose.redis.passwordFile`
