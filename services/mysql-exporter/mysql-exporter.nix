@@ -45,7 +45,7 @@
       printf 'port=%s\n' "${toString cfg.mysql.port}"
     } > "$tmp"
 
-    chmod 0600 "$tmp"
+    chmod 0644 "$tmp"
     mv -f "$tmp" "$mycnf_file"
   '';
 in {
