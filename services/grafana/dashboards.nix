@@ -2495,7 +2495,7 @@
       {
         id = 15;
         type = "stat";
-        title = "Shared Infra DB Alerts Firing";
+        title = "Shared Infra DB Conditions Active";
         datasource = {
           type = "prometheus";
           uid = "prometheus";
@@ -2517,7 +2517,7 @@
         };
         targets = [
           {
-            expr = "sum(ALERTS{alertstate=\"firing\",alertname=~\"PostgresExporterDatabaseDown|RedisExporterDatabaseDown|MysqlExporterDatabaseDown\"})";
+            expr = "((max(pg_up{job=\"postgres-exporter\"} == bool 0) or vector(0)) + (max(redis_up{job=\"redis-exporter\"} == bool 0) or vector(0)) + (max(mysql_up{job=\"mysql-exporter\"} == bool 0) or vector(0)))";
             refId = "A";
           }
         ];
@@ -2525,7 +2525,7 @@
       {
         id = 16;
         type = "timeseries";
-        title = "Shared Infra DB Alerts by Type";
+        title = "Shared Infra DB Conditions by Type";
         datasource = {
           type = "prometheus";
           uid = "prometheus";
@@ -2538,9 +2538,19 @@
         };
         targets = [
           {
-            expr = "sum by (alertname) (ALERTS{alertstate=\"firing\",alertname=~\"PostgresExporterDatabaseDown|RedisExporterDatabaseDown|MysqlExporterDatabaseDown\"})";
-            legendFormat = "{{alertname}}";
+            expr = "max(pg_up{job=\"postgres-exporter\"} == bool 0) or vector(0)";
+            legendFormat = "postgres";
             refId = "A";
+          }
+          {
+            expr = "max(redis_up{job=\"redis-exporter\"} == bool 0) or vector(0)";
+            legendFormat = "redis";
+            refId = "B";
+          }
+          {
+            expr = "max(mysql_up{job=\"mysql-exporter\"} == bool 0) or vector(0)";
+            legendFormat = "mysql";
+            refId = "C";
           }
         ];
       }
