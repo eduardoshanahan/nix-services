@@ -310,6 +310,105 @@
           }
         ];
       }
+      {
+        id = 12;
+        type = "stat";
+        title = "Platform Health - Alertmanager";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 8;
+          x = 0;
+          y = 38;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          justifyMode = "auto";
+          orientation = "auto";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+          textMode = "auto";
+        };
+        targets = [
+          {
+            expr = "sum(up{job=\"alertmanager\"})";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 13;
+        type = "stat";
+        title = "Platform Health - Grafana";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 8;
+          x = 8;
+          y = 38;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          justifyMode = "auto";
+          orientation = "auto";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+          textMode = "auto";
+        };
+        targets = [
+          {
+            expr = "sum(up{job=\"grafana\"})";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 14;
+        type = "stat";
+        title = "Platform Health - SNMP Exporter";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 8;
+          x = 16;
+          y = 38;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          justifyMode = "auto";
+          orientation = "auto";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+          textMode = "auto";
+        };
+        targets = [
+          {
+            expr = "sum(up{job=\"snmp-exporter\"})";
+            refId = "A";
+          }
+        ];
+      }
     ];
   };
   nodesDetailDashboardJson = builtins.toJSON {
@@ -1533,7 +1632,7 @@
         };
         targets = [
           {
-            expr = "sum by (host) (rate({job=\"synology-file-activity\"} |~ \"(?i)(fail|denied|unauthorized|permission)\"[5m])) or label_replace(vector(0), \"host\", \"hhsnas2\", \"\", \"\") or label_replace(vector(0), \"host\", \"hhsnas4\", \"\", \"\")";
+            expr = "sum by (host) (rate({job=\"synology-file-activity\"} |~ \"(?i)(fail|denied|unauthorized|permission)\"[5m])) or label_replace(vector(0), \"host\", \"nas2\", \"\", \"\") or label_replace(vector(0), \"host\", \"hhnas4\", \"\", \"\")";
             legendFormat = "{{host}}";
             refId = "A";
           }
