@@ -49,60 +49,6 @@ in {
       description = "Application log level passed via TIMETAGGER_LOG_LEVEL.";
     };
 
-    auth = {
-      proxy = {
-        enable = lib.mkOption {
-          type = lib.types.bool;
-          default = false;
-          description = "Enable TimeTagger reverse-proxy authentication mode.";
-        };
-
-        header = lib.mkOption {
-          type = lib.types.str;
-          default = "X-authentik-username";
-          description = "HTTP header containing the authenticated username.";
-        };
-
-        trusted = lib.mkOption {
-          type = lib.types.str;
-          default = "127.0.0.1";
-          description = "Comma-separated trusted reverse-proxy source IPs/CIDRs.";
-          example = "127.0.0.1,172.18.0.0/16";
-        };
-      };
-    };
-
-    authentikForwardAuth = {
-      enable = lib.mkOption {
-        type = lib.types.bool;
-        default = false;
-        description = "Enable Traefik forward-auth middleware pointing to Authentik outpost.";
-      };
-
-      address = lib.mkOption {
-        type = lib.types.str;
-        default = "http://authentik-server:9000/outpost.goauthentik.io/auth/traefik";
-        description = "Authentik outpost forward-auth endpoint URL.";
-      };
-
-      trustForwardHeader = lib.mkOption {
-        type = lib.types.bool;
-        default = true;
-        description = "Set Traefik forwardAuth trustForwardHeader flag.";
-      };
-
-      responseHeaders = lib.mkOption {
-        type = lib.types.listOf lib.types.str;
-        default = [
-          "X-authentik-username"
-          "X-authentik-email"
-          "X-authentik-name"
-          "X-authentik-groups"
-        ];
-        description = "Headers copied by Traefik from Authentik auth response to backend requests.";
-      };
-    };
-
     image = {
       repository = lib.mkOption {
         type = lib.types.str;
@@ -155,14 +101,6 @@ in {
         assertion = lib.hasPrefix "/" cfg.dataDir;
         message = "services.timeTaggerCompose.dataDir must be an absolute path.";
       }
-      {
-        assertion = builtins.match "^[^[:space:]]+$" cfg.auth.proxy.header != null;
-        message = "services.timeTaggerCompose.auth.proxy.header must not contain whitespace.";
-      }
-      {
-        assertion = !cfg.authentikForwardAuth.enable || builtins.match "^[^[:space:]]+$" cfg.authentikForwardAuth.address != null;
-        message = "services.timeTaggerCompose.authentikForwardAuth.address must not contain whitespace.";
-      }
     ];
 
     virtualisation.docker.enable = true;
@@ -197,18 +135,6 @@ in {
           "TIMETAGGER_TLS=${if cfg.tls then "true" else "false"}"
           "TIMETAGGER_DATA_DIR=${cfg.dataDir}"
           "TIMETAGGER_LOG_LEVEL=${cfg.logLevel}"
-          "TIMETAGGER_PROXY_AUTH_ENABLED=${if cfg.auth.proxy.enable then "True" else "False"}"
-          "TIMETAGGER_PROXY_AUTH_TRUSTED=${cfg.auth.proxy.trusted}"
-          "TIMETAGGER_PROXY_AUTH_HEADER=${cfg.auth.proxy.header}"
-          "TIMETAGGER_AUTHENTIK_FORWARD_AUTH_ENABLED=${if cfg.authentikForwardAuth.enable then "true" else "false"}"
-          "TIMETAGGER_AUTHENTIK_FORWARD_AUTH_ADDRESS=${cfg.authentikForwardAuth.address}"
-          "TIMETAGGER_AUTHENTIK_FORWARD_AUTH_TRUST_FORWARD_HEADER=${if cfg.authentikForwardAuth.trustForwardHeader then "true" else "false"}"
-          "TIMETAGGER_AUTHENTIK_FORWARD_AUTH_RESPONSE_HEADERS=${lib.concatStringsSep "," cfg.authentikForwardAuth.responseHeaders}"
-          "TIMETAGGER_ROUTER_MIDDLEWARES=${
-            if cfg.authentikForwardAuth.enable
-            then "timetagger-auth@docker"
-            else ""
-          }"
           "TZ=${cfg.timezone}"
         ];
 
