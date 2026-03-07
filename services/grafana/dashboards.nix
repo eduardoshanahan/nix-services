@@ -6845,6 +6845,356 @@
       }
     ];
   };
+  githubProfileOperationsDashboardJson = builtins.toJSON {
+    id = null;
+    uid = "github-profile-operations";
+    title = "GitHub Profile Operations";
+    tags = ["homelab" "github" "profile" "operations"];
+    timezone = "browser";
+    schemaVersion = 39;
+    version = 1;
+    refresh = "30s";
+    time = {
+      from = "now-30d";
+      to = "now";
+    };
+    editable = true;
+    panels = [
+      {
+        id = 1;
+        type = "stat";
+        title = "Exporter Up";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 6;
+          x = 0;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+        };
+        fieldConfig = {
+          defaults = {
+            min = 0;
+            max = 1;
+            mappings = [
+              {
+                type = "value";
+                options = {
+                  "0" = {
+                    text = "DOWN";
+                  };
+                  "1" = {
+                    text = "UP";
+                  };
+                };
+              }
+            ];
+            thresholds = {
+              mode = "absolute";
+              steps = [
+                {
+                  color = "red";
+                  value = null;
+                }
+                {
+                  color = "green";
+                  value = 1;
+                }
+              ];
+            };
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "max(github_profile_up{job=\"github-profile\"}) or vector(0)";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 2;
+        type = "stat";
+        title = "Last Fetch Age (seconds)";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 6;
+          x = 6;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+        };
+        fieldConfig = {
+          defaults = {
+            min = 0;
+            unit = "s";
+            thresholds = {
+              mode = "absolute";
+              steps = [
+                {
+                  color = "green";
+                  value = null;
+                }
+                {
+                  color = "orange";
+                  value = 3600;
+                }
+                {
+                  color = "red";
+                  value = 7200;
+                }
+              ];
+            };
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "time() - max(github_profile_last_fetch_unixtime{job=\"github-profile\"})";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 3;
+        type = "stat";
+        title = "Followers";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 6;
+          x = 12;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+        };
+        targets = [
+          {
+            expr = "max(github_profile_followers{job=\"github-profile\"}) or vector(0)";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 4;
+        type = "stat";
+        title = "Public Repositories";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 6;
+          x = 18;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+        };
+        targets = [
+          {
+            expr = "max(github_profile_public_repos{job=\"github-profile\"}) or vector(0)";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 5;
+        type = "timeseries";
+        title = "Followers / Following / Public Repos";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 0;
+          y = 6;
+        };
+        fieldConfig = {
+          defaults = {
+            min = 0;
+            unit = "short";
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "max by (username) (github_profile_followers{job=\"github-profile\"})";
+            legendFormat = "{{username}} followers";
+            refId = "A";
+          }
+          {
+            expr = "max by (username) (github_profile_following{job=\"github-profile\"})";
+            legendFormat = "{{username}} following";
+            refId = "B";
+          }
+          {
+            expr = "max by (username) (github_profile_public_repos{job=\"github-profile\"})";
+            legendFormat = "{{username}} repos";
+            refId = "C";
+          }
+        ];
+      }
+      {
+        id = 6;
+        type = "timeseries";
+        title = "Stars / Forks / Watchers";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 12;
+          y = 6;
+        };
+        fieldConfig = {
+          defaults = {
+            min = 0;
+            unit = "short";
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "max by (username) (github_profile_total_stars{job=\"github-profile\"})";
+            legendFormat = "{{username}} stars";
+            refId = "A";
+          }
+          {
+            expr = "max by (username) (github_profile_total_forks{job=\"github-profile\"})";
+            legendFormat = "{{username}} forks";
+            refId = "B";
+          }
+          {
+            expr = "max by (username) (github_profile_total_watchers{job=\"github-profile\"})";
+            legendFormat = "{{username}} watchers";
+            refId = "C";
+          }
+        ];
+      }
+      {
+        id = 7;
+        type = "timeseries";
+        title = "Commit Counts (1d/7d/30d/365d)";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 0;
+          y = 14;
+        };
+        fieldConfig = {
+          defaults = {
+            min = 0;
+            unit = "short";
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "max by (username) (github_profile_commits_1d{job=\"github-profile\"})";
+            legendFormat = "{{username}} commits 1d";
+            refId = "A";
+          }
+          {
+            expr = "max by (username) (github_profile_commits_7d{job=\"github-profile\"})";
+            legendFormat = "{{username}} commits 7d";
+            refId = "B";
+          }
+          {
+            expr = "max by (username) (github_profile_commits_30d{job=\"github-profile\"})";
+            legendFormat = "{{username}} commits 30d";
+            refId = "C";
+          }
+          {
+            expr = "max by (username) (github_profile_commits_365d{job=\"github-profile\"})";
+            legendFormat = "{{username}} commits 365d";
+            refId = "D";
+          }
+        ];
+      }
+      {
+        id = 8;
+        type = "timeseries";
+        title = "Commit Stats Backend Readiness";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 12;
+          y = 14;
+        };
+        fieldConfig = {
+          defaults = {
+            min = 0;
+            unit = "short";
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "max by (username) (github_profile_commit_repos_ready{job=\"github-profile\"})";
+            legendFormat = "{{username}} repos_ready";
+            refId = "A";
+          }
+          {
+            expr = "max by (username) (github_profile_commit_repos_pending{job=\"github-profile\"})";
+            legendFormat = "{{username}} repos_pending";
+            refId = "B";
+          }
+        ];
+      }
+    ];
+  };
   unifiOverviewDashboardJson = builtins.toJSON {
     id = null;
     uid = "unifi-overview";
