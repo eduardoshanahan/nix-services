@@ -2135,7 +2135,7 @@
       {
         id = 1;
         type = "stat";
-        title = "Postgres Exporter Targets Up";
+        title = "Postgres DB Up";
         datasource = {
           type = "prometheus";
           uid = "prometheus";
@@ -2157,7 +2157,7 @@
         };
         targets = [
           {
-            expr = "sum(up{job=\"postgres-exporter\"})";
+            expr = "sum(pg_up{job=\"postgres-exporter\"})";
             refId = "A";
           }
         ];
@@ -2686,6 +2686,159 @@
             expr = "(max((time() - container_last_seen{job=\"cadvisor\",container_label_com_docker_compose_service=\"smtp-relay\"}) < bool 120) or vector(0)) == bool 0";
             legendFormat = "container_not_seen";
             refId = "B";
+          }
+        ];
+      }
+      {
+        id = 19;
+        type = "timeseries";
+        title = "Shared Infra Exporter Scrape Up";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 24;
+          x = 0;
+          y = 48;
+        };
+        fieldConfig = {
+          defaults = {
+            min = 0;
+            max = 1;
+            thresholds = {
+              mode = "absolute";
+              steps = [
+                {
+                  color = "red";
+                  value = null;
+                }
+                {
+                  color = "green";
+                  value = 1;
+                }
+              ];
+            };
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "max(up{job=\"postgres-exporter\"}) or vector(0)";
+            legendFormat = "postgres-exporter scrape";
+            refId = "A";
+          }
+          {
+            expr = "max(up{job=\"redis-exporter\"}) or vector(0)";
+            legendFormat = "redis-exporter scrape";
+            refId = "B";
+          }
+          {
+            expr = "max(up{job=\"mysql-exporter\"}) or vector(0)";
+            legendFormat = "mysql-exporter scrape";
+            refId = "C";
+          }
+        ];
+      }
+      {
+        id = 20;
+        type = "stat";
+        title = "Shared Infra Degraded (Scrape Up, DB Down)";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 12;
+          x = 0;
+          y = 54;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+        };
+        fieldConfig = {
+          defaults = {
+            decimals = 0;
+            thresholds = {
+              mode = "absolute";
+              steps = [
+                {
+                  color = "green";
+                  value = null;
+                }
+                {
+                  color = "red";
+                  value = 1;
+                }
+              ];
+            };
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "(((max(up{job=\"postgres-exporter\"}) or vector(0)) * (max(pg_up{job=\"postgres-exporter\"} == bool 0) or vector(0))) + ((max(up{job=\"redis-exporter\"}) or vector(0)) * (max(redis_up{job=\"redis-exporter\"} == bool 0) or vector(0))) + ((max(up{job=\"mysql-exporter\"}) or vector(0)) * (max(mysql_up{job=\"mysql-exporter\"} == bool 0) or vector(0))))";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 21;
+        type = "timeseries";
+        title = "Shared Infra Degraded by Service";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 12;
+          x = 12;
+          y = 54;
+        };
+        fieldConfig = {
+          defaults = {
+            min = 0;
+            max = 1;
+            thresholds = {
+              mode = "absolute";
+              steps = [
+                {
+                  color = "green";
+                  value = null;
+                }
+                {
+                  color = "red";
+                  value = 1;
+                }
+              ];
+            };
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "(max(up{job=\"postgres-exporter\"}) or vector(0)) * (max(pg_up{job=\"postgres-exporter\"} == bool 0) or vector(0))";
+            legendFormat = "postgres";
+            refId = "A";
+          }
+          {
+            expr = "(max(up{job=\"redis-exporter\"}) or vector(0)) * (max(redis_up{job=\"redis-exporter\"} == bool 0) or vector(0))";
+            legendFormat = "redis";
+            refId = "B";
+          }
+          {
+            expr = "(max(up{job=\"mysql-exporter\"}) or vector(0)) * (max(mysql_up{job=\"mysql-exporter\"} == bool 0) or vector(0))";
+            legendFormat = "mysql";
+            refId = "C";
           }
         ];
       }
