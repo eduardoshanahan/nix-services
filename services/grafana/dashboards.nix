@@ -6261,6 +6261,371 @@
       }
     ];
   };
+  synologySnmpOperationsDashboardJson = builtins.toJSON {
+    id = null;
+    uid = "synology-snmp-operations";
+    title = "Synology SNMP Operations";
+    tags = ["homelab" "synology" "snmp" "nas"];
+    timezone = "browser";
+    schemaVersion = 39;
+    version = 1;
+    refresh = "30s";
+    time = {
+      from = "now-6h";
+      to = "now";
+    };
+    editable = true;
+    panels = [
+      {
+        id = 1;
+        type = "stat";
+        title = "SNMP Targets Up (all jobs)";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 6;
+          x = 0;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+        };
+        targets = [
+          {
+            expr = "sum(up{job=~\"synology-snmp|synology-snmp-system|synology-snmp-memory|synology-snmp-storage|synology-snmp-network|synology-snmp-load|synology-snmp-uptime\"}) or vector(0)";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 2;
+        type = "stat";
+        title = "CPU Usage %";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 6;
+          x = 6;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+        };
+        fieldConfig = {
+          defaults = {
+            unit = "percent";
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "avg(100 - ssCpuIdle{job=\"synology-snmp-system\"}) or vector(0)";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 3;
+        type = "stat";
+        title = "Memory Available %";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 6;
+          x = 12;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+        };
+        fieldConfig = {
+          defaults = {
+            unit = "percent";
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "avg(100 * (memAvailReal{job=\"synology-snmp-memory\"} / memTotalReal{job=\"synology-snmp-memory\"})) or vector(0)";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 4;
+        type = "stat";
+        title = "Root Volume Used %";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 6;
+          x = 18;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+        };
+        fieldConfig = {
+          defaults = {
+            unit = "percent";
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "avg(100 * (hrStorageUsed{job=\"synology-snmp-storage\",hrStorageDescr=\"/volume1\"} / hrStorageSize{job=\"synology-snmp-storage\",hrStorageDescr=\"/volume1\"})) or vector(0)";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 5;
+        type = "timeseries";
+        title = "SNMP Job Up by Module";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 0;
+          y = 6;
+        };
+        fieldConfig = {
+          defaults = {
+            min = 0;
+            max = 1;
+            thresholds = {
+              mode = "absolute";
+              steps = [
+                {
+                  color = "red";
+                  value = null;
+                }
+                {
+                  color = "green";
+                  value = 1;
+                }
+              ];
+            };
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "max(up{job=\"synology-snmp\"}) or vector(0)";
+            legendFormat = "synology-snmp";
+            refId = "A";
+          }
+          {
+            expr = "max(up{job=\"synology-snmp-system\"}) or vector(0)";
+            legendFormat = "synology-snmp-system";
+            refId = "B";
+          }
+          {
+            expr = "max(up{job=\"synology-snmp-memory\"}) or vector(0)";
+            legendFormat = "synology-snmp-memory";
+            refId = "C";
+          }
+          {
+            expr = "max(up{job=\"synology-snmp-storage\"}) or vector(0)";
+            legendFormat = "synology-snmp-storage";
+            refId = "D";
+          }
+          {
+            expr = "max(up{job=\"synology-snmp-network\"}) or vector(0)";
+            legendFormat = "synology-snmp-network";
+            refId = "E";
+          }
+          {
+            expr = "max(up{job=\"synology-snmp-load\"}) or vector(0)";
+            legendFormat = "synology-snmp-load";
+            refId = "F";
+          }
+          {
+            expr = "max(up{job=\"synology-snmp-uptime\"}) or vector(0)";
+            legendFormat = "synology-snmp-uptime";
+            refId = "G";
+          }
+        ];
+      }
+      {
+        id = 6;
+        type = "timeseries";
+        title = "CPU / Memory by Instance";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 12;
+          y = 6;
+        };
+        fieldConfig = {
+          defaults = {
+            unit = "percent";
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "100 - ssCpuIdle{job=\"synology-snmp-system\"}";
+            legendFormat = "{{instance}} cpu_used";
+            refId = "A";
+          }
+          {
+            expr = "100 * (memAvailReal{job=\"synology-snmp-memory\"} / memTotalReal{job=\"synology-snmp-memory\"})";
+            legendFormat = "{{instance}} mem_avail";
+            refId = "B";
+          }
+        ];
+      }
+      {
+        id = 7;
+        type = "timeseries";
+        title = "Disk Used % by Volume";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 0;
+          y = 14;
+        };
+        fieldConfig = {
+          defaults = {
+            unit = "percent";
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "100 * (hrStorageUsed{job=\"synology-snmp-storage\"} / hrStorageSize{job=\"synology-snmp-storage\"})";
+            legendFormat = "{{instance}} {{hrStorageDescr}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 8;
+        type = "timeseries";
+        title = "Network Throughput (bytes/s)";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 12;
+          y = 14;
+        };
+        fieldConfig = {
+          defaults = {
+            unit = "Bps";
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "sum by (instance) (rate(ifHCInOctets{job=\"synology-snmp-network\",ifName!~\"lo|sit0\"}[5m]))";
+            legendFormat = "{{instance}} rx";
+            refId = "A";
+          }
+          {
+            expr = "sum by (instance) (rate(ifHCOutOctets{job=\"synology-snmp-network\",ifName!~\"lo|sit0\"}[5m]))";
+            legendFormat = "{{instance}} tx";
+            refId = "B";
+          }
+        ];
+      }
+      {
+        id = 9;
+        type = "timeseries";
+        title = "Load Average (1m) by Instance";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 0;
+          y = 22;
+        };
+        targets = [
+          {
+            expr = "laLoadFloat{job=\"synology-snmp-load\",laNames=\"Load-1\"}";
+            legendFormat = "{{instance}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 10;
+        type = "timeseries";
+        title = "System Uptime (hours) by Instance";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 12;
+          y = 22;
+        };
+        targets = [
+          {
+            expr = "(hrSystemUptime{job=\"synology-snmp-uptime\"} / 100) / 3600";
+            legendFormat = "{{instance}}";
+            refId = "A";
+          }
+        ];
+      }
+    ];
+  };
   unifiOverviewDashboardJson = builtins.toJSON {
     id = null;
     uid = "unifi-overview";

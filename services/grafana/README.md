@@ -101,6 +101,7 @@ With `services.grafanaCompose.provisioning.dashboards.enableStarter = true`, the
 - `SMTP Relay Operations`
 - `Service SLI`
 - `Pi-hole Operations`
+- `Synology SNMP Operations`
 - `UniFi Overview`
 - `NAS File Activity` (only when Loki datasource is configured)
 - `Logs Pipeline` (only when Loki datasource is configured)
@@ -178,6 +179,17 @@ With `services.grafanaCompose.provisioning.dashboards.enableStarter = true`, the
 - Upstream resolver quality panels:
   - response time by destination
   - response variance by destination
+
+`Synology SNMP Operations` includes:
+
+- SNMP module target-up overview across all Synology SNMP jobs.
+- NAS resource summary cards (CPU, memory, root volume used).
+- Per-instance trend panels for:
+  - CPU/memory
+  - storage utilization
+  - network throughput
+  - load average
+  - uptime
 
 `Logs Pipeline` includes:
 
