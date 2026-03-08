@@ -7243,7 +7243,7 @@
         };
         targets = [
           {
-            expr = "sum(sum by (service) (rate(traefik_service_requests_total{service=~\"authentik@docker|vikunja@docker|homeassistant@docker|timetagger@docker|homepage@docker|ghost-blog@docker|uptime-kuma@docker\"}[15m])) > bool 0) or vector(0)";
+            expr = "sum(sum by (service) (rate(traefik_service_requests_total{service=~\"authentik@docker|vikunja@docker|timetagger@docker|homepage@docker|ghost-blog@docker|uptime-kuma@docker\"}[15m])) > bool 0) or vector(0)";
             refId = "A";
           }
         ];
@@ -7298,7 +7298,7 @@
         };
         targets = [
           {
-            expr = "sum(sum by (service) (rate(traefik_service_requests_total{service=~\"authentik@docker|vikunja@docker|homeassistant@docker|timetagger@docker|homepage@docker|ghost-blog@docker|uptime-kuma@docker\",code=~\"5..\"}[15m])) > bool 0) or vector(0)";
+            expr = "sum(sum by (service) (rate(traefik_service_requests_total{service=~\"authentik@docker|vikunja@docker|timetagger@docker|homepage@docker|ghost-blog@docker|uptime-kuma@docker\",code=~\"5..\"}[15m])) > bool 0) or vector(0)";
             refId = "A";
           }
         ];
@@ -7353,7 +7353,7 @@
         };
         targets = [
           {
-            expr = "100 * (1 - ((sum(rate(traefik_service_requests_total{service=~\"authentik@docker|vikunja@docker|homeassistant@docker|timetagger@docker|homepage@docker|ghost-blog@docker|uptime-kuma@docker\",code=~\"5..\"}[5m])) or vector(0)) / clamp_min((sum(rate(traefik_service_requests_total{service=~\"authentik@docker|vikunja@docker|homeassistant@docker|timetagger@docker|homepage@docker|ghost-blog@docker|uptime-kuma@docker\"}[5m])) or vector(0)), 0.001)))";
+            expr = "100 * (1 - ((sum(rate(traefik_service_requests_total{service=~\"authentik@docker|vikunja@docker|timetagger@docker|homepage@docker|ghost-blog@docker|uptime-kuma@docker\",code=~\"5..\"}[5m])) or vector(0)) / clamp_min((sum(rate(traefik_service_requests_total{service=~\"authentik@docker|vikunja@docker|timetagger@docker|homepage@docker|ghost-blog@docker|uptime-kuma@docker\"}[5m])) or vector(0)), 0.001)))";
             refId = "A";
           }
         ];
@@ -7444,7 +7444,7 @@
         };
         targets = [
           {
-            expr = "sum by (service) (rate(traefik_service_requests_total{service=~\"authentik@docker|vikunja@docker|homeassistant@docker|timetagger@docker|homepage@docker|ghost-blog@docker|uptime-kuma@docker\"}[5m]))";
+            expr = "sum by (service) (rate(traefik_service_requests_total{service=~\"authentik@docker|vikunja@docker|timetagger@docker|homepage@docker|ghost-blog@docker|uptime-kuma@docker\"}[5m]))";
             legendFormat = "{{service}}";
             refId = "A";
           }
@@ -7473,7 +7473,7 @@
         };
         targets = [
           {
-            expr = "sum by (service) (rate(traefik_service_requests_total{service=~\"authentik@docker|vikunja@docker|homeassistant@docker|timetagger@docker|homepage@docker|ghost-blog@docker|uptime-kuma@docker\",code=~\"5..\"}[5m]))";
+            expr = "sum by (service) (rate(traefik_service_requests_total{service=~\"authentik@docker|vikunja@docker|timetagger@docker|homepage@docker|ghost-blog@docker|uptime-kuma@docker\",code=~\"5..\"}[5m]))";
             legendFormat = "{{service}}";
             refId = "A";
           }
@@ -7503,7 +7503,7 @@
         };
         targets = [
           {
-            expr = "100 * (sum by (service) (rate(traefik_service_requests_total{service=~\"authentik@docker|vikunja@docker|homeassistant@docker|timetagger@docker|homepage@docker|ghost-blog@docker|uptime-kuma@docker\",code=~\"5..\"}[5m])) / clamp_min(sum by (service) (rate(traefik_service_requests_total{service=~\"authentik@docker|vikunja@docker|homeassistant@docker|timetagger@docker|homepage@docker|ghost-blog@docker|uptime-kuma@docker\"}[5m])), 0.001))";
+            expr = "100 * (sum by (service) (rate(traefik_service_requests_total{service=~\"authentik@docker|vikunja@docker|timetagger@docker|homepage@docker|ghost-blog@docker|uptime-kuma@docker\",code=~\"5..\"}[5m])) / clamp_min(sum by (service) (rate(traefik_service_requests_total{service=~\"authentik@docker|vikunja@docker|timetagger@docker|homepage@docker|ghost-blog@docker|uptime-kuma@docker\"}[5m])), 0.001))";
             legendFormat = "{{service}}";
             refId = "A";
           }
@@ -7532,7 +7532,7 @@
         };
         targets = [
           {
-            expr = "histogram_quantile(0.95, sum by (service, le) (rate(traefik_service_request_duration_seconds_bucket{service=~\"authentik@docker|vikunja@docker|homeassistant@docker|timetagger@docker|homepage@docker|ghost-blog@docker|uptime-kuma@docker\"}[5m])))";
+            expr = "histogram_quantile(0.95, sum by (service, le) (rate(traefik_service_request_duration_seconds_bucket{service=~\"authentik@docker|vikunja@docker|timetagger@docker|homepage@docker|ghost-blog@docker|uptime-kuma@docker\"}[5m])))";
             legendFormat = "{{service}}";
             refId = "A";
           }
@@ -7574,7 +7574,7 @@
         };
         targets = [
           {
-            expr = "max by (container_label_com_docker_compose_service) ((time() - container_last_seen{job=\"cadvisor\",container_label_com_docker_compose_service=~\"authentik-server|authentik-worker|vikunja|home-assistant|smtp-relay|timetagger|homepage|uptime-kuma\"}) < bool 180)";
+            expr = "max by (container_label_com_docker_compose_service) ((time() - container_last_seen{job=\"cadvisor\",container_label_com_docker_compose_service=~\"authentik-server|authentik-worker|vikunja|smtp-relay|timetagger|homepage|uptime-kuma\"}) < bool 180)";
             legendFormat = "{{container_label_com_docker_compose_service}}";
             refId = "A";
           }
