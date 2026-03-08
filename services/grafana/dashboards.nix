@@ -7934,7 +7934,7 @@
         };
         targets = [
           {
-            expr = "histogram_quantile(0.95, sum by (le) (rate(django_http_requests_latency_including_middlewares_seconds_bucket{job=\"authentik\"}[5m])))";
+            expr = "histogram_quantile(0.95, sum by (le) (rate(django_http_requests_latency_including_middlewares_seconds_bucket{job=\"authentik\"}[5m]))) and on() (sum(rate(django_http_requests_latency_including_middlewares_seconds_count{job=\"authentik\"}[5m])) > 0)";
             legendFormat = "p95";
             refId = "A";
           }
@@ -7997,7 +7997,7 @@
         };
         targets = [
           {
-            expr = "topk(8, histogram_quantile(0.95, sum by (handler_name, le) (rate(handler_execution_time_seconds_bucket{job=\"vikunja\"}[5m]))))";
+            expr = "topk(8, histogram_quantile(0.95, sum by (handler_name, le) (rate(handler_execution_time_seconds_bucket{job=\"vikunja\"}[5m]))) and on(handler_name) (sum by (handler_name) (rate(handler_execution_time_seconds_count{job=\"vikunja\"}[5m])) > 0))";
             legendFormat = "{{handler_name}}";
             refId = "A";
           }
