@@ -2819,7 +2819,7 @@
         };
         targets = [
           {
-            expr = "((max(pg_up{job=\"postgres-exporter\"} == bool 0) or vector(0)) + (max(redis_up{job=\"redis-exporter\"} == bool 0) or vector(0)) + (max(mysql_up{job=\"mysql-exporter\"} == bool 0) or vector(0)))";
+            expr = "((max(pg_up{job=\"postgres-exporter\"} == bool 0) or vector(0)) + (max(redis_up{job=\"redis-exporter\"} == bool 0) or vector(0)) + (max(mysql_up{job=\"mysql-exporter\"} == bool 0) or vector(0)) + (max(mongodb_up{job=\"mongodb-exporter\"} == bool 0) or vector(0)))";
             refId = "A";
           }
         ];
@@ -2873,6 +2873,11 @@
             expr = "max(mysql_up{job=\"mysql-exporter\"} == bool 0) or vector(0)";
             legendFormat = "mysql";
             refId = "C";
+          }
+          {
+            expr = "max(mongodb_up{job=\"mongodb-exporter\"} == bool 0) or vector(0)";
+            legendFormat = "mongo";
+            refId = "D";
           }
         ];
       }
@@ -3022,6 +3027,11 @@
             legendFormat = "mysql-exporter scrape";
             refId = "C";
           }
+          {
+            expr = "max(up{job=\"mongodb-exporter\"}) or vector(0)";
+            legendFormat = "mongodb-exporter scrape";
+            refId = "D";
+          }
         ];
       }
       {
@@ -3068,7 +3078,7 @@
         };
         targets = [
           {
-            expr = "(((max(up{job=\"postgres-exporter\"}) or vector(0)) * (max(pg_up{job=\"postgres-exporter\"} == bool 0) or vector(0))) + ((max(up{job=\"redis-exporter\"}) or vector(0)) * (max(redis_up{job=\"redis-exporter\"} == bool 0) or vector(0))) + ((max(up{job=\"mysql-exporter\"}) or vector(0)) * (max(mysql_up{job=\"mysql-exporter\"} == bool 0) or vector(0))))";
+            expr = "(((max(up{job=\"postgres-exporter\"}) or vector(0)) * (max(pg_up{job=\"postgres-exporter\"} == bool 0) or vector(0))) + ((max(up{job=\"redis-exporter\"}) or vector(0)) * (max(redis_up{job=\"redis-exporter\"} == bool 0) or vector(0))) + ((max(up{job=\"mysql-exporter\"}) or vector(0)) * (max(mysql_up{job=\"mysql-exporter\"} == bool 0) or vector(0))) + ((max(up{job=\"mongodb-exporter\"}) or vector(0)) * (max(mongodb_up{job=\"mongodb-exporter\"} == bool 0) or vector(0))))";
             refId = "A";
           }
         ];
@@ -3123,6 +3133,11 @@
             legendFormat = "mysql";
             refId = "C";
           }
+          {
+            expr = "(max(up{job=\"mongodb-exporter\"}) or vector(0)) * (max(mongodb_up{job=\"mongodb-exporter\"} == bool 0) or vector(0))";
+            legendFormat = "mongo";
+            refId = "D";
+          }
         ];
       }
       {
@@ -3169,7 +3184,7 @@
         };
         targets = [
           {
-            expr = "((max(up{job=\"postgres-exporter\"} == bool 0) or vector(0)) + (max(up{job=\"redis-exporter\"} == bool 0) or vector(0)) + (max(up{job=\"mysql-exporter\"} == bool 0) or vector(0)))";
+            expr = "((max(up{job=\"postgres-exporter\"} == bool 0) or vector(0)) + (max(up{job=\"redis-exporter\"} == bool 0) or vector(0)) + (max(up{job=\"mysql-exporter\"} == bool 0) or vector(0)) + (max(up{job=\"mongodb-exporter\"} == bool 0) or vector(0)))";
             refId = "A";
           }
         ];
@@ -3223,6 +3238,11 @@
             expr = "max(up{job=\"mysql-exporter\"} == bool 0) or vector(0)";
             legendFormat = "mysql-exporter";
             refId = "C";
+          }
+          {
+            expr = "max(up{job=\"mongodb-exporter\"} == bool 0) or vector(0)";
+            legendFormat = "mongodb-exporter";
+            refId = "D";
           }
         ];
       }
@@ -3497,7 +3517,7 @@
         };
         targets = [
           {
-            expr = "(2 * ((((max(up{job=\"postgres-exporter\"} == bool 0) or vector(0)) + (max(up{job=\"redis-exporter\"} == bool 0) or vector(0)) + (max(up{job=\"mysql-exporter\"} == bool 0) or vector(0))) == bool 0) * ((((max(up{job=\"postgres-exporter\"}) or vector(0)) * (max(pg_up{job=\"postgres-exporter\"} == bool 0) or vector(0))) + ((max(up{job=\"redis-exporter\"}) or vector(0)) * (max(redis_up{job=\"redis-exporter\"} == bool 0) or vector(0))) + ((max(up{job=\"mysql-exporter\"}) or vector(0)) * (max(mysql_up{job=\"mysql-exporter\"} == bool 0) or vector(0)))) == bool 0))) + ((((max(up{job=\"postgres-exporter\"} == bool 0) or vector(0)) + (max(up{job=\"redis-exporter\"} == bool 0) or vector(0)) + (max(up{job=\"mysql-exporter\"} == bool 0) or vector(0))) == bool 0) * ((((max(up{job=\"postgres-exporter\"}) or vector(0)) * (max(pg_up{job=\"postgres-exporter\"} == bool 0) or vector(0))) + ((max(up{job=\"redis-exporter\"}) or vector(0)) * (max(redis_up{job=\"redis-exporter\"} == bool 0) or vector(0))) + ((max(up{job=\"mysql-exporter\"}) or vector(0)) * (max(mysql_up{job=\"mysql-exporter\"} == bool 0) or vector(0)))) > bool 0))";
+            expr = "(2 * ((((max(up{job=\"postgres-exporter\"} == bool 0) or vector(0)) + (max(up{job=\"redis-exporter\"} == bool 0) or vector(0)) + (max(up{job=\"mysql-exporter\"} == bool 0) or vector(0)) + (max(up{job=\"mongodb-exporter\"} == bool 0) or vector(0))) == bool 0) * ((((max(up{job=\"postgres-exporter\"}) or vector(0)) * (max(pg_up{job=\"postgres-exporter\"} == bool 0) or vector(0))) + ((max(up{job=\"redis-exporter\"}) or vector(0)) * (max(redis_up{job=\"redis-exporter\"} == bool 0) or vector(0))) + ((max(up{job=\"mysql-exporter\"}) or vector(0)) * (max(mysql_up{job=\"mysql-exporter\"} == bool 0) or vector(0))) + ((max(up{job=\"mongodb-exporter\"}) or vector(0)) * (max(mongodb_up{job=\"mongodb-exporter\"} == bool 0) or vector(0)))) == bool 0))) + ((((max(up{job=\"postgres-exporter\"} == bool 0) or vector(0)) + (max(up{job=\"redis-exporter\"} == bool 0) or vector(0)) + (max(up{job=\"mysql-exporter\"} == bool 0) or vector(0)) + (max(up{job=\"mongodb-exporter\"} == bool 0) or vector(0))) == bool 0) * ((((max(up{job=\"postgres-exporter\"}) or vector(0)) * (max(pg_up{job=\"postgres-exporter\"} == bool 0) or vector(0))) + ((max(up{job=\"redis-exporter\"}) or vector(0)) * (max(redis_up{job=\"redis-exporter\"} == bool 0) or vector(0))) + ((max(up{job=\"mysql-exporter\"}) or vector(0)) * (max(mysql_up{job=\"mysql-exporter\"} == bool 0) or vector(0))) + ((max(up{job=\"mongodb-exporter\"}) or vector(0)) * (max(mongodb_up{job=\"mongodb-exporter\"} == bool 0) or vector(0)))) > bool 0))";
             refId = "A";
           }
         ];
@@ -3556,7 +3576,7 @@
         };
         targets = [
           {
-            expr = "((max(up{job=\"postgres-exporter\"} == bool 0) or vector(0)) + (max(up{job=\"redis-exporter\"} == bool 0) or vector(0)) + (max(up{job=\"mysql-exporter\"} == bool 0) or vector(0)))";
+            expr = "((max(up{job=\"postgres-exporter\"} == bool 0) or vector(0)) + (max(up{job=\"redis-exporter\"} == bool 0) or vector(0)) + (max(up{job=\"mysql-exporter\"} == bool 0) or vector(0)) + (max(up{job=\"mongodb-exporter\"} == bool 0) or vector(0)))";
             refId = "A";
           }
         ];
@@ -3615,7 +3635,7 @@
         };
         targets = [
           {
-            expr = "(((max(up{job=\"postgres-exporter\"}) or vector(0)) * (max(pg_up{job=\"postgres-exporter\"} == bool 0) or vector(0))) + ((max(up{job=\"redis-exporter\"}) or vector(0)) * (max(redis_up{job=\"redis-exporter\"} == bool 0) or vector(0))) + ((max(up{job=\"mysql-exporter\"}) or vector(0)) * (max(mysql_up{job=\"mysql-exporter\"} == bool 0) or vector(0))))";
+            expr = "(((max(up{job=\"postgres-exporter\"}) or vector(0)) * (max(pg_up{job=\"postgres-exporter\"} == bool 0) or vector(0))) + ((max(up{job=\"redis-exporter\"}) or vector(0)) * (max(redis_up{job=\"redis-exporter\"} == bool 0) or vector(0))) + ((max(up{job=\"mysql-exporter\"}) or vector(0)) * (max(mysql_up{job=\"mysql-exporter\"} == bool 0) or vector(0))) + ((max(up{job=\"mongodb-exporter\"}) or vector(0)) * (max(mongodb_up{job=\"mongodb-exporter\"} == bool 0) or vector(0))))";
             refId = "A";
           }
         ];
@@ -4162,7 +4182,7 @@
         };
         targets = [
           {
-            expr = "(sum(up{job=\"postgres-exporter\"}) or vector(0)) + (sum(up{job=\"redis-exporter\"}) or vector(0)) + (sum(up{job=\"mysql-exporter\"}) or vector(0))";
+            expr = "(sum(up{job=\"postgres-exporter\"}) or vector(0)) + (sum(up{job=\"redis-exporter\"}) or vector(0)) + (sum(up{job=\"mysql-exporter\"}) or vector(0)) + (sum(up{job=\"mongodb-exporter\"}) or vector(0))";
             refId = "A";
           }
         ];
