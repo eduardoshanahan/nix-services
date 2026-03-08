@@ -49,6 +49,20 @@ in {
       description = "Host Docker socket path bind-mounted read-only.";
     };
 
+    remoteHosts = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = [];
+      example = [
+        "tcp://rpi-box-03.<homelab-domain>:2375|rpi-box-03"
+        "tcp://hhnas4.<homelab-domain>:2375|hhnas4"
+      ];
+      description = ''
+        Optional list of Dozzle remote Docker hosts (or socket proxies), each in
+        Dozzle `--remote-host` format. Values are comma-joined into
+        `DOZZLE_REMOTE_HOST`.
+      '';
+    };
+
     image = {
       repository = lib.mkOption {
         type = lib.types.str;
@@ -136,6 +150,7 @@ in {
           "DOZZLE_TLS=${if cfg.tls then "true" else "false"}"
           "DOZZLE_DATA_DIR=${cfg.dataDir}"
           "DOZZLE_SOCKET_PATH=${cfg.socketPath}"
+          "DOZZLE_REMOTE_HOST=${lib.concatStringsSep "," cfg.remoteHosts}"
           "TZ=${cfg.timezone}"
         ];
 

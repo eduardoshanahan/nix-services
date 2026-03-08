@@ -21,6 +21,7 @@ This module deploys Dozzle behind Traefik using a checked-in Docker Compose file
 - `services.dozzleCompose.network`
 - `services.dozzleCompose.dataDir`
 - `services.dozzleCompose.socketPath`
+- `services.dozzleCompose.remoteHosts`
 - `services.dozzleCompose.image.repository`
 - `services.dozzleCompose.image.tag`
 - `services.dozzleCompose.image.allowMutableTag`

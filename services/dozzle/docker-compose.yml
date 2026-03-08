@@ -11,6 +11,7 @@ services:
     environment:
       - DOZZLE_NO_ANALYTICS=true
       - DOZZLE_LEVEL=info
+      - DOZZLE_REMOTE_HOST=${DOZZLE_REMOTE_HOST}
       - TZ=${TZ}
 
     volumes:
