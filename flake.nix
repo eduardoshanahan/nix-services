@@ -92,6 +92,7 @@
         homeAssistantModule = import ./services/home-assistant/home-assistant.nix;
         authentikComposeModule = import ./services/authentik/authentik.nix;
         timeTaggerComposeModule = import ./services/timetagger/timetagger.nix;
+        traggoComposeModule = import ./services/traggo/traggo.nix;
         dockerSocketProxyComposeModule = import ./services/docker-socket-proxy/docker-socket-proxy.nix;
       in {
         nixosModules = {
@@ -122,6 +123,7 @@
           homeAssistant = homeAssistantModule;
           authentikCompose = authentikComposeModule;
           timeTaggerCompose = timeTaggerComposeModule;
+          traggoCompose = traggoComposeModule;
           dockerSocketProxyCompose = dockerSocketProxyComposeModule;
         };
 
@@ -153,6 +155,7 @@
           homeAssistant = homeAssistantModule;
           authentikCompose = authentikComposeModule;
           timeTaggerCompose = timeTaggerComposeModule;
+          traggoCompose = traggoComposeModule;
           dockerSocketProxyCompose = dockerSocketProxyComposeModule;
         };
       }
