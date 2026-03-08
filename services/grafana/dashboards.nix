@@ -8566,6 +8566,90 @@
           }
         ];
       }
+      {
+        id = 11;
+        type = "stat";
+        title = "HA Alerts Firing";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 0;
+          y = 22;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+        };
+        fieldConfig = {
+          defaults = {
+            min = 0;
+            decimals = 0;
+            unit = "short";
+            thresholds = {
+              mode = "absolute";
+              steps = [
+                {
+                  color = "green";
+                  value = null;
+                }
+                {
+                  color = "orange";
+                  value = 1;
+                }
+                {
+                  color = "red";
+                  value = 2;
+                }
+              ];
+            };
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "sum(ALERTS{alertname=~\"HomeAssistantHigh5xxRatio|HomeAssistantHighLatencyP95|HomeAssistantSystemdDown\",alertstate=\"firing\"}) or vector(0)";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 12;
+        type = "timeseries";
+        title = "HA Alerts by Name";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 12;
+          y = 22;
+        };
+        fieldConfig = {
+          defaults = {
+            min = 0;
+            unit = "short";
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "sum by (alertname) (ALERTS{alertname=~\"HomeAssistantHigh5xxRatio|HomeAssistantHighLatencyP95|HomeAssistantSystemdDown\",alertstate=\"firing\"}) or label_replace(vector(0), \"alertname\", \"none\", \"\", \"\")";
+            legendFormat = "{{alertname}}";
+            refId = "A";
+          }
+        ];
+      }
     ];
   };
   unifiOverviewDashboardJson = builtins.toJSON {
