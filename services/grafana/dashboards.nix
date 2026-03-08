@@ -8616,7 +8616,7 @@
         };
         targets = [
           {
-            expr = "sum(ALERTS{alertname=~\"HomeAssistantHigh5xxRatio|HomeAssistantHighLatencyP95|HomeAssistantSystemdDown\",alertstate=\"firing\"}) or vector(0)";
+            expr = "sum(ALERTS{alertname=~\"HomeAssistantHigh5xxRatio|HomeAssistantHighLatencyP95|HomeAssistantSystemdDown|HomeAssistantRecorderRollbackRatioHigh|HomeAssistantRecorderConnectionsHigh\",alertstate=\"firing\"}) or vector(0)";
             refId = "A";
           }
         ];
@@ -8644,8 +8644,101 @@
         };
         targets = [
           {
-            expr = "sum by (alertname) (ALERTS{alertname=~\"HomeAssistantHigh5xxRatio|HomeAssistantHighLatencyP95|HomeAssistantSystemdDown\",alertstate=\"firing\"}) or label_replace(vector(0), \"alertname\", \"none\", \"\", \"\")";
+            expr = "sum by (alertname) (ALERTS{alertname=~\"HomeAssistantHigh5xxRatio|HomeAssistantHighLatencyP95|HomeAssistantSystemdDown|HomeAssistantRecorderRollbackRatioHigh|HomeAssistantRecorderConnectionsHigh\",alertstate=\"firing\"}) or label_replace(vector(0), \"alertname\", \"none\", \"\", \"\")";
             legendFormat = "{{alertname}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 13;
+        type = "timeseries";
+        title = "Recorder DB Connections";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 8;
+          x = 0;
+          y = 30;
+        };
+        fieldConfig = {
+          defaults = {
+            min = 0;
+            unit = "short";
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "max(pg_stat_database_numbackends{job=\"postgres-exporter\",datname=\"homeassistant\"}) or vector(0)";
+            legendFormat = "homeassistant";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 14;
+        type = "timeseries";
+        title = "Recorder DB Commit/Rollback Rate";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 8;
+          x = 8;
+          y = 30;
+        };
+        fieldConfig = {
+          defaults = {
+            min = 0;
+            unit = "ops";
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "rate(pg_stat_database_xact_commit{job=\"postgres-exporter\",datname=\"homeassistant\"}[5m]) or vector(0)";
+            legendFormat = "commit/s";
+            refId = "A";
+          }
+          {
+            expr = "rate(pg_stat_database_xact_rollback{job=\"postgres-exporter\",datname=\"homeassistant\"}[5m]) or vector(0)";
+            legendFormat = "rollback/s";
+            refId = "B";
+          }
+        ];
+      }
+      {
+        id = 15;
+        type = "timeseries";
+        title = "Recorder DB Cache Hit Ratio";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 8;
+          x = 16;
+          y = 30;
+        };
+        fieldConfig = {
+          defaults = {
+            min = 0;
+            max = 100;
+            unit = "percent";
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "100 * ((rate(pg_stat_database_blks_hit{job=\"postgres-exporter\",datname=\"homeassistant\"}[5m]) or vector(0)) / clamp_min(((rate(pg_stat_database_blks_hit{job=\"postgres-exporter\",datname=\"homeassistant\"}[5m]) or vector(0)) + (rate(pg_stat_database_blks_read{job=\"postgres-exporter\",datname=\"homeassistant\"}[5m]) or vector(0))), 0.01))";
+            legendFormat = "cache hit %";
             refId = "A";
           }
         ];
