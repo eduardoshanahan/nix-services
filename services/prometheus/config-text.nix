@@ -368,7 +368,7 @@
       "          description: \"Service {{ $labels.service }} p95 request latency has been above 2s for more than 15 minutes.\""
       ""
       "      - alert: AppContainerNotSeen"
-      "        expr: max by (container_label_com_docker_compose_service) ((time() - container_last_seen{job=\"cadvisor\",container_label_com_docker_compose_service=~\"authentik-server|authentik-worker|vikunja|timetagger|homepage|uptime-kuma|diagrams-net|excalidraw|owntracks-recorder|traggo\"}) < bool 180) == 0"
+      "        expr: max by (container_label_com_docker_compose_service) ((time() - container_last_seen{job=\"cadvisor\",container_label_com_docker_compose_service=~\"authentik-server|authentik-worker|vikunja|timetagger|homepage|uptime-kuma|diagrams-net|excalidraw|owntracks-recorder|traggo|dozzle\"}) < bool 180) == 0"
       "        for: 5m"
       "        labels:"
       "          severity: critical"

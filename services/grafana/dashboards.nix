@@ -7565,7 +7565,7 @@
         };
         targets = [
           {
-            expr = "max by (container_label_com_docker_compose_service) ((time() - container_last_seen{job=\"cadvisor\",container_label_com_docker_compose_service=~\"authentik-server|authentik-worker|vikunja|timetagger|homepage|uptime-kuma|diagrams-net|excalidraw|owntracks-recorder|traggo\"}) < bool 180)";
+            expr = "max by (container_label_com_docker_compose_service) ((time() - container_last_seen{job=\"cadvisor\",container_label_com_docker_compose_service=~\"authentik-server|authentik-worker|vikunja|timetagger|homepage|uptime-kuma|diagrams-net|excalidraw|owntracks-recorder|traggo|dozzle\"}) < bool 180)";
             legendFormat = "{{container_label_com_docker_compose_service}}";
             refId = "A";
           }
