@@ -7600,14 +7600,14 @@
       {
         id = 1;
         type = "stat";
-        title = "Authentik Metrics Targets Up";
+        title = "Authentik Request Rate";
         datasource = {
           type = "prometheus";
           uid = "prometheus";
         };
         gridPos = {
           h = 6;
-          w = 6;
+          w = 4;
           x = 0;
           y = 0;
         };
@@ -7623,27 +7623,14 @@
         fieldConfig = {
           defaults = {
             min = 0;
-            decimals = 0;
-            unit = "short";
-            thresholds = {
-              mode = "absolute";
-              steps = [
-                {
-                  color = "red";
-                  value = null;
-                }
-                {
-                  color = "green";
-                  value = 1;
-                }
-              ];
-            };
+            decimals = 2;
+            unit = "reqps";
           };
           overrides = [];
         };
         targets = [
           {
-            expr = "sum(up{job=\"authentik\"}) or vector(0)";
+            expr = "sum(rate(django_http_responses_total_by_status_total{job=\"authentik\"}[5m])) or vector(0)";
             refId = "A";
           }
         ];
@@ -7651,15 +7638,71 @@
       {
         id = 2;
         type = "stat";
-        title = "Vikunja Metrics Targets Up";
+        title = "Authentik Auth Failure Ratio";
         datasource = {
           type = "prometheus";
           uid = "prometheus";
         };
         gridPos = {
           h = 6;
-          w = 6;
-          x = 6;
+          w = 4;
+          x = 4;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+        };
+        fieldConfig = {
+          defaults = {
+            min = 0;
+            max = 100;
+            decimals = 1;
+            unit = "percent";
+            thresholds = {
+              mode = "absolute";
+              steps = [
+                {
+                  color = "green";
+                  value = null;
+                }
+                {
+                  color = "orange";
+                  value = 5;
+                }
+                {
+                  color = "red";
+                  value = 20;
+                }
+              ];
+            };
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "100 * ((sum(rate(django_http_responses_total_by_status_total{job=\"authentik\",status=~\"401|403\"}[5m])) or vector(0)) / clamp_min((sum(rate(django_http_responses_total_by_status_total{job=\"authentik\"}[5m])) or vector(0)), 0.01))";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 3;
+        type = "stat";
+        title = "Authentik Queue Depth";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 4;
+          x = 8;
           y = 0;
         };
         options = {
@@ -7685,7 +7728,15 @@
                 }
                 {
                   color = "green";
-                  value = 1;
+                  value = 0;
+                }
+                {
+                  color = "orange";
+                  value = 10;
+                }
+                {
+                  color = "red";
+                  value = 25;
                 }
               ];
             };
@@ -7694,22 +7745,22 @@
         };
         targets = [
           {
-            expr = "sum(up{job=\"vikunja\"}) or vector(0)";
+            expr = "sum(max by (actor_name, queue_name, instance) (authentik_tasks_queued{job=\"authentik\"})) or vector(0)";
             refId = "A";
           }
         ];
       }
       {
-        id = 3;
+        id = 4;
         type = "stat";
-        title = "Authentik Samples Scraped";
+        title = "Authentik Tasks In Progress";
         datasource = {
           type = "prometheus";
           uid = "prometheus";
         };
         gridPos = {
           h = 6;
-          w = 6;
+          w = 4;
           x = 12;
           y = 0;
         };
@@ -7732,23 +7783,23 @@
         };
         targets = [
           {
-            expr = "sum(scrape_samples_scraped{job=\"authentik\"}) or vector(0)";
+            expr = "sum(max by (actor_name, queue_name, instance) (authentik_tasks_in_progress{job=\"authentik\"})) or vector(0)";
             refId = "A";
           }
         ];
       }
       {
-        id = 4;
+        id = 5;
         type = "stat";
-        title = "Vikunja Samples Scraped";
+        title = "Vikunja Event Throughput";
         datasource = {
           type = "prometheus";
           uid = "prometheus";
         };
         gridPos = {
           h = 6;
-          w = 6;
-          x = 18;
+          w = 4;
+          x = 16;
           y = 0;
         };
         options = {
@@ -7763,22 +7814,78 @@
         fieldConfig = {
           defaults = {
             min = 0;
-            decimals = 0;
-            unit = "short";
+            decimals = 2;
+            unit = "ops";
           };
           overrides = [];
         };
         targets = [
           {
-            expr = "sum(scrape_samples_scraped{job=\"vikunja\"}) or vector(0)";
+            expr = "sum(rate(handler_execution_time_seconds_count{job=\"vikunja\"}[5m])) or vector(0)";
             refId = "A";
           }
         ];
       }
       {
-        id = 5;
+        id = 6;
+        type = "stat";
+        title = "Vikunja Failed Event Ratio";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 4;
+          x = 20;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+        };
+        fieldConfig = {
+          defaults = {
+            min = 0;
+            max = 100;
+            decimals = 1;
+            unit = "percent";
+            thresholds = {
+              mode = "absolute";
+              steps = [
+                {
+                  color = "green";
+                  value = null;
+                }
+                {
+                  color = "orange";
+                  value = 2;
+                }
+                {
+                  color = "red";
+                  value = 10;
+                }
+              ];
+            };
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "100 * ((sum(rate(handler_execution_time_seconds_count{job=\"vikunja\",success!=\"true\"}[5m])) or vector(0)) / clamp_min((sum(rate(handler_execution_time_seconds_count{job=\"vikunja\"}[5m])) or vector(0)), 0.01))";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 7;
         type = "timeseries";
-        title = "Authentik Up by Instance";
+        title = "Authentik Responses by Status";
         datasource = {
           type = "prometheus";
           uid = "prometheus";
@@ -7792,35 +7899,22 @@
         fieldConfig = {
           defaults = {
             min = 0;
-            max = 1;
-            thresholds = {
-              mode = "absolute";
-              steps = [
-                {
-                  color = "red";
-                  value = null;
-                }
-                {
-                  color = "green";
-                  value = 1;
-                }
-              ];
-            };
+            unit = "reqps";
           };
           overrides = [];
         };
         targets = [
           {
-            expr = "up{job=\"authentik\"} or label_replace(vector(0), \"instance\", \"none\", \"\", \"\")";
-            legendFormat = "{{instance}}";
+            expr = "sum by (status) (rate(django_http_responses_total_by_status_total{job=\"authentik\"}[5m]))";
+            legendFormat = "{{status}}";
             refId = "A";
           }
         ];
       }
       {
-        id = 6;
+        id = 8;
         type = "timeseries";
-        title = "Vikunja Up by Instance";
+        title = "Authentik Request Duration P95";
         datasource = {
           type = "prometheus";
           uid = "prometheus";
@@ -7834,35 +7928,22 @@
         fieldConfig = {
           defaults = {
             min = 0;
-            max = 1;
-            thresholds = {
-              mode = "absolute";
-              steps = [
-                {
-                  color = "red";
-                  value = null;
-                }
-                {
-                  color = "green";
-                  value = 1;
-                }
-              ];
-            };
+            unit = "s";
           };
           overrides = [];
         };
         targets = [
           {
-            expr = "up{job=\"vikunja\"} or label_replace(vector(0), \"instance\", \"none\", \"\", \"\")";
-            legendFormat = "{{instance}}";
+            expr = "histogram_quantile(0.95, sum by (le) (rate(django_http_requests_latency_including_middlewares_seconds_bucket{job=\"authentik\"}[5m])))";
+            legendFormat = "p95";
             refId = "A";
           }
         ];
       }
       {
-        id = 7;
+        id = 9;
         type = "timeseries";
-        title = "Scrape Samples by Instance";
+        title = "Authentik Task Queue by Queue";
         datasource = {
           type = "prometheus";
           uid = "prometheus";
@@ -7882,16 +7963,21 @@
         };
         targets = [
           {
-            expr = "scrape_samples_scraped{job=~\"authentik|vikunja\"}";
-            legendFormat = "{{job}} {{instance}}";
+            expr = "sum by (queue_name) (max by (actor_name, queue_name, instance) (authentik_tasks_queued{job=\"authentik\"}))";
+            legendFormat = "{{queue_name}}";
             refId = "A";
+          }
+          {
+            expr = "topk(8, max by (actor_name) (authentik_tasks_queued{job=\"authentik\"}))";
+            legendFormat = "{{actor_name}}";
+            refId = "B";
           }
         ];
       }
       {
-        id = 8;
+        id = 10;
         type = "timeseries";
-        title = "Scrape Duration by Instance";
+        title = "Vikunja Handler Duration P95";
         datasource = {
           type = "prometheus";
           uid = "prometheus";
@@ -7911,16 +7997,16 @@
         };
         targets = [
           {
-            expr = "scrape_duration_seconds{job=~\"authentik|vikunja\"}";
-            legendFormat = "{{job}} {{instance}}";
+            expr = "topk(8, histogram_quantile(0.95, sum by (handler_name, le) (rate(handler_execution_time_seconds_bucket{job=\"vikunja\"}[5m]))))";
+            legendFormat = "{{handler_name}}";
             refId = "A";
           }
         ];
       }
       {
-        id = 9;
+        id = 11;
         type = "timeseries";
-        title = "Process CPU Usage (core seconds/s)";
+        title = "Vikunja Handler Event Rate";
         datasource = {
           type = "prometheus";
           uid = "prometheus";
@@ -7934,22 +8020,27 @@
         fieldConfig = {
           defaults = {
             min = 0;
-            unit = "short";
+            unit = "ops";
           };
           overrides = [];
         };
         targets = [
           {
-            expr = "sum by (job, instance) (rate(process_cpu_seconds_total{job=~\"authentik|vikunja\"}[5m])) or label_replace(vector(0), \"job\", \"none\", \"\", \"\")";
-            legendFormat = "{{job}} {{instance}}";
+            expr = "topk(8, sum by (handler_name) (rate(handler_execution_time_seconds_count{job=\"vikunja\"}[5m])))";
+            legendFormat = "{{handler_name}}";
             refId = "A";
+          }
+          {
+            expr = "sum(rate(subscriber_messages_received_total{job=\"vikunja\"}[5m])) or vector(0)";
+            legendFormat = "subscriber throughput";
+            refId = "B";
           }
         ];
       }
       {
-        id = 10;
+        id = 12;
         type = "timeseries";
-        title = "Process RSS Memory (bytes)";
+        title = "Vikunja Domain Object Counts";
         datasource = {
           type = "prometheus";
           uid = "prometheus";
@@ -7963,15 +8054,35 @@
         fieldConfig = {
           defaults = {
             min = 0;
-            unit = "bytes";
+            unit = "short";
           };
           overrides = [];
         };
         targets = [
           {
-            expr = "max by (job, instance) (process_resident_memory_bytes{job=~\"authentik|vikunja\"}) or label_replace(vector(0), \"job\", \"none\", \"\", \"\")";
-            legendFormat = "{{job}} {{instance}}";
+            expr = "vikunja_task_count{job=\"vikunja\"} or vector(0)";
+            legendFormat = "tasks";
             refId = "A";
+          }
+          {
+            expr = "vikunja_project_count{job=\"vikunja\"} or vector(0)";
+            legendFormat = "projects";
+            refId = "B";
+          }
+          {
+            expr = "vikunja_active_users{job=\"vikunja\"} or vector(0)";
+            legendFormat = "active users";
+            refId = "C";
+          }
+          {
+            expr = "vikunja_user_count{job=\"vikunja\"} or vector(0)";
+            legendFormat = "users";
+            refId = "D";
+          }
+          {
+            expr = "vikunja_team_count{job=\"vikunja\"} or vector(0)";
+            legendFormat = "teams";
+            refId = "E";
           }
         ];
       }
