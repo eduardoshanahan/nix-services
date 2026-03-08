@@ -1,0 +1,72 @@
+services:
+  karakeep:
+    image: ${KARAKEEP_IMAGE_REPOSITORY}:${KARAKEEP_VERSION}
+    container_name: ${KARAKEEP_CONTAINER_NAME}
+    restart: unless-stopped
+    init: true
+
+    env_file:
+      - "${KARAKEEP_ENV_FILE}"
+
+    environment:
+      - MEILI_ADDR=http://karakeep-meilisearch:7700
+      - BROWSER_WEB_URL=http://karakeep-chrome:9222
+      - DATA_DIR=/data
+      - TZ=${TZ}
+
+    volumes:
+      - "${KARAKEEP_DATA_DIR}:/data:rw"
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=${KARAKEEP_NETWORK}"
+      - "traefik.http.routers.karakeep.rule=Host(`${KARAKEEP_HOSTNAME}`)"
+      - "traefik.http.services.karakeep.loadbalancer.server.port=3000"
+      - "traefik.http.routers.karakeep.entrypoints=${KARAKEEP_ENTRYPOINTS}"
+      - "traefik.http.routers.karakeep.tls=${KARAKEEP_TLS}"
+
+    networks:
+      - traefik
+
+    depends_on:
+      - karakeep-chrome
+      - karakeep-meilisearch
+
+  karakeep-chrome:
+    image: ${KARAKEEP_CHROME_IMAGE}
+    container_name: karakeep-chrome
+    restart: unless-stopped
+    init: true
+    command:
+      - --no-sandbox
+      - --disable-gpu
+      - --disable-dev-shm-usage
+      - --remote-debugging-address=0.0.0.0
+      - --remote-debugging-port=9222
+      - --hide-scrollbars
+
+    networks:
+      - traefik
+
+  karakeep-meilisearch:
+    image: ${KARAKEEP_MEILISEARCH_IMAGE}
+    container_name: karakeep-meilisearch
+    restart: unless-stopped
+    init: true
+
+    env_file:
+      - "${KARAKEEP_ENV_FILE}"
+
+    environment:
+      - MEILI_NO_ANALYTICS=true
+
+    volumes:
+      - "${KARAKEEP_MEILISEARCH_DATA_DIR}:/meili_data:rw"
+
+    networks:
+      - traefik
+
+networks:
+  traefik:
+    external: true
+    name: ${KARAKEEP_NETWORK}

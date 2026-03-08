@@ -94,6 +94,7 @@
         authentikComposeModule = import ./services/authentik/authentik.nix;
         timeTaggerComposeModule = import ./services/timetagger/timetagger.nix;
         traggoComposeModule = import ./services/traggo/traggo.nix;
+        karakeepComposeModule = import ./services/karakeep/karakeep.nix;
         dozzleComposeModule = import ./services/dozzle/dozzle.nix;
         dockerSocketProxyComposeModule = import ./services/docker-socket-proxy/docker-socket-proxy.nix;
       in {
@@ -127,6 +128,7 @@
           authentikCompose = authentikComposeModule;
           timeTaggerCompose = timeTaggerComposeModule;
           traggoCompose = traggoComposeModule;
+          karakeepCompose = karakeepComposeModule;
           dozzleCompose = dozzleComposeModule;
           dockerSocketProxyCompose = dockerSocketProxyComposeModule;
         };
@@ -161,6 +163,7 @@
           authentikCompose = authentikComposeModule;
           timeTaggerCompose = timeTaggerComposeModule;
           traggoCompose = traggoComposeModule;
+          karakeepCompose = karakeepComposeModule;
           dozzleCompose = dozzleComposeModule;
           dockerSocketProxyCompose = dockerSocketProxyComposeModule;
         };
