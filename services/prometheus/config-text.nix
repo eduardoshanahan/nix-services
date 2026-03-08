@@ -225,6 +225,10 @@
         targets = cfg.scrape.mysqlExporterTargets;
       })
       ++ (optionalJobLines {
+        name = "mongodb-exporter";
+        targets = cfg.scrape.mongodbExporterTargets;
+      })
+      ++ (optionalJobLines {
         name = "grafana";
         targets = cfg.scrape.grafanaTargets;
       })
@@ -561,6 +565,15 @@
       "          summary: \"MySQL exporter DB down on {{ $labels.instance }}\""
       "          description: \"mysqld-exporter can be scraped but DB connectivity is failing (mysql_up=0) for more than 3 minutes.\""
       ""
+      "      - alert: MongodbExporterDatabaseDown"
+      "        expr: mongodb_up{job=\"mongodb-exporter\"} == 0"
+      "        for: 3m"
+      "        labels:"
+      "          severity: critical"
+      "        annotations:"
+      "          summary: \"MongoDB exporter DB down on {{ $labels.instance }}\""
+      "          description: \"mongodb-exporter can be scraped but DB connectivity is failing (mongodb_up=0) for more than 3 minutes.\""
+      ""
       "      - alert: PostgresExporterDegraded"
       "        expr: up{job=\"postgres-exporter\"} == 1 and on(instance, job) pg_up{job=\"postgres-exporter\"} == 0"
       "        for: 3m"
@@ -588,17 +601,26 @@
       "          summary: \"MySQL exporter degraded on {{ $labels.instance }}\""
       "          description: \"Exporter is reachable but MySQL connectivity is failing (up=1, mysql_up=0) for more than 3 minutes.\""
       ""
+      "      - alert: MongodbExporterDegraded"
+      "        expr: up{job=\"mongodb-exporter\"} == 1 and on(instance, job) mongodb_up{job=\"mongodb-exporter\"} == 0"
+      "        for: 3m"
+      "        labels:"
+      "          severity: critical"
+      "        annotations:"
+      "          summary: \"MongoDB exporter degraded on {{ $labels.instance }}\""
+      "          description: \"Exporter is reachable but MongoDB connectivity is failing (up=1, mongodb_up=0) for more than 3 minutes.\""
+      ""
       "      - alert: SharedInfraAnyExporterDown"
-      "        expr: ((max(up{job=\"postgres-exporter\"} == bool 0) or vector(0)) + (max(up{job=\"redis-exporter\"} == bool 0) or vector(0)) + (max(up{job=\"mysql-exporter\"} == bool 0) or vector(0))) > 0"
+      "        expr: ((max(up{job=\"postgres-exporter\"} == bool 0) or vector(0)) + (max(up{job=\"redis-exporter\"} == bool 0) or vector(0)) + (max(up{job=\"mysql-exporter\"} == bool 0) or vector(0)) + (max(up{job=\"mongodb-exporter\"} == bool 0) or vector(0))) > 0"
       "        for: 2m"
       "        labels:"
       "          severity: warning"
       "        annotations:"
       "          summary: \"Shared infra exporter down\""
-      "          description: \"At least one shared infra exporter (postgres/redis/mysql) is not being scraped for more than 2 minutes.\""
+      "          description: \"At least one shared infra exporter (postgres/redis/mysql/mongodb) is not being scraped for more than 2 minutes.\""
       ""
       "      - alert: SharedInfraAnyDegraded"
-      "        expr: (((max(up{job=\"postgres-exporter\"}) or vector(0)) * (max(pg_up{job=\"postgres-exporter\"} == bool 0) or vector(0))) + ((max(up{job=\"redis-exporter\"}) or vector(0)) * (max(redis_up{job=\"redis-exporter\"} == bool 0) or vector(0))) + ((max(up{job=\"mysql-exporter\"}) or vector(0)) * (max(mysql_up{job=\"mysql-exporter\"} == bool 0) or vector(0)))) > 0"
+      "        expr: (((max(up{job=\"postgres-exporter\"}) or vector(0)) * (max(pg_up{job=\"postgres-exporter\"} == bool 0) or vector(0))) + ((max(up{job=\"redis-exporter\"}) or vector(0)) * (max(redis_up{job=\"redis-exporter\"} == bool 0) or vector(0))) + ((max(up{job=\"mysql-exporter\"}) or vector(0)) * (max(mysql_up{job=\"mysql-exporter\"} == bool 0) or vector(0))) + ((max(up{job=\"mongodb-exporter\"}) or vector(0)) * (max(mongodb_up{job=\"mongodb-exporter\"} == bool 0) or vector(0)))) > 0"
       "        for: 3m"
       "        labels:"
       "          severity: critical"
@@ -632,6 +654,15 @@
       "        annotations:"
       "          summary: \"MySQL exporter scrape down on {{ $labels.instance }}\""
       "          description: \"Prometheus cannot scrape mysqld-exporter for more than 2 minutes.\""
+      ""
+      "      - alert: MongodbExporterScrapeDown"
+      "        expr: up{job=\"mongodb-exporter\"} == 0"
+      "        for: 2m"
+      "        labels:"
+      "          severity: warning"
+      "        annotations:"
+      "          summary: \"MongoDB exporter scrape down on {{ $labels.instance }}\""
+      "          description: \"Prometheus cannot scrape mongodb-exporter for more than 2 minutes.\""
       ""
       "      - alert: SmtpRelaySystemdDown"
       "        expr: (max(node_systemd_unit_state{job=\"nodes\",name=\"smtp-relay.service\",state=\"active\"}) or vector(0)) == 0"

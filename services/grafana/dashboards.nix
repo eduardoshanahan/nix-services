@@ -2121,7 +2121,7 @@
     id = null;
     uid = "shared-infra";
     title = "Shared Infra";
-    tags = ["homelab" "shared-infra" "postgres" "redis" "mysql"];
+    tags = ["homelab" "shared-infra" "postgres" "redis" "mysql" "mongo"];
     timezone = "browser";
     schemaVersion = 39;
     version = 1;
@@ -2142,7 +2142,7 @@
         };
         gridPos = {
           h = 6;
-          w = 8;
+          w = 6;
           x = 0;
           y = 0;
         };
@@ -2206,8 +2206,8 @@
         };
         gridPos = {
           h = 6;
-          w = 8;
-          x = 8;
+          w = 6;
+          x = 6;
           y = 0;
         };
         options = {
@@ -2270,8 +2270,8 @@
         };
         gridPos = {
           h = 6;
-          w = 8;
-          x = 16;
+          w = 6;
+          x = 12;
           y = 0;
         };
         options = {
@@ -2320,6 +2320,70 @@
         targets = [
           {
             expr = "max(mysql_up{job=\"mysql-exporter\"}) or vector(0)";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 34;
+        type = "stat";
+        title = "Mongo DB Up";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 6;
+          x = 18;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+        };
+        fieldConfig = {
+          defaults = {
+            decimals = 0;
+            min = 0;
+            max = 1;
+            mappings = [
+              {
+                type = "value";
+                options = {
+                  "0" = {
+                    text = "DOWN";
+                  };
+                  "1" = {
+                    text = "UP";
+                  };
+                };
+              }
+            ];
+            thresholds = {
+              mode = "absolute";
+              steps = [
+                {
+                  color = "red";
+                  value = null;
+                }
+                {
+                  color = "green";
+                  value = 1;
+                }
+              ];
+            };
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "max(mongodb_up{job=\"mongodb-exporter\"}) or vector(0)";
             refId = "A";
           }
         ];
@@ -4147,7 +4211,7 @@
         };
         targets = [
           {
-            expr = "sum(up{job=~\"prometheus|alertmanager|grafana|loki|traefik|nodes|promtail|cadvisor|snmp-exporter|pihole-exporter|gitea|unpoller|postgres-exporter|redis-exporter|mysql-exporter|github-profile|authentik|vikunja\"} == bool 0) or vector(0)";
+            expr = "sum(up{job=~\"prometheus|alertmanager|grafana|loki|traefik|nodes|promtail|cadvisor|snmp-exporter|pihole-exporter|gitea|unpoller|postgres-exporter|redis-exporter|mysql-exporter|mongodb-exporter|github-profile|authentik|vikunja\"} == bool 0) or vector(0)";
             refId = "A";
           }
         ];
@@ -4236,7 +4300,7 @@
         };
         targets = [
           {
-            expr = "sum by (job) (up{job=~\"prometheus|alertmanager|grafana|loki|traefik|nodes|promtail|cadvisor|snmp-exporter|pihole-exporter|gitea|unpoller|postgres-exporter|redis-exporter|mysql-exporter|github-profile|authentik|vikunja\"})";
+            expr = "sum by (job) (up{job=~\"prometheus|alertmanager|grafana|loki|traefik|nodes|promtail|cadvisor|snmp-exporter|pihole-exporter|gitea|unpoller|postgres-exporter|redis-exporter|mysql-exporter|mongodb-exporter|github-profile|authentik|vikunja\"})";
             legendFormat = "{{job}}";
             refId = "A";
           }

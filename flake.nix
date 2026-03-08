@@ -81,6 +81,7 @@
         postgresExporterModule = import ./services/postgres-exporter/postgres-exporter.nix;
         redisExporterModule = import ./services/redis-exporter/redis-exporter.nix;
         mysqlExporterModule = import ./services/mysql-exporter/mysql-exporter.nix;
+        mongodbExporterModule = import ./services/mongodb-exporter/mongodb-exporter.nix;
         unpollerModule = import ./services/unpoller/unpoller.nix;
         tailscaleModule = import ./services/tailscale/tailscale.nix;
         ghostModule = import ./services/ghost/ghost.nix;
@@ -112,6 +113,7 @@
           postgresExporterCompose = postgresExporterModule;
           redisExporterCompose = redisExporterModule;
           mysqlExporterCompose = mysqlExporterModule;
+          mongodbExporterCompose = mongodbExporterModule;
           unpoller = unpollerModule;
           tailscale = tailscaleModule;
           ghost = ghostModule;
@@ -144,6 +146,7 @@
           postgresExporterCompose = postgresExporterModule;
           redisExporterCompose = redisExporterModule;
           mysqlExporterCompose = mysqlExporterModule;
+          mongodbExporterCompose = mongodbExporterModule;
           unpoller = unpollerModule;
           tailscale = tailscaleModule;
           ghost = ghostModule;

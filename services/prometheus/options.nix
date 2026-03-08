@@ -265,6 +265,13 @@
         description = "MySQL exporter targets (`host:port`) to scrape.";
       };
 
+      mongodbExporterTargets = lib.mkOption {
+        type = lib.types.listOf lib.types.str;
+        default = [];
+        example = ["rpi-box-02-metrics.internal.example:9216"];
+        description = "MongoDB exporter targets (`host:port`) to scrape.";
+      };
+
       piholeExporterTargets = lib.mkOption {
         type = lib.types.listOf lib.types.str;
         default = [];
