@@ -5993,123 +5993,6 @@
       {
         id = 6;
         type = "timeseries";
-        title = "5xx % by Service (top 12)";
-        datasource = {
-          type = "prometheus";
-          uid = "prometheus";
-        };
-        gridPos = {
-          h = 8;
-          w = 12;
-          x = 12;
-          y = 6;
-        };
-        fieldConfig = {
-          defaults = {
-            unit = "percent";
-          };
-          overrides = [];
-        };
-        targets = [
-          {
-            expr = "topk(12, 100 * (sum by (service) (rate(traefik_service_requests_total{service!=\"noop@internal\",code=~\"5..\"}[5m])) / clamp_min(sum by (service) (rate(traefik_service_requests_total{service!=\"noop@internal\"}[5m])), 0.001)))";
-            legendFormat = "{{service}}";
-            refId = "A";
-          }
-        ];
-      }
-      {
-        id = 7;
-        type = "timeseries";
-        title = "p95 Latency by Service (top 12)";
-        datasource = {
-          type = "prometheus";
-          uid = "prometheus";
-        };
-        gridPos = {
-          h = 8;
-          w = 12;
-          x = 0;
-          y = 14;
-        };
-        fieldConfig = {
-          defaults = {
-            unit = "s";
-          };
-          overrides = [];
-        };
-        targets = [
-          {
-            expr = "topk(12, histogram_quantile(0.95, sum by (service, le) (rate(traefik_service_request_duration_seconds_bucket{service!=\"noop@internal\"}[5m]))))";
-            legendFormat = "{{service}}";
-            refId = "A";
-          }
-        ];
-      }
-      {
-        id = 8;
-        type = "timeseries";
-        title = "Success % by Service (top 12)";
-        datasource = {
-          type = "prometheus";
-          uid = "prometheus";
-        };
-        gridPos = {
-          h = 8;
-          w = 12;
-          x = 12;
-          y = 14;
-        };
-        fieldConfig = {
-          defaults = {
-            unit = "percent";
-          };
-          overrides = [];
-        };
-        targets = [
-          {
-            expr = "topk(12, 100 * (1 - (sum by (service) (rate(traefik_service_requests_total{service!=\"noop@internal\",code=~\"5..\"}[5m])) / clamp_min(sum by (service) (rate(traefik_service_requests_total{service!=\"noop@internal\"}[5m])), 0.001))))";
-            legendFormat = "{{service}}";
-            refId = "A";
-          }
-        ];
-      }
-      {
-        id = 9;
-        type = "timeseries";
-        title = "Global Success % / 5xx %";
-        datasource = {
-          type = "prometheus";
-          uid = "prometheus";
-        };
-        gridPos = {
-          h = 8;
-          w = 12;
-          x = 0;
-          y = 22;
-        };
-        fieldConfig = {
-          defaults = {
-            unit = "percent";
-          };
-          overrides = [];
-        };
-        targets = [
-          {
-            expr = "100 * (1 - ((sum(rate(traefik_service_requests_total{service!=\"noop@internal\",code=~\"5..\"}[5m])) or vector(0)) / clamp_min((sum(rate(traefik_service_requests_total{service!=\"noop@internal\"}[5m])) or vector(0)), 0.001)))";
-            legendFormat = "success_pct";
-            refId = "A";
-          }
-          {
-            expr = "100 * ((sum(rate(traefik_service_requests_total{service!=\"noop@internal\",code=~\"5..\"}[5m])) or vector(0)) / clamp_min((sum(rate(traefik_service_requests_total{service!=\"noop@internal\"}[5m])) or vector(0)), 0.001))";
-            legendFormat = "error_5xx_pct";
-            refId = "B";
-          }
-        ];
-      }
-      {
-        id = 10;
-        type = "timeseries";
         title = "Global Request Rate by Status Class";
         datasource = {
           type = "prometheus";
@@ -6119,7 +6002,7 @@
           h = 8;
           w = 12;
           x = 12;
-          y = 22;
+          y = 6;
         };
         fieldConfig = {
           defaults = {
@@ -6147,6 +6030,67 @@
             expr = "sum(rate(traefik_service_requests_total{service!=\"noop@internal\",code=~\"5..\"}[5m]))";
             legendFormat = "5xx";
             refId = "D";
+          }
+        ];
+      }
+      {
+        id = 9;
+        type = "timeseries";
+        title = "Global Success % / 5xx %";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 0;
+          y = 14;
+        };
+        fieldConfig = {
+          defaults = {
+            unit = "percent";
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "100 * (1 - ((sum(rate(traefik_service_requests_total{service!=\"noop@internal\",code=~\"5..\"}[5m])) or vector(0)) / clamp_min((sum(rate(traefik_service_requests_total{service!=\"noop@internal\"}[5m])) or vector(0)), 0.001)))";
+            legendFormat = "success_pct";
+            refId = "A";
+          }
+          {
+            expr = "100 * ((sum(rate(traefik_service_requests_total{service!=\"noop@internal\",code=~\"5..\"}[5m])) or vector(0)) / clamp_min((sum(rate(traefik_service_requests_total{service!=\"noop@internal\"}[5m])) or vector(0)), 0.001))";
+            legendFormat = "error_5xx_pct";
+            refId = "B";
+          }
+        ];
+      }
+      {
+        id = 10;
+        type = "timeseries";
+        title = "Global p95 Latency (top 12 services)";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 12;
+          y = 14;
+        };
+        fieldConfig = {
+          defaults = {
+            unit = "s";
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "topk(12, histogram_quantile(0.95, sum by (service, le) (rate(traefik_service_request_duration_seconds_bucket{service!=\"noop@internal\"}[5m]))))";
+            legendFormat = "{{service}}";
+            refId = "A";
           }
         ];
       }
@@ -7361,7 +7305,7 @@
       {
         id = 4;
         type = "stat";
-        title = "SMTP Relay Container Seen";
+        title = "App Alerts Firing";
         datasource = {
           type = "prometheus";
           uid = "prometheus";
@@ -7384,30 +7328,22 @@
         fieldConfig = {
           defaults = {
             min = 0;
-            max = 1;
-            mappings = [
-              {
-                type = "value";
-                options = {
-                  "0" = {
-                    text = "NOT SEEN";
-                  };
-                  "1" = {
-                    text = "SEEN";
-                  };
-                };
-              }
-            ];
+            decimals = 0;
+            unit = "short";
             thresholds = {
               mode = "absolute";
               steps = [
                 {
-                  color = "red";
+                  color = "green";
                   value = null;
                 }
                 {
-                  color = "green";
+                  color = "orange";
                   value = 1;
+                }
+                {
+                  color = "red";
+                  value = 3;
                 }
               ];
             };
@@ -7416,7 +7352,7 @@
         };
         targets = [
           {
-            expr = "max((time() - container_last_seen{job=\"cadvisor\",container_label_com_docker_compose_service=\"smtp-relay\"}) < bool 180) or vector(0)";
+            expr = "sum(ALERTS{alertname=~\"AppServiceHigh5xxRatio|AppServiceHighLatencyP95|AppContainerNotSeen\",alertstate=\"firing\"}) or vector(0)";
             refId = "A";
           }
         ];
@@ -7445,35 +7381,6 @@
         targets = [
           {
             expr = "sum by (service) (rate(traefik_service_requests_total{service=~\"authentik@docker|vikunja@docker|timetagger@docker|homepage@docker|ghost-blog@docker|uptime-kuma@docker|diagrams-net@docker|excalidraw@docker|owntracks-recorder@docker\"}[5m]))";
-            legendFormat = "{{service}}";
-            refId = "A";
-          }
-        ];
-      }
-      {
-        id = 6;
-        type = "timeseries";
-        title = "5xx Rate by App Service (req/s)";
-        datasource = {
-          type = "prometheus";
-          uid = "prometheus";
-        };
-        gridPos = {
-          h = 8;
-          w = 12;
-          x = 12;
-          y = 6;
-        };
-        fieldConfig = {
-          defaults = {
-            min = 0;
-            unit = "reqps";
-          };
-          overrides = [];
-        };
-        targets = [
-          {
-            expr = "sum by (service) (rate(traefik_service_requests_total{service=~\"authentik@docker|vikunja@docker|timetagger@docker|homepage@docker|ghost-blog@docker|uptime-kuma@docker|diagrams-net@docker|excalidraw@docker|owntracks-recorder@docker\",code=~\"5..\"}[5m]))";
             legendFormat = "{{service}}";
             refId = "A";
           }
@@ -7548,7 +7455,7 @@
         };
         gridPos = {
           h = 8;
-          w = 24;
+          w = 12;
           x = 0;
           y = 22;
         };
@@ -7574,8 +7481,37 @@
         };
         targets = [
           {
-            expr = "max by (container_label_com_docker_compose_service) ((time() - container_last_seen{job=\"cadvisor\",container_label_com_docker_compose_service=~\"authentik-server|authentik-worker|vikunja|smtp-relay|timetagger|homepage|uptime-kuma|diagrams-net|excalidraw|owntracks-recorder\"}) < bool 180)";
+            expr = "max by (container_label_com_docker_compose_service) ((time() - container_last_seen{job=\"cadvisor\",container_label_com_docker_compose_service=~\"authentik-server|authentik-worker|vikunja|timetagger|homepage|uptime-kuma|diagrams-net|excalidraw|owntracks-recorder\"}) < bool 180)";
             legendFormat = "{{container_label_com_docker_compose_service}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 10;
+        type = "timeseries";
+        title = "App Alerts by Name";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 12;
+          y = 22;
+        };
+        fieldConfig = {
+          defaults = {
+            min = 0;
+            unit = "short";
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "sum by (alertname) (ALERTS{alertname=~\"AppServiceHigh5xxRatio|AppServiceHighLatencyP95|AppContainerNotSeen\",alertstate=\"firing\"}) or label_replace(vector(0), \"alertname\", \"none\", \"\", \"\")";
+            legendFormat = "{{alertname}}";
             refId = "A";
           }
         ];
