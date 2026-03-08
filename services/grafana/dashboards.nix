@@ -8088,6 +8088,486 @@
       }
     ];
   };
+  homeAssistantOperationsDashboardJson = builtins.toJSON {
+    id = null;
+    uid = "home-assistant-operations";
+    title = "Home Assistant Operations";
+    tags = ["homelab" "home-assistant" "operations" "reliability"];
+    timezone = "browser";
+    schemaVersion = 39;
+    version = 1;
+    refresh = "30s";
+    time = {
+      from = "now-24h";
+      to = "now";
+    };
+    editable = true;
+    panels = [
+      {
+        id = 1;
+        type = "stat";
+        title = "HA Request Rate";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 4;
+          x = 0;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+        };
+        fieldConfig = {
+          defaults = {
+            min = 0;
+            decimals = 2;
+            unit = "reqps";
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "sum(rate(traefik_service_requests_total{service=\"homeassistant@docker\"}[5m])) or vector(0)";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 2;
+        type = "stat";
+        title = "HA 5xx Ratio";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 4;
+          x = 4;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+        };
+        fieldConfig = {
+          defaults = {
+            min = 0;
+            max = 100;
+            decimals = 2;
+            unit = "percent";
+            thresholds = {
+              mode = "absolute";
+              steps = [
+                {
+                  color = "green";
+                  value = null;
+                }
+                {
+                  color = "orange";
+                  value = 1;
+                }
+                {
+                  color = "red";
+                  value = 5;
+                }
+              ];
+            };
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "100 * ((sum(rate(traefik_service_requests_total{service=\"homeassistant@docker\",code=~\"5..\"}[5m])) or vector(0)) / clamp_min((sum(rate(traefik_service_requests_total{service=\"homeassistant@docker\"}[5m])) or vector(0)), 0.01))";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 3;
+        type = "stat";
+        title = "HA P95 Request Duration";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 4;
+          x = 8;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+        };
+        fieldConfig = {
+          defaults = {
+            min = 0;
+            unit = "s";
+            thresholds = {
+              mode = "absolute";
+              steps = [
+                {
+                  color = "green";
+                  value = null;
+                }
+                {
+                  color = "orange";
+                  value = 0.5;
+                }
+                {
+                  color = "red";
+                  value = 2;
+                }
+              ];
+            };
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "histogram_quantile(0.95, sum by (le) (rate(traefik_service_request_duration_seconds_bucket{service=\"homeassistant@docker\"}[5m]))) and on() (sum(rate(traefik_service_requests_total{service=\"homeassistant@docker\"}[5m])) > 0)";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 4;
+        type = "stat";
+        title = "HA Container Seen";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 4;
+          x = 12;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+        };
+        fieldConfig = {
+          defaults = {
+            min = 0;
+            max = 1;
+            mappings = [
+              {
+                type = "value";
+                options = {
+                  "0" = {
+                    text = "NOT SEEN";
+                  };
+                  "1" = {
+                    text = "SEEN";
+                  };
+                };
+              }
+            ];
+            thresholds = {
+              mode = "absolute";
+              steps = [
+                {
+                  color = "red";
+                  value = null;
+                }
+                {
+                  color = "green";
+                  value = 1;
+                }
+              ];
+            };
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "max((time() - container_last_seen{job=\"cadvisor\",container_label_com_docker_compose_service=\"home-assistant\"}) < bool 180) or vector(0)";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 5;
+        type = "stat";
+        title = "HA systemd Active";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 4;
+          x = 16;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+        };
+        fieldConfig = {
+          defaults = {
+            min = 0;
+            max = 1;
+            mappings = [
+              {
+                type = "value";
+                options = {
+                  "0" = {
+                    text = "INACTIVE";
+                  };
+                  "1" = {
+                    text = "ACTIVE";
+                  };
+                };
+              }
+            ];
+            thresholds = {
+              mode = "absolute";
+              steps = [
+                {
+                  color = "red";
+                  value = null;
+                }
+                {
+                  color = "green";
+                  value = 1;
+                }
+              ];
+            };
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "max(node_systemd_unit_state{job=\"nodes\",name=\"home-assistant.service\",state=\"active\"}) or vector(0)";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 6;
+        type = "stat";
+        title = "Recorder DB Up";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 4;
+          x = 20;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+        };
+        fieldConfig = {
+          defaults = {
+            min = 0;
+            max = 1;
+            mappings = [
+              {
+                type = "value";
+                options = {
+                  "0" = {
+                    text = "DOWN";
+                  };
+                  "1" = {
+                    text = "UP";
+                  };
+                };
+              }
+            ];
+            thresholds = {
+              mode = "absolute";
+              steps = [
+                {
+                  color = "red";
+                  value = null;
+                }
+                {
+                  color = "green";
+                  value = 1;
+                }
+              ];
+            };
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "max(pg_up{job=\"postgres-exporter\"}) or vector(0)";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 7;
+        type = "timeseries";
+        title = "HA Requests by Status Code";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 0;
+          y = 6;
+        };
+        fieldConfig = {
+          defaults = {
+            min = 0;
+            unit = "reqps";
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "sum by (code) (rate(traefik_service_requests_total{service=\"homeassistant@docker\"}[5m]))";
+            legendFormat = "{{code}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 8;
+        type = "timeseries";
+        title = "HA 5xx Rate";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 12;
+          y = 6;
+        };
+        fieldConfig = {
+          defaults = {
+            min = 0;
+            unit = "reqps";
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "sum by (code) (rate(traefik_service_requests_total{service=\"homeassistant@docker\",code=~\"5..\"}[5m]))";
+            legendFormat = "{{code}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 9;
+        type = "timeseries";
+        title = "HA Latency (P50/P95)";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 0;
+          y = 14;
+        };
+        fieldConfig = {
+          defaults = {
+            min = 0;
+            unit = "s";
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "histogram_quantile(0.50, sum by (le) (rate(traefik_service_request_duration_seconds_bucket{service=\"homeassistant@docker\"}[5m]))) and on() (sum(rate(traefik_service_requests_total{service=\"homeassistant@docker\"}[5m])) > 0)";
+            legendFormat = "p50";
+            refId = "A";
+          }
+          {
+            expr = "histogram_quantile(0.95, sum by (le) (rate(traefik_service_request_duration_seconds_bucket{service=\"homeassistant@docker\"}[5m]))) and on() (sum(rate(traefik_service_requests_total{service=\"homeassistant@docker\"}[5m])) > 0)";
+            legendFormat = "p95";
+            refId = "B";
+          }
+        ];
+      }
+      {
+        id = 10;
+        type = "timeseries";
+        title = "HA Container CPU / Memory";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 12;
+          y = 14;
+        };
+        fieldConfig = {
+          defaults = {
+            min = 0;
+            unit = "short";
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "sum(rate(container_cpu_usage_seconds_total{job=\"cadvisor\",container_label_com_docker_compose_service=\"home-assistant\"}[5m]))";
+            legendFormat = "cpu cores";
+            refId = "A";
+          }
+          {
+            expr = "max(container_memory_working_set_bytes{job=\"cadvisor\",container_label_com_docker_compose_service=\"home-assistant\"})";
+            legendFormat = "memory working set";
+            refId = "B";
+          }
+        ];
+      }
+    ];
+  };
   unifiOverviewDashboardJson = builtins.toJSON {
     id = null;
     uid = "unifi-overview";
