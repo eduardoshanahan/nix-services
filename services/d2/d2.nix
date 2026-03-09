@@ -9,6 +9,7 @@
   composeDir = "/var/lib/${serviceName}-compose";
   staticDir = "/etc/${serviceName}";
   dockerBin = "${config.virtualisation.docker.package}/bin/docker";
+  composeCmd = "${dockerBin} compose --project-directory ${composeDir} -f ${composeDir}/docker-compose.yml";
   defaultFileName =
     if lib.hasSuffix ".d2" cfg.defaultFile
     then cfg.defaultFile
@@ -129,12 +130,12 @@ in {
           "${pkgs.runtimeShell} -c 'test -s ${composeDir}/app/main.go'"
           "${pkgs.runtimeShell} -c 'test -s ${composeDir}/app/go.mod'"
           "${pkgs.runtimeShell} -c 'for i in $(seq 1 30); do ${dockerBin} info >/dev/null 2>&1 && exit 0; sleep 1; done; echo \"d2: docker daemon is not ready\" >&2; exit 1'"
-          "${pkgs.runtimeShell} -c '${dockerBin} compose config >/dev/null'"
+          "${pkgs.runtimeShell} -c '${composeCmd} config >/dev/null'"
           "${pkgs.runtimeShell} -c '${dockerBin} network inspect ${cfg.network} >/dev/null 2>&1 || ${dockerBin} network create ${cfg.network}'"
         ];
 
-        ExecStart = "${dockerBin} compose --project-directory ${composeDir} -f ${composeDir}/docker-compose.yml up -d --build";
-        ExecStop = "${dockerBin} compose --project-directory ${composeDir} -f ${composeDir}/docker-compose.yml down";
+        ExecStart = "${composeCmd} up -d --build";
+        ExecStop = "${composeCmd} down";
       };
     };
   };
