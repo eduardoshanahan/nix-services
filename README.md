@@ -46,6 +46,7 @@ Quick pointer map:
   - `services/traefik/README.md`
   - `services/grafana/README.md`
   - `services/smtp-relay/README.md`
+  - `services/d2/README.md`
 
 ## Public Repo Hygiene
 

@@ -1,0 +1,55 @@
+services:
+  d2:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        D2_IMAGE_REPOSITORY: ${D2_IMAGE_REPOSITORY}
+        D2_IMAGE_TAG: ${D2_IMAGE_TAG}
+    image: d2-local:${D2_IMAGE_TAG}
+    container_name: ${D2_CONTAINER_NAME}
+    restart: unless-stopped
+    init: true
+
+    expose:
+      - "8080"
+
+    environment:
+      - TZ=${TZ}
+      - D2_DATA_DIR=/srv/d2
+      - D2_DEFAULT_FILE=${D2_DEFAULT_FILE}
+      - D2_AUTH_ENABLED=${D2_AUTH_ENABLED}
+      - D2_AUTH_USERNAME=${D2_AUTH_USERNAME}
+      - D2_AUTH_PASSWORD_FILE=${D2_AUTH_PASSWORD_FILE}
+
+    volumes:
+      - "${D2_DATA_DIR}:/srv/d2:rw"
+
+    healthcheck:
+      test: ["CMD-SHELL", "wget --spider -q http://127.0.0.1:8080/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 8
+      start_period: 15s
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=${D2_NETWORK}"
+      - "traefik.http.routers.d2.rule=Host(`${D2_HOSTNAME}`)"
+      - "traefik.http.services.d2.loadbalancer.server.port=8080"
+      - "traefik.http.routers.d2.entrypoints=${D2_ENTRYPOINTS}"
+      - "traefik.http.routers.d2.tls=${D2_TLS}"
+
+    networks:
+      - traefik
+
+networks:
+  traefik:
+    external: true
+    name: ${D2_NETWORK}
