@@ -7271,7 +7271,7 @@
         };
         targets = [
           {
-            expr = "sum(sum by (service) (rate(traefik_service_requests_total{service=~\"authentik@docker|vikunja@docker|timetagger@docker|homepage@docker|ghost-blog@docker|uptime-kuma@docker|diagrams-net@docker|excalidraw@docker|owntracks-recorder@docker|traggo@docker|dozzle@docker|fossflow@docker|searxng@docker|d2@docker\"}[15m])) > bool 0) or vector(0)";
+            expr = "sum(sum by (service) (rate(traefik_service_requests_total{service=~\"authentik@docker|vikunja@docker|timetagger@docker|homepage@docker|ghost-blog@docker|uptime-kuma@docker|diagrams-net@docker|excalidraw@docker|owntracks-recorder@docker|traggo@docker|dozzle@docker|fossflow@docker|searxng@docker|d2@docker|paperless@docker\"}[15m])) > bool 0) or vector(0)";
             refId = "A";
           }
         ];
@@ -7326,7 +7326,7 @@
         };
         targets = [
           {
-            expr = "sum(sum by (service) (rate(traefik_service_requests_total{service=~\"authentik@docker|vikunja@docker|timetagger@docker|homepage@docker|ghost-blog@docker|uptime-kuma@docker|diagrams-net@docker|excalidraw@docker|owntracks-recorder@docker|traggo@docker|dozzle@docker|fossflow@docker|searxng@docker|d2@docker\",code=~\"5..\"}[15m])) > bool 0) or vector(0)";
+            expr = "sum(sum by (service) (rate(traefik_service_requests_total{service=~\"authentik@docker|vikunja@docker|timetagger@docker|homepage@docker|ghost-blog@docker|uptime-kuma@docker|diagrams-net@docker|excalidraw@docker|owntracks-recorder@docker|traggo@docker|dozzle@docker|fossflow@docker|searxng@docker|d2@docker|paperless@docker\",code=~\"5..\"}[15m])) > bool 0) or vector(0)";
             refId = "A";
           }
         ];
@@ -7381,7 +7381,7 @@
         };
         targets = [
           {
-            expr = "100 * (1 - ((sum(rate(traefik_service_requests_total{service=~\"authentik@docker|vikunja@docker|timetagger@docker|homepage@docker|ghost-blog@docker|uptime-kuma@docker|diagrams-net@docker|excalidraw@docker|owntracks-recorder@docker|traggo@docker|dozzle@docker|fossflow@docker|searxng@docker|d2@docker\",code=~\"5..\"}[5m])) or vector(0)) / clamp_min((sum(rate(traefik_service_requests_total{service=~\"authentik@docker|vikunja@docker|timetagger@docker|homepage@docker|ghost-blog@docker|uptime-kuma@docker|diagrams-net@docker|excalidraw@docker|owntracks-recorder@docker|traggo@docker|dozzle@docker|fossflow@docker|searxng@docker|d2@docker\"}[5m])) or vector(0)), 0.001)))";
+            expr = "100 * (1 - ((sum(rate(traefik_service_requests_total{service=~\"authentik@docker|vikunja@docker|timetagger@docker|homepage@docker|ghost-blog@docker|uptime-kuma@docker|diagrams-net@docker|excalidraw@docker|owntracks-recorder@docker|traggo@docker|dozzle@docker|fossflow@docker|searxng@docker|d2@docker|paperless@docker\",code=~\"5..\"}[5m])) or vector(0)) / clamp_min((sum(rate(traefik_service_requests_total{service=~\"authentik@docker|vikunja@docker|timetagger@docker|homepage@docker|ghost-blog@docker|uptime-kuma@docker|diagrams-net@docker|excalidraw@docker|owntracks-recorder@docker|traggo@docker|dozzle@docker|fossflow@docker|searxng@docker|d2@docker|paperless@docker\"}[5m])) or vector(0)), 0.001)))";
             refId = "A";
           }
         ];
@@ -7464,7 +7464,7 @@
         };
         targets = [
           {
-            expr = "sum by (service) (rate(traefik_service_requests_total{service=~\"authentik@docker|vikunja@docker|timetagger@docker|homepage@docker|ghost-blog@docker|uptime-kuma@docker|diagrams-net@docker|excalidraw@docker|owntracks-recorder@docker|traggo@docker|dozzle@docker|fossflow@docker|searxng@docker|d2@docker\"}[5m]))";
+            expr = "sum by (service) (rate(traefik_service_requests_total{service=~\"authentik@docker|vikunja@docker|timetagger@docker|homepage@docker|ghost-blog@docker|uptime-kuma@docker|diagrams-net@docker|excalidraw@docker|owntracks-recorder@docker|traggo@docker|dozzle@docker|fossflow@docker|searxng@docker|d2@docker|paperless@docker\"}[5m]))";
             legendFormat = "{{service}}";
             refId = "A";
           }
@@ -7494,7 +7494,7 @@
         };
         targets = [
           {
-            expr = "100 * (sum by (service) (rate(traefik_service_requests_total{service=~\"authentik@docker|vikunja@docker|timetagger@docker|homepage@docker|ghost-blog@docker|uptime-kuma@docker|diagrams-net@docker|excalidraw@docker|owntracks-recorder@docker|traggo@docker|dozzle@docker|fossflow@docker|searxng@docker|d2@docker\",code=~\"5..\"}[5m])) / clamp_min(sum by (service) (rate(traefik_service_requests_total{service=~\"authentik@docker|vikunja@docker|timetagger@docker|homepage@docker|ghost-blog@docker|uptime-kuma@docker|diagrams-net@docker|excalidraw@docker|owntracks-recorder@docker|traggo@docker|dozzle@docker|fossflow@docker|searxng@docker|d2@docker\"}[5m])), 0.001))";
+            expr = "100 * (sum by (service) (rate(traefik_service_requests_total{service=~\"authentik@docker|vikunja@docker|timetagger@docker|homepage@docker|ghost-blog@docker|uptime-kuma@docker|diagrams-net@docker|excalidraw@docker|owntracks-recorder@docker|traggo@docker|dozzle@docker|fossflow@docker|searxng@docker|d2@docker|paperless@docker\",code=~\"5..\"}[5m])) / clamp_min(sum by (service) (rate(traefik_service_requests_total{service=~\"authentik@docker|vikunja@docker|timetagger@docker|homepage@docker|ghost-blog@docker|uptime-kuma@docker|diagrams-net@docker|excalidraw@docker|owntracks-recorder@docker|traggo@docker|dozzle@docker|fossflow@docker|searxng@docker|d2@docker|paperless@docker\"}[5m])), 0.001))";
             legendFormat = "{{service}}";
             refId = "A";
           }
@@ -7523,7 +7523,7 @@
         };
         targets = [
           {
-            expr = "histogram_quantile(0.95, sum by (service, le) (rate(traefik_service_request_duration_seconds_bucket{service=~\"authentik@docker|vikunja@docker|timetagger@docker|homepage@docker|ghost-blog@docker|uptime-kuma@docker|diagrams-net@docker|excalidraw@docker|owntracks-recorder@docker|traggo@docker|dozzle@docker|fossflow@docker|searxng@docker|d2@docker\"}[5m])))";
+            expr = "histogram_quantile(0.95, sum by (service, le) (rate(traefik_service_request_duration_seconds_bucket{service=~\"authentik@docker|vikunja@docker|timetagger@docker|homepage@docker|ghost-blog@docker|uptime-kuma@docker|diagrams-net@docker|excalidraw@docker|owntracks-recorder@docker|traggo@docker|dozzle@docker|fossflow@docker|searxng@docker|d2@docker|paperless@docker\"}[5m])))";
             legendFormat = "{{service}}";
             refId = "A";
           }
