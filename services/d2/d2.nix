@@ -94,7 +94,7 @@ in {
         Type = "oneshot";
         RemainAfterExit = true;
         WorkingDirectory = "/";
-        TimeoutStartSec = 300;
+        TimeoutStartSec = 1800;
         Restart = "on-failure";
         RestartSec = 10;
 
