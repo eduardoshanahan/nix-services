@@ -97,6 +97,7 @@
         karakeepComposeModule = import ./services/karakeep/karakeep.nix;
         dozzleComposeModule = import ./services/dozzle/dozzle.nix;
         dockerSocketProxyComposeModule = import ./services/docker-socket-proxy/docker-socket-proxy.nix;
+        fossflowComposeModule = import ./services/fossflow/fossflow.nix;
       in {
         nixosModules = {
           traefik = traefikModule;
@@ -131,6 +132,7 @@
           karakeepCompose = karakeepComposeModule;
           dozzleCompose = dozzleComposeModule;
           dockerSocketProxyCompose = dockerSocketProxyComposeModule;
+          fossflowCompose = fossflowComposeModule;
         };
 
         services = {
@@ -166,6 +168,7 @@
           karakeepCompose = karakeepComposeModule;
           dozzleCompose = dozzleComposeModule;
           dockerSocketProxyCompose = dockerSocketProxyComposeModule;
+          fossflowCompose = fossflowComposeModule;
         };
       }
     );
