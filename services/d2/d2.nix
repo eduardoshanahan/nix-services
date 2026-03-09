@@ -114,7 +114,7 @@ in {
 
         ExecStartPre = [
           "${pkgs.runtimeShell} -c 'mkdir -p ${lib.escapeShellArg cfg.dataDir}/projects ${lib.escapeShellArg cfg.dataDir}/auth'"
-          "${pkgs.runtimeShell} -c 'if [ ! -s ${lib.escapeShellArg ("${cfg.dataDir}/projects/${defaultFileName}")} ]; then cat > ${lib.escapeShellArg ("${cfg.dataDir}/projects/${defaultFileName}")} <<\"EOD2\"\ndirection: right\n\napp: D2 service\napp -> users: served via Traefik\nEOD2\nfi'"
+          "${pkgs.runtimeShell} -c 'if [ ! -s ${lib.escapeShellArg ("${cfg.dataDir}/projects/${defaultFileName}")} ]; then printf \"%s\\n\" \"direction: right\" \"\" \"app: D2 service\" \"app -> users: served via Traefik\" > ${lib.escapeShellArg ("${cfg.dataDir}/projects/${defaultFileName}")}; fi'"
           "${pkgs.runtimeShell} -c 'if [ \"${authEnabledFlag}\" = \"1\" ] && [ \"${authAutoGenerateFlag}\" = \"1\" ] && [ ! -s ${lib.escapeShellArg defaultGeneratedPasswordFile} ]; then umask 077; ${pkgs.openssl}/bin/openssl rand -base64 24 > ${lib.escapeShellArg defaultGeneratedPasswordFile}; fi'"
           "${pkgs.runtimeShell} -c 'if [ \"${authEnabledFlag}\" = \"1\" ]; then test -s ${lib.escapeShellArg effectivePasswordFile}; fi'"
           "${pkgs.runtimeShell} -c 'test -s ${composeDir}/docker-compose.yml'"
