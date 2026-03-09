@@ -26,7 +26,7 @@ services:
       - "${D2_DATA_DIR}:/srv/d2:rw"
 
     healthcheck:
-      test: ["CMD-SHELL", "wget --spider -q http://127.0.0.1:8080/health || exit 1"]
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:8080/health >/dev/null || exit 1"]
       interval: 15s
       timeout: 5s
       retries: 8
