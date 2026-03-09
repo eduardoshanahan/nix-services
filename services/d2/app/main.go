@@ -441,13 +441,13 @@ const indexHTML = `<!doctype html>
       }
 
       async function loadFile(name) {
-        const res = await fetch(`/api/file?name=${encodeURIComponent(name)}`);
+        const res = await fetch("/api/file?name=" + encodeURIComponent(name));
         if (!res.ok) throw new Error("failed to load file");
         source.value = await res.text();
       }
 
       async function saveFile(name, content) {
-        const res = await fetch(`/api/file?name=${encodeURIComponent(name)}`, {
+        const res = await fetch("/api/file?name=" + encodeURIComponent(name), {
           method: "PUT",
           headers: { "Content-Type": "text/plain; charset=utf-8" },
           body: content,
@@ -482,7 +482,7 @@ const indexHTML = `<!doctype html>
         try {
           await saveFile(name, "");
           await refreshFileSelect(name);
-          setStatus(`created ${name}`);
+          setStatus("created " + name);
         } catch (err) {
           setStatus(err.message);
         }
@@ -493,7 +493,7 @@ const indexHTML = `<!doctype html>
         if (!name) return;
         try {
           await saveFile(name, source.value);
-          setStatus(`saved ${name}`);
+          setStatus("saved " + name);
         } catch (err) {
           setStatus(err.message);
         }
@@ -512,7 +512,7 @@ const indexHTML = `<!doctype html>
       fileSelect.addEventListener("change", async () => {
         try {
           await loadFile(fileSelect.value);
-          setStatus(`loaded ${fileSelect.value}`);
+          setStatus("loaded " + fileSelect.value);
         } catch (err) {
           setStatus(err.message);
         }
