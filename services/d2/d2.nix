@@ -125,6 +125,7 @@ in {
           "${pkgs.runtimeShell} -c 'if [ ! -s ${lib.escapeShellArg ("${cfg.dataDir}/projects/${defaultFileName}")} ]; then printf \"%%s\\n\" \"direction: right\" \"\" \"app: D2 service\" \"app -> users: served via Traefik\" > ${lib.escapeShellArg ("${cfg.dataDir}/projects/${defaultFileName}")}; fi'"
           "${pkgs.runtimeShell} -c 'if [ \"${authEnabledFlag}\" = \"1\" ] && [ \"${authAutoGenerateFlag}\" = \"1\" ] && [ ! -s ${lib.escapeShellArg defaultGeneratedPasswordFile} ]; then umask 077; ${pkgs.openssl}/bin/openssl rand -base64 24 > ${lib.escapeShellArg defaultGeneratedPasswordFile}; fi'"
           "${pkgs.runtimeShell} -c 'if [ \"${authEnabledFlag}\" = \"1\" ]; then test -s ${lib.escapeShellArg effectivePasswordFile}; fi'"
+          "${pkgs.runtimeShell} -c 'if [ \"${authEnabledFlag}\" = \"1\" ]; then chmod 0644 ${lib.escapeShellArg effectivePasswordFile}; fi'"
           "${pkgs.runtimeShell} -c 'test -s ${composeDir}/docker-compose.yml'"
           "${pkgs.runtimeShell} -c 'test -s ${composeDir}/Dockerfile'"
           "${pkgs.runtimeShell} -c 'test -s ${composeDir}/app/main.go'"
