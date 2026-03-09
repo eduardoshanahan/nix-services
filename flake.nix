@@ -98,6 +98,7 @@
         dozzleComposeModule = import ./services/dozzle/dozzle.nix;
         dockerSocketProxyComposeModule = import ./services/docker-socket-proxy/docker-socket-proxy.nix;
         fossflowComposeModule = import ./services/fossflow/fossflow.nix;
+        searxngComposeModule = import ./services/searxng/searxng.nix;
       in {
         nixosModules = {
           traefik = traefikModule;
@@ -133,6 +134,7 @@
           dozzleCompose = dozzleComposeModule;
           dockerSocketProxyCompose = dockerSocketProxyComposeModule;
           fossflowCompose = fossflowComposeModule;
+          searxngCompose = searxngComposeModule;
         };
 
         services = {
@@ -169,6 +171,7 @@
           dozzleCompose = dozzleComposeModule;
           dockerSocketProxyCompose = dockerSocketProxyComposeModule;
           fossflowCompose = fossflowComposeModule;
+          searxngCompose = searxngComposeModule;
         };
       }
     );

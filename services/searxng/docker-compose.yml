@@ -1,0 +1,56 @@
+services:
+  searxng:
+    image: ${SEARXNG_IMAGE}
+    container_name: ${SEARXNG_CONTAINER_NAME}
+    restart: unless-stopped
+    init: true
+    mem_limit: 768m
+    pids_limit: 256
+    cpus: "1.5"
+
+    expose:
+      - "8080"
+
+    environment:
+      - SEARXNG_BASE_URL=${SEARXNG_BASE_URL}
+      - UWSGI_WORKERS=2
+      - UWSGI_THREADS=2
+      - TZ=${TZ}
+
+    volumes:
+      - "${SEARXNG_CONFIG_DIR}:/etc/searxng:rw"
+      - "${SEARXNG_DATA_DIR}:/var/cache/searxng:rw"
+
+    healthcheck:
+      test: ["CMD-SHELL", "wget --spider -q http://127.0.0.1:8080/ || exit 1"]
+      interval: 20s
+      timeout: 5s
+      retries: 8
+      start_period: 35s
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=${SEARXNG_NETWORK}"
+      - "traefik.http.routers.searxng.rule=Host(`${SEARXNG_HOSTNAME}`)"
+      - "traefik.http.services.searxng.loadbalancer.server.port=8080"
+      - "traefik.http.routers.searxng.entrypoints=${SEARXNG_ENTRYPOINTS}"
+      - "traefik.http.routers.searxng.tls=${SEARXNG_TLS}"
+      - "traefik.http.routers.searxng.middlewares=searxng-sec@docker"
+      - "traefik.http.middlewares.searxng-sec.headers.stsSeconds=31536000"
+      - "traefik.http.middlewares.searxng-sec.headers.frameDeny=true"
+      - "traefik.http.middlewares.searxng-sec.headers.contentTypeNosniff=true"
+      - "traefik.http.middlewares.searxng-sec.headers.referrerPolicy=no-referrer"
+
+    networks:
+      - traefik
+
+networks:
+  traefik:
+    external: true
+    name: ${SEARXNG_NETWORK}
