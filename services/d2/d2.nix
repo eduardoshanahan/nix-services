@@ -92,7 +92,7 @@ in {
       serviceConfig = {
         Type = "oneshot";
         RemainAfterExit = true;
-        WorkingDirectory = composeDir;
+        WorkingDirectory = "/";
         TimeoutStartSec = 300;
         Restart = "on-failure";
         RestartSec = 10;
@@ -133,8 +133,8 @@ in {
           "${pkgs.runtimeShell} -c '${dockerBin} network inspect ${cfg.network} >/dev/null 2>&1 || ${dockerBin} network create ${cfg.network}'"
         ];
 
-        ExecStart = "${dockerBin} compose up -d --build";
-        ExecStop = "${dockerBin} compose down";
+        ExecStart = "${dockerBin} compose --project-directory ${composeDir} -f ${composeDir}/docker-compose.yml up -d --build";
+        ExecStop = "${dockerBin} compose --project-directory ${composeDir} -f ${composeDir}/docker-compose.yml down";
       };
     };
   };
