@@ -6,7 +6,8 @@
 }: let
   cfg = config.services.d2Compose;
   serviceName = "d2";
-  composeDir = "/etc/${serviceName}";
+  composeDir = "/var/lib/${serviceName}-compose";
+  staticDir = "/etc/${serviceName}";
   dockerBin = "${config.virtualisation.docker.package}/bin/docker";
   defaultFileName =
     if lib.hasSuffix ".d2" cfg.defaultFile
@@ -113,8 +114,14 @@ in {
         ];
 
         ExecStartPre = [
+          "${pkgs.runtimeShell} -c 'mkdir -p ${composeDir}/app'"
+          "${pkgs.runtimeShell} -c 'cp -f ${staticDir}/docker-compose.yml ${composeDir}/docker-compose.yml'"
+          "${pkgs.runtimeShell} -c 'cp -f ${staticDir}/Dockerfile ${composeDir}/Dockerfile'"
+          "${pkgs.runtimeShell} -c 'cp -f ${staticDir}/app/main.go ${composeDir}/app/main.go'"
+          "${pkgs.runtimeShell} -c 'cp -f ${staticDir}/app/go.mod ${composeDir}/app/go.mod'"
+          "${pkgs.runtimeShell} -c 'cp -f ${staticDir}/app/go.sum ${composeDir}/app/go.sum'"
           "${pkgs.runtimeShell} -c 'mkdir -p ${lib.escapeShellArg cfg.dataDir}/projects ${lib.escapeShellArg cfg.dataDir}/auth'"
-          "${pkgs.runtimeShell} -c 'if [ ! -s ${lib.escapeShellArg ("${cfg.dataDir}/projects/${defaultFileName}")} ]; then printf \"%s\\n\" \"direction: right\" \"\" \"app: D2 service\" \"app -> users: served via Traefik\" > ${lib.escapeShellArg ("${cfg.dataDir}/projects/${defaultFileName}")}; fi'"
+          "${pkgs.runtimeShell} -c 'if [ ! -s ${lib.escapeShellArg ("${cfg.dataDir}/projects/${defaultFileName}")} ]; then printf \"%%s\\n\" \"direction: right\" \"\" \"app: D2 service\" \"app -> users: served via Traefik\" > ${lib.escapeShellArg ("${cfg.dataDir}/projects/${defaultFileName}")}; fi'"
           "${pkgs.runtimeShell} -c 'if [ \"${authEnabledFlag}\" = \"1\" ] && [ \"${authAutoGenerateFlag}\" = \"1\" ] && [ ! -s ${lib.escapeShellArg defaultGeneratedPasswordFile} ]; then umask 077; ${pkgs.openssl}/bin/openssl rand -base64 24 > ${lib.escapeShellArg defaultGeneratedPasswordFile}; fi'"
           "${pkgs.runtimeShell} -c 'if [ \"${authEnabledFlag}\" = \"1\" ]; then test -s ${lib.escapeShellArg effectivePasswordFile}; fi'"
           "${pkgs.runtimeShell} -c 'test -s ${composeDir}/docker-compose.yml'"
