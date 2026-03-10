@@ -122,12 +122,6 @@ in {
       description = "Trusted proxy hops for n8n behind Traefik.";
     };
 
-    runners.enable = lib.mkOption {
-      type = lib.types.bool;
-      default = true;
-      description = "Enable n8n task runners.";
-    };
-
     database.postgres = {
       host = lib.mkOption {
         type = lib.types.str;
@@ -250,7 +244,6 @@ in {
           "WEBHOOK_URL=${publicUrl}/"
           "N8N_PROXY_HOPS=${toString cfg.proxyHops}"
           "N8N_SECURE_COOKIE=${if cfg.tls then "true" else "false"}"
-          "N8N_RUNNERS_ENABLED=${if cfg.runners.enable then "true" else "false"}"
           "N8N_DATA_DIR=${cfg.dataDir}"
           "N8N_RUNTIME_ENV_FILE=/run/secrets/${serviceName}.env"
           "N8N_DB_HOST=${cfg.database.postgres.host}"
