@@ -4,10 +4,20 @@ n8n is packaged here as a Docker Compose-backed NixOS module.
 
 - Compose file lives at `services/n8n/docker-compose.yml`.
 - The module exports `services.n8nCompose`.
+- Current default image is `docker.n8n.io/n8nio/n8n:2.7.4`.
 - Persistent state stays under `services.n8nCompose.dataDir` and should be
   pointed at a dedicated host path such as `/srv/n8n`.
 - Runtime secrets are read from files and rendered into `/run/secrets/n8n.env`
   at service start.
+- The service is intended to run behind Traefik with PostgreSQL as the primary
+  backend.
+
+Current operational notes:
+
+- `N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true` is enabled by default.
+- `N8N_RUNNERS_ENABLED` is intentionally not set on current `2.x` releases.
+- Upstream currently logs non-blocking warnings about the internal Python task
+  runner and the future storage-path rename for `v3`.
 
 Important options:
 
