@@ -272,6 +272,13 @@
         description = "MongoDB exporter targets (`host:port`) to scrape.";
       };
 
+      doltTargets = lib.mkOption {
+        type = lib.types.listOf lib.types.str;
+        default = [];
+        example = ["dolt.internal.example:11228"];
+        description = "Dolt metrics targets (`host:port`) to scrape.";
+      };
+
       piholeExporterTargets = lib.mkOption {
         type = lib.types.listOf lib.types.str;
         default = [];

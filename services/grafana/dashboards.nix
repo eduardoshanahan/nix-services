@@ -2121,7 +2121,7 @@
     id = null;
     uid = "shared-infra";
     title = "Shared Infra";
-    tags = ["homelab" "shared-infra" "postgres" "redis" "mysql" "mongo"];
+    tags = ["homelab" "shared-infra" "postgres" "redis" "mysql" "mongo" "dolt"];
     timezone = "browser";
     schemaVersion = 39;
     version = 1;
@@ -3639,6 +3639,183 @@
             refId = "A";
           }
         ];
+      }
+      {
+        id = 35;
+        type = "stat";
+        title = "Dolt Metrics Scrape Up";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 8;
+          x = 0;
+          y = 84;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+        };
+        fieldConfig = {
+          defaults = {
+            decimals = 0;
+            min = 0;
+            max = 1;
+            mappings = [
+              {
+                type = "value";
+                options = {
+                  "0" = {
+                    text = "DOWN";
+                  };
+                  "1" = {
+                    text = "UP";
+                  };
+                };
+              }
+            ];
+            thresholds = {
+              mode = "absolute";
+              steps = [
+                {
+                  color = "red";
+                  value = null;
+                }
+                {
+                  color = "green";
+                  value = 1;
+                }
+              ];
+            };
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "max(up{job=\"dolt\"}) or vector(0)";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 36;
+        type = "stat";
+        title = "Dolt Concurrent Connections";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 8;
+          x = 8;
+          y = 84;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+        };
+        fieldConfig = {
+          defaults = {
+            decimals = 0;
+            min = 0;
+            unit = "short";
+            thresholds = {
+              mode = "absolute";
+              steps = [
+                {
+                  color = "green";
+                  value = null;
+                }
+                {
+                  color = "yellow";
+                  value = 25;
+                }
+                {
+                  color = "red";
+                  value = 75;
+                }
+              ];
+            };
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "max(dss_concurrent_connections{job=\"dolt\"}) or vector(0)";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 37;
+        type = "timeseries";
+        title = "Dolt Concurrent Queries";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 8;
+          x = 16;
+          y = 84;
+        };
+        targets = [
+          {
+            expr = "max by (instance) (dss_concurrent_queries{job=\"dolt\"})";
+            legendFormat = "{{instance}}";
+            refId = "A";
+          }
+        ];
+        fieldConfig = {
+          defaults = {
+            min = 0;
+            unit = "short";
+          };
+          overrides = [];
+        };
+      }
+      {
+        id = 38;
+        type = "timeseries";
+        title = "Dolt Query Duration P95";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 24;
+          x = 0;
+          y = 90;
+        };
+        targets = [
+          {
+            expr = "histogram_quantile(0.95, sum by (le, instance) (rate(dss_query_duration_bucket{job=\"dolt\"}[5m])))";
+            legendFormat = "{{instance}} p95";
+            refId = "A";
+          }
+        ];
+        fieldConfig = {
+          defaults = {
+            min = 0;
+            unit = "s";
+          };
+          overrides = [];
+        };
       }
     ];
   };

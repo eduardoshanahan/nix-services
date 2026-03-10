@@ -229,6 +229,10 @@
         targets = cfg.scrape.mongodbExporterTargets;
       })
       ++ (optionalJobLines {
+        name = "dolt";
+        targets = cfg.scrape.doltTargets;
+      })
+      ++ (optionalJobLines {
         name = "grafana";
         targets = cfg.scrape.grafanaTargets;
       })
