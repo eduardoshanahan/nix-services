@@ -100,6 +100,7 @@
         fossflowComposeModule = import ./services/fossflow/fossflow.nix;
         searxngComposeModule = import ./services/searxng/searxng.nix;
         d2ComposeModule = import ./services/d2/d2.nix;
+        n8nComposeModule = import ./services/n8n/n8n.nix;
       in {
         nixosModules = {
           traefik = traefikModule;
@@ -137,6 +138,7 @@
           fossflowCompose = fossflowComposeModule;
           searxngCompose = searxngComposeModule;
           d2Compose = d2ComposeModule;
+          n8nCompose = n8nComposeModule;
         };
 
         services = {
@@ -175,6 +177,7 @@
           fossflowCompose = fossflowComposeModule;
           searxngCompose = searxngComposeModule;
           d2Compose = d2ComposeModule;
+          n8nCompose = n8nComposeModule;
         };
       }
     );
