@@ -233,7 +233,7 @@ in {
         Type = "oneshot";
         RemainAfterExit = true;
         WorkingDirectory = composeDir;
-        TimeoutStartSec = 180;
+        TimeoutStartSec = 900;
         Restart = "on-failure";
         RestartSec = 10;
 
