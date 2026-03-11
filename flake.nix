@@ -95,6 +95,7 @@
         timeTaggerComposeModule = import ./services/timetagger/timetagger.nix;
         traggoComposeModule = import ./services/traggo/traggo.nix;
         karakeepComposeModule = import ./services/karakeep/karakeep.nix;
+        woodpeckerComposeModule = import ./services/woodpecker/woodpecker.nix;
         dozzleComposeModule = import ./services/dozzle/dozzle.nix;
         dockerSocketProxyComposeModule = import ./services/docker-socket-proxy/docker-socket-proxy.nix;
         fossflowComposeModule = import ./services/fossflow/fossflow.nix;
@@ -133,6 +134,7 @@
           timeTaggerCompose = timeTaggerComposeModule;
           traggoCompose = traggoComposeModule;
           karakeepCompose = karakeepComposeModule;
+          woodpeckerCompose = woodpeckerComposeModule;
           dozzleCompose = dozzleComposeModule;
           dockerSocketProxyCompose = dockerSocketProxyComposeModule;
           fossflowCompose = fossflowComposeModule;
@@ -172,6 +174,7 @@
           timeTaggerCompose = timeTaggerComposeModule;
           traggoCompose = traggoComposeModule;
           karakeepCompose = karakeepComposeModule;
+          woodpeckerCompose = woodpeckerComposeModule;
           dozzleCompose = dozzleComposeModule;
           dockerSocketProxyCompose = dockerSocketProxyComposeModule;
           fossflowCompose = fossflowComposeModule;

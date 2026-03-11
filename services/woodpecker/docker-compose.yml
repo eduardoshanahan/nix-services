@@ -1,0 +1,84 @@
+services:
+  woodpecker-server:
+    image: ${WOODPECKER_SERVER_IMAGE_REPOSITORY}:${WOODPECKER_SERVER_IMAGE_TAG}
+    container_name: ${WOODPECKER_SERVER_CONTAINER_NAME}
+    restart: unless-stopped
+    init: true
+
+    expose:
+      - "8000"
+
+    ports:
+      - "${WOODPECKER_SERVER_GRPC_BIND}:${WOODPECKER_SERVER_GRPC_PORT}:9000"
+
+    env_file:
+      - ${WOODPECKER_SERVER_RUNTIME_ENV_FILE}
+
+    environment:
+      - TZ=${TZ}
+      - WOODPECKER_HOST=${WOODPECKER_HOST_URL}
+      - WOODPECKER_SERVER_ADDR=:8000
+      - WOODPECKER_GRPC_ADDR=:9000
+      - WOODPECKER_OPEN=${WOODPECKER_OPEN}
+      - WOODPECKER_ADMIN=${WOODPECKER_ADMIN_USERS}
+      - WOODPECKER_GITEA=true
+      - WOODPECKER_GITEA_URL=${WOODPECKER_GITEA_URL}
+
+    volumes:
+      - "${WOODPECKER_DATA_DIR}:/var/lib/woodpecker"
+      - "/etc/ssl/certs/homelab-root-ca.crt:/etc/ssl/certs/homelab-root-ca.crt:ro"
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=${WOODPECKER_NETWORK}"
+      - "traefik.http.routers.woodpecker.rule=Host(`${WOODPECKER_HOSTNAME}`)"
+      - "traefik.http.services.woodpecker.loadbalancer.server.port=8000"
+      - "traefik.http.routers.woodpecker.entrypoints=${WOODPECKER_ENTRYPOINTS}"
+      - "traefik.http.routers.woodpecker.tls=${WOODPECKER_TLS}"
+
+    networks:
+      - traefik
+
+  woodpecker-agent:
+    image: ${WOODPECKER_AGENT_IMAGE_REPOSITORY}:${WOODPECKER_AGENT_IMAGE_TAG}
+    container_name: ${WOODPECKER_AGENT_CONTAINER_NAME}
+    restart: unless-stopped
+    init: true
+    depends_on:
+      - woodpecker-server
+
+    env_file:
+      - ${WOODPECKER_AGENT_RUNTIME_ENV_FILE}
+
+    environment:
+      - TZ=${TZ}
+      - WOODPECKER_SERVER=${WOODPECKER_AGENT_SERVER}
+      - WOODPECKER_MAX_WORKFLOWS=${WOODPECKER_AGENT_MAX_WORKFLOWS}
+      - WOODPECKER_BACKEND=docker
+      - WOODPECKER_HOSTNAME=${WOODPECKER_AGENT_HOSTNAME}
+      - WOODPECKER_BACKEND_DOCKER_VOLUMES=${WOODPECKER_AGENT_BACKEND_DOCKER_VOLUMES}
+      - WOODPECKER_BACKEND_DOCKER_NETWORK=${WOODPECKER_AGENT_BACKEND_DOCKER_NETWORK}
+
+    volumes:
+      - "${WOODPECKER_AGENT_SOCKET_PATH}:/var/run/docker.sock"
+      - "/etc/ssl/certs/homelab-root-ca.crt:/etc/ssl/certs/homelab-root-ca.crt:ro"
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+    networks:
+      - traefik
+
+networks:
+  traefik:
+    external: true
+    name: ${WOODPECKER_NETWORK}
