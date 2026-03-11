@@ -23,6 +23,11 @@ Operational notes:
   startup; this module ensures the container can trust the homelab TLS chain.
 - PostgreSQL must already contain the `seerr` role and database before the
   service starts.
+- Verified deployed shape on 2026-03-11:
+  - URL: `https://seerr.<homelab-domain>/`
+  - host: `rpi-box-02`
+  - Postgres endpoint: `postgres.<homelab-domain>:5433`
+  - media-server integration: Jellyfin at `https://jellyfin.<homelab-domain>/`
 
 Important options:
 
