@@ -41,5 +41,9 @@ CREATE DATABASE woodpecker OWNER woodpecker;
 
 - Open registration should stay disabled for this deployment.
 - The colocated agent defaults to one workflow at a time.
+- For private Gitea repositories, prefer Woodpecker's documented SSH clone path:
+  add a repo-scoped deploy key in Gitea, store the private key as a
+  repo-scoped Woodpecker secret, and set `clone.git.settings.use-ssh: true` in
+  the workflow.
 - The NAS AMD64 agent intentionally remains a separate deployment because it has
   a different risk profile and lifecycle than the Pi-hosted server.

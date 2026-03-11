@@ -271,7 +271,10 @@ in {
 
       backendDockerVolumes = lib.mkOption {
         type = lib.types.listOf lib.types.str;
-        default = [ "/etc/ssl/certs:/etc/ssl/certs:ro" ];
+        default = [
+          "/etc/ssl/certs:/etc/ssl/certs:ro"
+          "/etc/ssl/certs/ca-certificates.crt:/etc/ssl/cert.pem:ro"
+        ];
         description = "Volumes injected into CI job containers via WOODPECKER_BACKEND_DOCKER_VOLUMES.";
       };
 

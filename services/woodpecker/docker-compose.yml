@@ -68,6 +68,7 @@ services:
     volumes:
       - "${WOODPECKER_AGENT_SOCKET_PATH}:/var/run/docker.sock"
       - "/etc/ssl/certs/homelab-root-ca.crt:/etc/ssl/certs/homelab-root-ca.crt:ro"
+      - "/etc/ssl/certs/ca-certificates.crt:/etc/ssl/cert.pem:ro"
 
     logging:
       driver: "json-file"
