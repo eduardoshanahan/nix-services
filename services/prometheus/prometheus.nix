@@ -8,6 +8,7 @@
   serviceName = "prometheus";
   composeDir = "/etc/${serviceName}";
   dockerBin = "${config.virtualisation.docker.package}/bin/docker";
+  externalUrl = "${if cfg.tls then "https" else "http"}://${cfg.hostname}/";
   hostnameRegex = "^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)(\\.([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?))*$";
   networkRegex = "^[a-zA-Z0-9][a-zA-Z0-9_.-]*$";
 
@@ -97,6 +98,7 @@ in {
           }"
           "PROMETHEUS_DATA_DIR=${cfg.dataDir}"
           "PROMETHEUS_RETENTION_TIME=${cfg.retentionTime}"
+          "PROMETHEUS_EXTERNAL_URL=${externalUrl}"
           "TZ=${cfg.timezone}"
         ];
 

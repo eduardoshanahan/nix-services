@@ -9,6 +9,7 @@ services:
       - "--config.file=/etc/prometheus/prometheus.yml"
       - "--storage.tsdb.path=/prometheus"
       - "--storage.tsdb.retention.time=${PROMETHEUS_RETENTION_TIME}"
+      - "--web.external-url=${PROMETHEUS_EXTERNAL_URL}"
 
     expose:
       - "9090"

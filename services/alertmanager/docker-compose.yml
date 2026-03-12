@@ -8,6 +8,7 @@ services:
     command:
       - "--config.file=/etc/alertmanager/alertmanager.yml"
       - "--storage.path=/alertmanager"
+      - "--web.external-url=${ALERTMANAGER_EXTERNAL_URL}"
 
     expose:
       - "9093"

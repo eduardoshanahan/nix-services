@@ -8,6 +8,7 @@
   serviceName = "alertmanager";
   composeDir = "/etc/${serviceName}";
   dockerBin = "${config.virtualisation.docker.package}/bin/docker";
+  externalUrl = "${if cfg.tls then "https" else "http"}://${cfg.hostname}/";
   hostnameRegex = "^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)(\\.([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?))*$";
   networkRegex = "^[a-zA-Z0-9][a-zA-Z0-9_.-]*$";
   emailEnabled = cfg.notifications.email.enable;
@@ -127,6 +128,7 @@ in {
           }"
           "ALERTMANAGER_DATA_DIR=${cfg.dataDir}"
           "ALERTMANAGER_CONFIG_FILE=/run/alertmanager/alertmanager.yml"
+          "ALERTMANAGER_EXTERNAL_URL=${externalUrl}"
           "TZ=${cfg.timezone}"
         ];
 

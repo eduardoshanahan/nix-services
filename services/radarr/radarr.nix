@@ -1,0 +1,226 @@
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}: let
+  cfg = config.services.radarrCompose;
+  serviceName = "radarr";
+  composeDir = "/etc/${serviceName}";
+  dockerBin = "${config.virtualisation.docker.package}/bin/docker";
+  hostnameRegex = "^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)(\\.([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?))*$";
+  networkRegex = "^[a-zA-Z0-9][a-zA-Z0-9_.-]*$";
+in {
+  options.services.radarrCompose = {
+    enable = lib.mkEnableOption "Radarr service (Docker Compose)";
+
+    containerName = lib.mkOption {
+      type = lib.types.str;
+      default = "radarr";
+      description = "Docker container name.";
+    };
+
+    hostname = lib.mkOption {
+      type = lib.types.str;
+      description = "Hostname used for the Traefik router `Host()` rule.";
+    };
+
+    timezone = lib.mkOption {
+      type = lib.types.str;
+      default = "UTC";
+      description = "Timezone passed to the container via `TZ`.";
+    };
+
+    network = lib.mkOption {
+      type = lib.types.str;
+      default = "traefik";
+      description = "External Docker network name used by Traefik and downstream services.";
+    };
+
+    dataDir = lib.mkOption {
+      type = lib.types.str;
+      default = "/var/lib/radarr";
+      description = "Persistent host path used for Radarr config/state.";
+    };
+
+    mediaDir = lib.mkOption {
+      type = lib.types.nullOr lib.types.str;
+      default = null;
+      description = "Optional host path bind-mounted into the container for media library access.";
+    };
+
+    mediaMountPath = lib.mkOption {
+      type = lib.types.str;
+      default = "/media";
+      description = "Container path used for the optional media library bind mount.";
+    };
+
+    downloadsDir = lib.mkOption {
+      type = lib.types.nullOr lib.types.str;
+      default = null;
+      description = "Optional host path bind-mounted into the container for downloader completed files.";
+    };
+
+    downloadsMountPath = lib.mkOption {
+      type = lib.types.str;
+      default = "/downloads";
+      description = "Container path used for the optional downloader bind mount.";
+    };
+
+    uid = lib.mkOption {
+      type = lib.types.int;
+      default = 1000;
+      description = "UID passed to the container as `PUID`.";
+    };
+
+    gid = lib.mkOption {
+      type = lib.types.int;
+      default = 1000;
+      description = "GID passed to the container as `PGID`.";
+    };
+
+    image = {
+      repository = lib.mkOption {
+        type = lib.types.str;
+        default = "lscr.io/linuxserver/radarr";
+        description = "Container image repository.";
+      };
+
+      tag = lib.mkOption {
+        type = lib.types.str;
+        default = "latest";
+        description = "Container image tag.";
+      };
+
+      allowMutableTag = lib.mkOption {
+        type = lib.types.bool;
+        default = true;
+        description = "Allow mutable tags such as `latest`.";
+      };
+    };
+
+    tls = lib.mkEnableOption "TLS on the Radarr Traefik router";
+  };
+
+  config = lib.mkIf cfg.enable {
+    assertions = [
+      {
+        assertion = builtins.match hostnameRegex cfg.hostname != null;
+        message = "services.radarrCompose.hostname must be a valid DNS hostname.";
+      }
+      {
+        assertion = builtins.match networkRegex cfg.network != null;
+        message = "services.radarrCompose.network may only contain letters, numbers, `.`, `_`, and `-`.";
+      }
+      {
+        assertion = builtins.match "^[^[:space:]]+$" cfg.image.repository != null;
+        message = "services.radarrCompose.image.repository must not contain whitespace.";
+      }
+      {
+        assertion = builtins.match "^[^[:space:]]+$" cfg.image.tag != null;
+        message = "services.radarrCompose.image.tag must not contain whitespace.";
+      }
+      {
+        assertion = cfg.image.allowMutableTag || cfg.image.tag != "latest";
+        message = "services.radarrCompose.image.tag must be pinned (not `latest`) unless services.radarrCompose.image.allowMutableTag = true.";
+      }
+      {
+        assertion = lib.hasPrefix "/" cfg.dataDir;
+        message = "services.radarrCompose.dataDir must be an absolute path.";
+      }
+      {
+        assertion = cfg.mediaDir == null || lib.hasPrefix "/" cfg.mediaDir;
+        message = "services.radarrCompose.mediaDir must be null or an absolute path.";
+      }
+      {
+        assertion = lib.hasPrefix "/" cfg.mediaMountPath;
+        message = "services.radarrCompose.mediaMountPath must be an absolute path.";
+      }
+      {
+        assertion = cfg.downloadsDir == null || lib.hasPrefix "/" cfg.downloadsDir;
+        message = "services.radarrCompose.downloadsDir must be null or an absolute path.";
+      }
+      {
+        assertion = lib.hasPrefix "/" cfg.downloadsMountPath;
+        message = "services.radarrCompose.downloadsMountPath must be an absolute path.";
+      }
+      {
+        assertion = cfg.uid >= 0;
+        message = "services.radarrCompose.uid must be non-negative.";
+      }
+      {
+        assertion = cfg.gid >= 0;
+        message = "services.radarrCompose.gid must be non-negative.";
+      }
+    ];
+
+    virtualisation.docker.enable = true;
+
+    environment.etc."${serviceName}/docker-compose.yml".source = ./docker-compose.yml;
+
+    systemd.services.${serviceName} = {
+      description = "Radarr (Docker Compose)";
+      wantedBy = ["multi-user.target"];
+      requires = ["docker.service"];
+      after = ["docker.service" "network-online.target"];
+      wants = ["network-online.target"];
+      restartTriggers = [
+        config.environment.etc."${serviceName}/docker-compose.yml".source
+      ];
+
+      serviceConfig = {
+        Type = "oneshot";
+        RemainAfterExit = true;
+        WorkingDirectory = composeDir;
+        TimeoutStartSec = 900;
+        Restart = "on-failure";
+        RestartSec = 10;
+
+        Environment = [
+          "RADARR_CONTAINER_NAME=${cfg.containerName}"
+          "RADARR_IMAGE_REPOSITORY=${cfg.image.repository}"
+          "RADARR_IMAGE_TAG=${cfg.image.tag}"
+          "RADARR_NETWORK=${cfg.network}"
+          "RADARR_HOST=${cfg.hostname}"
+          "RADARR_ENTRYPOINTS=${
+            if cfg.tls
+            then "websecure"
+            else "web"
+          }"
+          "RADARR_TLS=${
+            if cfg.tls
+            then "true"
+            else "false"
+          }"
+          "RADARR_DATA_DIR=${cfg.dataDir}"
+          "RADARR_MEDIA_DIR=${
+            if cfg.mediaDir == null
+            then ""
+            else cfg.mediaDir
+          }"
+          "RADARR_MEDIA_MOUNT_PATH=${cfg.mediaMountPath}"
+          "RADARR_DOWNLOADS_DIR=${
+            if cfg.downloadsDir == null
+            then ""
+            else cfg.downloadsDir
+          }"
+          "RADARR_DOWNLOADS_MOUNT_PATH=${cfg.downloadsMountPath}"
+          "RADARR_PUID=${toString cfg.uid}"
+          "RADARR_PGID=${toString cfg.gid}"
+          "TZ=${cfg.timezone}"
+        ];
+
+        ExecStartPre = [
+          "${pkgs.runtimeShell} -c 'mkdir -p ${lib.escapeShellArg cfg.dataDir} && chown ${toString cfg.uid}:${toString cfg.gid} ${lib.escapeShellArg cfg.dataDir} && chmod 0750 ${lib.escapeShellArg cfg.dataDir}'"
+          "${pkgs.runtimeShell} -c 'test -s ${composeDir}/docker-compose.yml'"
+          "${pkgs.runtimeShell} -c 'for i in $(seq 1 30); do ${dockerBin} info >/dev/null 2>&1 && exit 0; sleep 1; done; echo \"radarr: docker daemon is not ready\" >&2; exit 1'"
+          "${pkgs.runtimeShell} -c '${dockerBin} compose config >/dev/null'"
+          "${pkgs.runtimeShell} -c '${dockerBin} network inspect ${cfg.network} >/dev/null 2>&1 || ${dockerBin} network create ${cfg.network}'"
+        ];
+
+        ExecStart = "${dockerBin} compose up -d";
+        ExecStop = "${dockerBin} compose down";
+      };
+    };
+  };
+}

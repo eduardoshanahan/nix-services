@@ -103,6 +103,7 @@
         d2ComposeModule = import ./services/d2/d2.nix;
         n8nComposeModule = import ./services/n8n/n8n.nix;
         seerrModule = import ./services/seerr/seerr.nix;
+        radarrComposeModule = import ./services/radarr/radarr.nix;
       in {
         nixosModules = {
           traefik = traefikModule;
@@ -143,6 +144,7 @@
           d2Compose = d2ComposeModule;
           n8nCompose = n8nComposeModule;
           seerr = seerrModule;
+          radarrCompose = radarrComposeModule;
         };
 
         services = {
@@ -184,6 +186,7 @@
           d2Compose = d2ComposeModule;
           n8nCompose = n8nComposeModule;
           seerr = seerrModule;
+          radarrCompose = radarrComposeModule;
         };
       }
     );
