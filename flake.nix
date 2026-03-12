@@ -104,6 +104,7 @@
         n8nComposeModule = import ./services/n8n/n8n.nix;
         seerrModule = import ./services/seerr/seerr.nix;
         radarrComposeModule = import ./services/radarr/radarr.nix;
+        prowlarrComposeModule = import ./services/prowlarr/prowlarr.nix;
       in {
         nixosModules = {
           traefik = traefikModule;
@@ -145,6 +146,7 @@
           n8nCompose = n8nComposeModule;
           seerr = seerrModule;
           radarrCompose = radarrComposeModule;
+          prowlarrCompose = prowlarrComposeModule;
         };
 
         services = {
@@ -187,6 +189,7 @@
           n8nCompose = n8nComposeModule;
           seerr = seerrModule;
           radarrCompose = radarrComposeModule;
+          prowlarrCompose = prowlarrComposeModule;
         };
       }
     );
