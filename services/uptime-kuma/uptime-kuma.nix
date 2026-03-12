@@ -6,7 +6,7 @@
 }: let
   cfg = config.services.uptimeKuma;
   runtimeSecretEnv = import ../../lib/runtime-secret-env.nix {inherit lib pkgs;};
-  serviceName = "uptime-kuma";
+  serviceName = "uptime-kuma-compose";
   composeDir = "/etc/${serviceName}";
   dockerBin = "${config.virtualisation.docker.package}/bin/docker";
   hostnameRegex = "^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)(\\.([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?))*$";

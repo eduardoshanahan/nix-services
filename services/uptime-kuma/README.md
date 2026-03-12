@@ -7,6 +7,8 @@ This module deploys Uptime Kuma behind Traefik using a checked-in Docker Compose
 - Compose file is versioned at `services/uptime-kuma/docker-compose.yml`.
 - NixOS injects runtime environment variables (container name, image/tag, network, hostname, TLS mode, timezone, data path).
 - systemd runs `docker compose up -d` / `docker compose down` and waits for container health after startup.
+- The managed systemd unit is `uptime-kuma-compose.service` to avoid collisions
+  with upstream NixOS runtime naming.
 - Data persists under `services.uptimeKuma.dataDir` (default `/var/lib/uptime-kuma`).
 
 ## Exposed options
