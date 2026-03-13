@@ -103,6 +103,9 @@
         d2ComposeModule = import ./services/d2/d2.nix;
         n8nComposeModule = import ./services/n8n/n8n.nix;
         seerrModule = import ./services/seerr/seerr.nix;
+        calibreWebAutomatedComposeModule = import ./services/calibre-web-automated/calibre-web-automated.nix;
+        lazylibrarianComposeModule = import ./services/lazylibrarian/lazylibrarian.nix;
+        lidarrComposeModule = import ./services/lidarr/lidarr.nix;
         radarrComposeModule = import ./services/radarr/radarr.nix;
         prowlarrComposeModule = import ./services/prowlarr/prowlarr.nix;
         sonarrComposeModule = import ./services/sonarr/sonarr.nix;
@@ -146,6 +149,9 @@
           d2Compose = d2ComposeModule;
           n8nCompose = n8nComposeModule;
           seerr = seerrModule;
+          calibreWebAutomatedCompose = calibreWebAutomatedComposeModule;
+          lazylibrarianCompose = lazylibrarianComposeModule;
+          lidarrCompose = lidarrComposeModule;
           radarrCompose = radarrComposeModule;
           prowlarrCompose = prowlarrComposeModule;
           sonarrCompose = sonarrComposeModule;
@@ -190,6 +196,9 @@
           d2Compose = d2ComposeModule;
           n8nCompose = n8nComposeModule;
           seerr = seerrModule;
+          calibreWebAutomatedCompose = calibreWebAutomatedComposeModule;
+          lazylibrarianCompose = lazylibrarianComposeModule;
+          lidarrCompose = lidarrComposeModule;
           radarrCompose = radarrComposeModule;
           prowlarrCompose = prowlarrComposeModule;
           sonarrCompose = sonarrComposeModule;

@@ -1,0 +1,44 @@
+services:
+  lidarr:
+    image: ${LIDARR_IMAGE_REPOSITORY}:${LIDARR_IMAGE_TAG}
+    container_name: ${LIDARR_CONTAINER_NAME}
+    restart: unless-stopped
+    mem_limit: 1024m
+    pids_limit: 512
+    cpus: "2.0"
+
+    expose:
+      - "8686"
+
+    environment:
+      - TZ=${TZ}
+      - PUID=${LIDARR_PUID}
+      - PGID=${LIDARR_PGID}
+      - UMASK=002
+
+    volumes:
+      - "${LIDARR_DATA_DIR}:/config"
+      - "${LIDARR_MEDIA_DIR}:${LIDARR_MEDIA_MOUNT_PATH}"
+      - "${LIDARR_DOWNLOADS_DIR}:${LIDARR_DOWNLOADS_MOUNT_PATH}"
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=${LIDARR_NETWORK}"
+      - "traefik.http.routers.lidarr.rule=Host(`${LIDARR_HOST}`)"
+      - "traefik.http.services.lidarr.loadbalancer.server.port=8686"
+      - "traefik.http.routers.lidarr.entrypoints=${LIDARR_ENTRYPOINTS}"
+      - "traefik.http.routers.lidarr.tls=${LIDARR_TLS}"
+
+    networks:
+      - traefik
+
+networks:
+  traefik:
+    external: true
+    name: ${LIDARR_NETWORK}
