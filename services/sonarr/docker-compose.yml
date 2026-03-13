@@ -1,0 +1,44 @@
+services:
+  sonarr:
+    image: ${SONARR_IMAGE_REPOSITORY}:${SONARR_IMAGE_TAG}
+    container_name: ${SONARR_CONTAINER_NAME}
+    restart: unless-stopped
+    mem_limit: 1024m
+    pids_limit: 512
+    cpus: "2.0"
+
+    expose:
+      - "8989"
+
+    environment:
+      - TZ=${TZ}
+      - PUID=${SONARR_PUID}
+      - PGID=${SONARR_PGID}
+      - UMASK=002
+
+    volumes:
+      - "${SONARR_DATA_DIR}:/config"
+      - "${SONARR_MEDIA_DIR}:${SONARR_MEDIA_MOUNT_PATH}"
+      - "${SONARR_DOWNLOADS_DIR}:${SONARR_DOWNLOADS_MOUNT_PATH}"
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=${SONARR_NETWORK}"
+      - "traefik.http.routers.sonarr.rule=Host(`${SONARR_HOST}`)"
+      - "traefik.http.services.sonarr.loadbalancer.server.port=8989"
+      - "traefik.http.routers.sonarr.entrypoints=${SONARR_ENTRYPOINTS}"
+      - "traefik.http.routers.sonarr.tls=${SONARR_TLS}"
+
+    networks:
+      - traefik
+
+networks:
+  traefik:
+    external: true
+    name: ${SONARR_NETWORK}
