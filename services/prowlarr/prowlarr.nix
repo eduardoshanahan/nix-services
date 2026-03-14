@@ -10,6 +10,19 @@
   dockerBin = "${config.virtualisation.docker.package}/bin/docker";
   hostnameRegex = "^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)(\\.([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?))*$";
   networkRegex = "^[a-zA-Z0-9][a-zA-Z0-9_.-]*$";
+  servarrReconcile = import ../../lib/servarr-reconcile.nix {
+    inherit lib pkgs dockerBin;
+  };
+  reconcileScript = servarrReconcile.writeProwlarrApplicationsScript {
+    scriptName = "${serviceName}-reconcile-applications";
+    containerName = cfg.containerName;
+    networkName = cfg.network;
+    configXmlPath = "${cfg.dataDir}/config.xml";
+    port = 9696;
+    apiPath = "/api/v1";
+    applications = cfg.applications;
+  };
+  hasDeclarativeApplications = lib.any (app: app.enable) cfg.applications;
 in {
   options.services.prowlarrCompose = {
     enable = lib.mkEnableOption "Prowlarr service (Docker Compose)";
@@ -76,6 +89,12 @@ in {
     };
 
     tls = lib.mkEnableOption "TLS on the Prowlarr Traefik router";
+
+    applications = lib.mkOption {
+      type = lib.types.listOf (lib.types.submodule servarrReconcile.prowlarrApplicationSubmodule);
+      default = [];
+      description = "Declarative application links to reconcile in Prowlarr after startup.";
+    };
   };
 
   config = lib.mkIf cfg.enable {
@@ -111,6 +130,18 @@ in {
       {
         assertion = cfg.gid >= 0;
         message = "services.prowlarrCompose.gid must be non-negative.";
+      }
+      {
+        assertion = lib.all (app: (!app.enable) || (builtins.match servarrReconcile.urlRegex app.baseUrl != null)) cfg.applications;
+        message = "services.prowlarrCompose.applications.*.baseUrl must be an absolute http(s) URL when enabled.";
+      }
+      {
+        assertion = lib.all (app: (!app.enable) || (builtins.match servarrReconcile.urlRegex app.prowlarrUrl != null)) cfg.applications;
+        message = "services.prowlarrCompose.applications.*.prowlarrUrl must be an absolute http(s) URL when enabled.";
+      }
+      {
+        assertion = lib.all (app: (!app.enable) || lib.hasPrefix "/" app.configXmlPath) cfg.applications;
+        message = "services.prowlarrCompose.applications.*.configXmlPath must be an absolute path when enabled.";
       }
     ];
 
@@ -161,6 +192,24 @@ in {
 
         ExecStart = "${dockerBin} compose up -d";
         ExecStop = "${dockerBin} compose down";
+      };
+    };
+
+    systemd.services."${serviceName}-reconcile" = lib.mkIf hasDeclarativeApplications {
+      description = "Reconcile declarative ${serviceName} applications";
+      wantedBy = ["${serviceName}.service"];
+      requires = ["${serviceName}.service"];
+      after = ["${serviceName}.service" "network-online.target"];
+      wants = ["network-online.target"];
+      partOf = ["${serviceName}.service"];
+
+      serviceConfig = {
+        Type = "oneshot";
+        TimeoutStartSec = 300;
+        Restart = "on-failure";
+        RestartSec = 30;
+        ExecStartPre = "${pkgs.coreutils}/bin/sleep 45";
+        ExecStart = reconcileScript;
       };
     };
   };

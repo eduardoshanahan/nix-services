@@ -10,6 +10,23 @@
   dockerBin = "${config.virtualisation.docker.package}/bin/docker";
   hostnameRegex = "^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)(\\.([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?))*$";
   networkRegex = "^[a-zA-Z0-9][a-zA-Z0-9_.-]*$";
+  servarrReconcile = import ../../lib/servarr-reconcile.nix {
+    inherit lib pkgs dockerBin;
+  };
+  reconcileScript = servarrReconcile.writeArrReconcileScript {
+    scriptName = "${serviceName}-reconcile-integrations";
+    inherit serviceName;
+    containerName = cfg.containerName;
+    networkName = cfg.network;
+    configXmlPath = "${cfg.dataDir}/config.xml";
+    port = 8686;
+    apiPath = "/api/v1";
+    qbittorrent = cfg.integrations.qbittorrent;
+    prowlarr = cfg.integrations.prowlarr;
+  };
+  hasDeclarativeIntegrations =
+    cfg.integrations.qbittorrent.enable
+    || cfg.integrations.prowlarr.enable;
 in {
   options.services.lidarrCompose = {
     enable = lib.mkEnableOption "Lidarr service (Docker Compose)";
@@ -100,6 +117,20 @@ in {
     };
 
     tls = lib.mkEnableOption "TLS on the Lidarr Traefik router";
+
+    integrations = {
+      qbittorrent = lib.mkOption {
+        type = lib.types.submodule servarrReconcile.qbittorrentSubmodule;
+        default = {};
+        description = "Declarative qBittorrent settings to reconcile after Lidarr starts.";
+      };
+
+      prowlarr = lib.mkOption {
+        type = lib.types.submodule servarrReconcile.prowlarrIndexerSubmodule;
+        default = {};
+        description = "Declarative Prowlarr-backed indexer URL settings to reconcile after Lidarr starts.";
+      };
+    };
   };
 
   config = lib.mkIf cfg.enable {
@@ -151,6 +182,14 @@ in {
       {
         assertion = cfg.gid >= 0;
         message = "services.lidarrCompose.gid must be non-negative.";
+      }
+      {
+        assertion = (!cfg.integrations.qbittorrent.enable) || (builtins.match "^[^[:space:]]+$" cfg.integrations.qbittorrent.host != null);
+        message = "services.lidarrCompose.integrations.qbittorrent.host must not contain whitespace when enabled.";
+      }
+      {
+        assertion = (!cfg.integrations.prowlarr.enable) || (builtins.match servarrReconcile.urlRegex cfg.integrations.prowlarr.url != null);
+        message = "services.lidarrCompose.integrations.prowlarr.url must be an absolute http(s) URL when enabled.";
       }
     ];
 
@@ -205,6 +244,24 @@ in {
 
         ExecStart = "${dockerBin} compose up -d";
         ExecStop = "${dockerBin} compose down";
+      };
+    };
+
+    systemd.services."${serviceName}-reconcile" = lib.mkIf hasDeclarativeIntegrations {
+      description = "Reconcile declarative ${serviceName} integrations";
+      wantedBy = ["${serviceName}.service"];
+      requires = ["${serviceName}.service"];
+      after = ["${serviceName}.service" "network-online.target"];
+      wants = ["network-online.target"];
+      partOf = ["${serviceName}.service"];
+
+      serviceConfig = {
+        Type = "oneshot";
+        TimeoutStartSec = 300;
+        Restart = "on-failure";
+        RestartSec = 30;
+        ExecStartPre = "${pkgs.coreutils}/bin/sleep 45";
+        ExecStart = reconcileScript;
       };
     };
   };
