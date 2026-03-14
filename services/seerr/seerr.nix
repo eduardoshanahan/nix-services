@@ -11,6 +11,51 @@
   dockerBin = "${config.virtualisation.docker.package}/bin/docker";
   hostnameRegex = "^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)(\\.([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?))*$";
   networkRegex = "^[a-zA-Z0-9][a-zA-Z0-9_.-]*$";
+  jqBin = "${pkgs.jq}/bin/jq";
+  awkBin = "${pkgs.gawk}/bin/awk";
+
+  seerrArrIntegrationSubmodule = {
+    options = {
+      enable = lib.mkEnableOption "Seerr backend reconciliation";
+
+      hostname = lib.mkOption {
+        type = lib.types.str;
+        description = "Backend hostname or FQDN to apply in Seerr.";
+        example = "radarr.<homelab-domain>";
+      };
+
+      port = lib.mkOption {
+        type = lib.types.port;
+        default = 443;
+        description = "Backend port to apply in Seerr.";
+      };
+
+      useSsl = lib.mkOption {
+        type = lib.types.bool;
+        default = true;
+        description = "Whether Seerr should use HTTPS for this backend.";
+      };
+
+      baseUrl = lib.mkOption {
+        type = lib.types.str;
+        default = "";
+        description = "Optional backend base path.";
+      };
+
+      externalUrl = lib.mkOption {
+        type = lib.types.nullOr lib.types.str;
+        default = null;
+        description = "Optional external URL to apply when the Seerr record has that field.";
+        example = "https://radarr.<homelab-domain>";
+      };
+
+      configXmlPath = lib.mkOption {
+        type = lib.types.str;
+        description = "Absolute path to the backend config.xml used to read its API key.";
+        example = "/srv/radarr/config.xml";
+      };
+    };
+  };
 
   runtimeEnvScript = pkgs.writeShellScript "${serviceName}-runtime-env" ''
     set -euo pipefail
@@ -42,6 +87,94 @@
     chmod 0600 "$tmp"
     mv -f "$tmp" "$env_file"
   '';
+
+  reconcileScript = pkgs.writeShellScript "${serviceName}-reconcile-integrations" ''
+    set -euo pipefail
+
+    settings_path=${lib.escapeShellArg "${cfg.dataDir}/settings.json"}
+    radarr_json=${lib.escapeShellArg (builtins.toJSON cfg.integrations.radarr)}
+    sonarr_json=${lib.escapeShellArg (builtins.toJSON cfg.integrations.sonarr)}
+
+    log() {
+      printf 'seerr: %s\n' "$*" >&2
+    }
+
+    get_backend_api_key() {
+      local config_xml_path="$1"
+      ${awkBin} -F'[<>]' '/ApiKey/{print $3; exit}' "$config_xml_path" 2>/dev/null || true
+    }
+
+    update_array() {
+      local key="$1"
+      local config_json="$2"
+      local enabled hostname port use_ssl base_url external_url config_xml_path api_key
+      local tmp
+
+      enabled="$(${jqBin} -r '.enable' <<<"$config_json")"
+      if [[ "$enabled" != "true" ]]; then
+        return 0
+      fi
+
+      hostname="$(${jqBin} -r '.hostname' <<<"$config_json")"
+      port="$(${jqBin} -r '.port' <<<"$config_json")"
+      use_ssl="$(${jqBin} -r '.useSsl' <<<"$config_json")"
+      base_url="$(${jqBin} -r '.baseUrl' <<<"$config_json")"
+      external_url="$(${jqBin} -r '.externalUrl // empty' <<<"$config_json")"
+      config_xml_path="$(${jqBin} -r '.configXmlPath' <<<"$config_json")"
+      api_key="$(get_backend_api_key "$config_xml_path")"
+
+      if [[ -z "$api_key" ]]; then
+        log "could not read backend API key from $config_xml_path for $key"
+        return 0
+      fi
+
+      if [[ "$(${jqBin} -r --arg key "$key" '(.[$key] | type) // "null"' "$settings_path")" != "array" ]]; then
+        log "settings.json key $key is not an array; skipping"
+        return 0
+      fi
+
+      if [[ "$(${jqBin} -r --arg key "$key" '.[$key] | length' "$settings_path")" == "0" ]]; then
+        log "settings.json key $key has no existing entries; skipping"
+        return 0
+      fi
+
+      tmp="$(mktemp -p "$(dirname "$settings_path")" ".settings.json.XXXXXX")"
+
+      ${jqBin} \
+        --arg key "$key" \
+        --arg hostname "$hostname" \
+        --argjson port "$port" \
+        --argjson useSsl "$use_ssl" \
+        --arg baseUrl "$base_url" \
+        --arg apiKey "$api_key" \
+        --arg externalUrl "$external_url" '
+          .[$key] |= map(
+            .hostname = $hostname
+            | .port = $port
+            | .useSsl = $useSsl
+            | .baseUrl = $baseUrl
+            | .apiKey = $apiKey
+            | if has("externalUrl") and ($externalUrl != "") then .externalUrl = $externalUrl else . end
+          )' \
+        "$settings_path" > "$tmp"
+
+      chmod 0600 "$tmp"
+      mv -f "$tmp" "$settings_path"
+      log "updated $key entries in $settings_path"
+    }
+
+    if [[ ! -s "$settings_path" ]]; then
+      log "settings file is missing or empty: $settings_path"
+      exit 1
+    fi
+
+    update_array "radarr" "$radarr_json"
+    update_array "sonarr" "$sonarr_json"
+  '';
+
+  hasDeclarativeIntegrations =
+    cfg.integrations.radarr.enable
+    || cfg.integrations.sonarr.enable;
 in {
   options.services.seerr = {
     enable = lib.mkEnableOption "Seerr service (Docker Compose)";
@@ -130,6 +263,20 @@ in {
     };
 
     tls = lib.mkEnableOption "TLS on the Seerr Traefik router";
+
+    integrations = {
+      radarr = lib.mkOption {
+        type = lib.types.submodule seerrArrIntegrationSubmodule;
+        default = {};
+        description = "Declarative Seerr Radarr backend settings to reconcile after startup.";
+      };
+
+      sonarr = lib.mkOption {
+        type = lib.types.submodule seerrArrIntegrationSubmodule;
+        default = {};
+        description = "Declarative Seerr Sonarr backend settings to reconcile after startup.";
+      };
+    };
   };
 
   config = lib.mkIf cfg.enable {
@@ -173,6 +320,22 @@ in {
       {
         assertion = cfg.database.postgres.passwordFile != null;
         message = "services.seerr.database.postgres.passwordFile must be set.";
+      }
+      {
+        assertion = (!cfg.integrations.radarr.enable) || (builtins.match "^[^[:space:]]+$" cfg.integrations.radarr.hostname != null);
+        message = "services.seerr.integrations.radarr.hostname must not contain whitespace when enabled.";
+      }
+      {
+        assertion = (!cfg.integrations.sonarr.enable) || (builtins.match "^[^[:space:]]+$" cfg.integrations.sonarr.hostname != null);
+        message = "services.seerr.integrations.sonarr.hostname must not contain whitespace when enabled.";
+      }
+      {
+        assertion = (!cfg.integrations.radarr.enable) || lib.hasPrefix "/" cfg.integrations.radarr.configXmlPath;
+        message = "services.seerr.integrations.radarr.configXmlPath must be an absolute path when enabled.";
+      }
+      {
+        assertion = (!cfg.integrations.sonarr.enable) || lib.hasPrefix "/" cfg.integrations.sonarr.configXmlPath;
+        message = "services.seerr.integrations.sonarr.configXmlPath must be an absolute path when enabled.";
       }
     ];
 
@@ -227,6 +390,24 @@ in {
 
         ExecStart = "${dockerBin} compose up -d";
         ExecStop = "${dockerBin} compose down";
+      };
+    };
+
+    systemd.services."${serviceName}-reconcile" = lib.mkIf hasDeclarativeIntegrations {
+      description = "Reconcile declarative ${serviceName} integrations";
+      wantedBy = ["${serviceName}.service"];
+      requires = ["${serviceName}.service"];
+      after = ["${serviceName}.service" "network-online.target"];
+      wants = ["network-online.target"];
+      partOf = ["${serviceName}.service"];
+
+      serviceConfig = {
+        Type = "oneshot";
+        TimeoutStartSec = 300;
+        Restart = "on-failure";
+        RestartSec = 30;
+        ExecStartPre = "${pkgs.coreutils}/bin/sleep 45";
+        ExecStart = reconcileScript;
       };
     };
   };
