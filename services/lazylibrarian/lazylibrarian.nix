@@ -37,6 +37,8 @@
     port="$(${pkgs.jq}/bin/jq -r '.port' <<<"$qbittorrent_json")"
     use_ssl="$(${pkgs.jq}/bin/jq -r '.useSsl' <<<"$qbittorrent_json")"
     label="$(${pkgs.jq}/bin/jq -r '.label' <<<"$qbittorrent_json")"
+    proxy_headers="$(${pkgs.jq}/bin/jq -r '.proxyHeaders' <<<"$qbittorrent_json")"
+    proxy_local_header="$(${pkgs.jq}/bin/jq -r '.proxyLocalHeader' <<<"$qbittorrent_json")"
 
     if [[ "$use_ssl" == "true" && "$host" != http://* && "$host" != https://* ]]; then
       host="https://$host"
@@ -50,6 +52,8 @@
       -v torrent_enabled="True" \
       -v host="$host" \
       -v port="$port" \
+      -v http_proxy="$( [[ "$proxy_headers" == "true" ]] && printf 'True' || printf 'False' )" \
+      -v proxy_local="$proxy_local_header" \
       -v label="$label" '
         function flush_torrent() {
           if (in_torrent && !seen_torrent_enabled) {
@@ -65,11 +69,27 @@
           }
         }
 
+        function flush_webserver() {
+          if (in_webserver && !seen_http_proxy) {
+            print "http_proxy = " http_proxy
+          }
+        }
+
+        function flush_proxy() {
+          if (in_proxy && !seen_proxy_local) {
+            print "proxy_local = " proxy_local
+          }
+        }
+
         /^\[.*\]$/ {
           flush_torrent()
           flush_qbittorrent()
+          flush_webserver()
+          flush_proxy()
           in_torrent = ($0 == "[TORRENT]")
           in_qbittorrent = ($0 == "[QBITTORRENT]")
+          in_webserver = ($0 == "[WEBSERVER]")
+          in_proxy = ($0 == "[PROXY]")
           print
           next
         }
@@ -77,6 +97,8 @@
         END {
           flush_torrent()
           flush_qbittorrent()
+          flush_webserver()
+          flush_proxy()
           if (!seen_torrent_section) {
             print ""
             print "[TORRENT]"
@@ -88,6 +110,16 @@
             print "qbittorrent_host = " host
             print "qbittorrent_port = " port
             print "qbittorrent_label = " label
+          }
+          if (!seen_webserver_section) {
+            print ""
+            print "[WEBSERVER]"
+            print "http_proxy = " http_proxy
+          }
+          if (!seen_proxy_section) {
+            print ""
+            print "[PROXY]"
+            print "proxy_local = " proxy_local
           }
         }
 
@@ -120,9 +152,28 @@
             }
           }
 
+          if (in_webserver) {
+            seen_webserver_section = 1
+            if ($0 ~ /^http_proxy[[:space:]]*=/) {
+              print "http_proxy = " http_proxy
+              seen_http_proxy = 1
+              next
+            }
+          }
+
+          if (in_proxy) {
+            seen_proxy_section = 1
+            if ($0 ~ /^proxy_local[[:space:]]*=/) {
+              print "proxy_local = " proxy_local
+              seen_proxy_local = 1
+              next
+            }
+          }
+
           print
         }
-      ' "$config_path" > "$tmp"
+      ' \
+      "$config_path" > "$tmp"
 
     chmod 0600 "$tmp"
     mv -f "$tmp" "$config_path"
@@ -155,6 +206,18 @@
         type = lib.types.str;
         default = "lazylibrarian";
         description = "qBittorrent category/label to apply in LazyLibrarian.";
+      };
+
+      proxyHeaders = lib.mkOption {
+        type = lib.types.bool;
+        default = true;
+        description = "Enable LazyLibrarian's HTTP proxy mode so it respects Traefik's forwarded scheme.";
+      };
+
+      proxyLocalHeader = lib.mkOption {
+        type = lib.types.str;
+        default = "Host";
+        description = "Header name to use for LazyLibrarian's PROXY_LOCAL setting.";
       };
     };
   };
