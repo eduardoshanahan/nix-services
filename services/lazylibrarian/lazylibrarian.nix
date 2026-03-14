@@ -10,6 +10,156 @@
   dockerBin = "${config.virtualisation.docker.package}/bin/docker";
   hostnameRegex = "^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)(\\.([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?))*$";
   networkRegex = "^[a-zA-Z0-9][a-zA-Z0-9_.-]*$";
+  gawkBin = "${pkgs.gawk}/bin/awk";
+  integrationConfigPath = "${cfg.dataDir}/config.ini";
+
+  reconcileScript = pkgs.writeShellScript "${serviceName}-reconcile-integrations" ''
+    set -euo pipefail
+
+    config_path=${lib.escapeShellArg integrationConfigPath}
+    qbittorrent_json=${lib.escapeShellArg (builtins.toJSON cfg.integrations.qbittorrent)}
+
+    log() {
+      printf 'lazylibrarian: %s\n' "$*" >&2
+    }
+
+    if [[ ! -s "$config_path" ]]; then
+      log "config file is missing or empty: $config_path"
+      exit 1
+    fi
+
+    enabled="$(${pkgs.jq}/bin/jq -r '.enable' <<<"$qbittorrent_json")"
+    if [[ "$enabled" != "true" ]]; then
+      exit 0
+    fi
+
+    host="$(${pkgs.jq}/bin/jq -r '.host' <<<"$qbittorrent_json")"
+    port="$(${pkgs.jq}/bin/jq -r '.port' <<<"$qbittorrent_json")"
+    use_ssl="$(${pkgs.jq}/bin/jq -r '.useSsl' <<<"$qbittorrent_json")"
+    label="$(${pkgs.jq}/bin/jq -r '.label' <<<"$qbittorrent_json")"
+
+    if [[ "$use_ssl" == "true" && "$host" != http://* && "$host" != https://* ]]; then
+      host="https://$host"
+    elif [[ "$use_ssl" != "true" && "$host" != http://* && "$host" != https://* ]]; then
+      host="http://$host"
+    fi
+
+    tmp="$(mktemp -p "$(dirname "$config_path")" ".config.ini.XXXXXX")"
+
+    ${gawkBin} \
+      -v torrent_enabled="True" \
+      -v host="$host" \
+      -v port="$port" \
+      -v label="$label" '
+        function flush_torrent() {
+          if (in_torrent && !seen_torrent_enabled) {
+            print "tor_downloader_qbittorrent = " torrent_enabled
+          }
+        }
+
+        function flush_qbittorrent() {
+          if (in_qbittorrent) {
+            if (!seen_qb_host) print "qbittorrent_host = " host
+            if (!seen_qb_port) print "qbittorrent_port = " port
+            if (!seen_qb_label) print "qbittorrent_label = " label
+          }
+        }
+
+        /^\[.*\]$/ {
+          flush_torrent()
+          flush_qbittorrent()
+          in_torrent = ($0 == "[TORRENT]")
+          in_qbittorrent = ($0 == "[QBITTORRENT]")
+          print
+          next
+        }
+
+        END {
+          flush_torrent()
+          flush_qbittorrent()
+          if (!seen_torrent_section) {
+            print ""
+            print "[TORRENT]"
+            print "tor_downloader_qbittorrent = " torrent_enabled
+          }
+          if (!seen_qb_section) {
+            print ""
+            print "[QBITTORRENT]"
+            print "qbittorrent_host = " host
+            print "qbittorrent_port = " port
+            print "qbittorrent_label = " label
+          }
+        }
+
+        {
+          if (in_torrent) {
+            seen_torrent_section = 1
+            if ($0 ~ /^tor_downloader_qbittorrent[[:space:]]*=/) {
+              print "tor_downloader_qbittorrent = " torrent_enabled
+              seen_torrent_enabled = 1
+              next
+            }
+          }
+
+          if (in_qbittorrent) {
+            seen_qb_section = 1
+            if ($0 ~ /^qbittorrent_host[[:space:]]*=/) {
+              print "qbittorrent_host = " host
+              seen_qb_host = 1
+              next
+            }
+            if ($0 ~ /^qbittorrent_port[[:space:]]*=/) {
+              print "qbittorrent_port = " port
+              seen_qb_port = 1
+              next
+            }
+            if ($0 ~ /^qbittorrent_label[[:space:]]*=/) {
+              print "qbittorrent_label = " label
+              seen_qb_label = 1
+              next
+            }
+          }
+
+          print
+        }
+      ' "$config_path" > "$tmp"
+
+    chmod 0600 "$tmp"
+    mv -f "$tmp" "$config_path"
+    log "updated qBittorrent settings in $config_path"
+  '';
+
+  qbittorrentIntegrationSubmodule = {
+    options = {
+      enable = lib.mkEnableOption "LazyLibrarian qBittorrent reconciliation";
+
+      host = lib.mkOption {
+        type = lib.types.str;
+        description = "qBittorrent hostname or URL to apply in LazyLibrarian.";
+        example = "qbittorrent.<homelab-domain>";
+      };
+
+      port = lib.mkOption {
+        type = lib.types.port;
+        default = 443;
+        description = "qBittorrent port to apply in LazyLibrarian.";
+      };
+
+      useSsl = lib.mkOption {
+        type = lib.types.bool;
+        default = true;
+        description = "Whether to prefix the qBittorrent host with https:// when no scheme is provided.";
+      };
+
+      label = lib.mkOption {
+        type = lib.types.str;
+        default = "lazylibrarian";
+        description = "qBittorrent category/label to apply in LazyLibrarian.";
+      };
+    };
+  };
+
+  hasDeclarativeIntegrations = cfg.integrations.qbittorrent.enable;
 in {
   options.services.lazylibrarianCompose = {
     enable = lib.mkEnableOption "LazyLibrarian service (Docker Compose)";
@@ -112,6 +262,12 @@ in {
     };
 
     tls = lib.mkEnableOption "TLS on the LazyLibrarian Traefik router";
+
+    integrations.qbittorrent = lib.mkOption {
+      type = lib.types.submodule qbittorrentIntegrationSubmodule;
+      default = {};
+      description = "Declarative qBittorrent settings to reconcile in LazyLibrarian before startup.";
+    };
   };
 
   config = lib.mkIf cfg.enable {
@@ -172,6 +328,10 @@ in {
         assertion = cfg.gid >= 0;
         message = "services.lazylibrarianCompose.gid must be non-negative.";
       }
+      {
+        assertion = (!cfg.integrations.qbittorrent.enable) || (builtins.match "^[^[:space:]]+$" cfg.integrations.qbittorrent.host != null);
+        message = "services.lazylibrarianCompose.integrations.qbittorrent.host must not contain whitespace when enabled.";
+      }
     ];
 
     virtualisation.docker.enable = true;
@@ -219,6 +379,9 @@ in {
         ExecStartPre = [
           "${pkgs.runtimeShell} -c 'mkdir -p ${lib.escapeShellArg cfg.dataDir}${lib.optionalString (cfg.downloadsDir != null) " ${lib.escapeShellArg cfg.downloadsDir}"}${lib.optionalString (cfg.booksDir != null) " ${lib.escapeShellArg cfg.booksDir}"}${lib.optionalString (cfg.cwaIngestDir != null) " ${lib.escapeShellArg cfg.cwaIngestDir}"} && chown ${toString cfg.uid}:${toString cfg.gid} ${lib.escapeShellArg cfg.dataDir} && chmod 0750 ${lib.escapeShellArg cfg.dataDir}${lib.optionalString (cfg.booksDir != null) " && chmod 0775 ${lib.escapeShellArg cfg.booksDir}"}${lib.optionalString (cfg.cwaIngestDir != null) " && chmod 0775 ${lib.escapeShellArg cfg.cwaIngestDir}"}'"
           "${pkgs.runtimeShell} -c 'test -s /etc/ssl/certs/ca-certificates-with-homelab.pem'"
+        ] ++ lib.optionals hasDeclarativeIntegrations [
+          reconcileScript
+        ] ++ [
           "${pkgs.runtimeShell} -c 'test -s ${composeDir}/docker-compose.yml'"
           "${pkgs.runtimeShell} -c 'for i in $(seq 1 30); do ${dockerBin} info >/dev/null 2>&1 && exit 0; sleep 1; done; echo \"lazylibrarian: docker daemon is not ready\" >&2; exit 1'"
           "${pkgs.runtimeShell} -c '${dockerBin} compose config >/dev/null'"
