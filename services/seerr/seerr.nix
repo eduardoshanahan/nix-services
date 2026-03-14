@@ -57,6 +57,50 @@
     };
   };
 
+  seerrJellyfinIntegrationSubmodule = {
+    options = {
+      enable = lib.mkEnableOption "Seerr Jellyfin reconciliation";
+
+      hostname = lib.mkOption {
+        type = lib.types.str;
+        description = "Jellyfin hostname or FQDN to apply in Seerr.";
+        example = "jellyfin.<homelab-domain>";
+      };
+
+      port = lib.mkOption {
+        type = lib.types.port;
+        default = 443;
+        description = "Jellyfin port to apply in Seerr.";
+      };
+
+      useSsl = lib.mkOption {
+        type = lib.types.bool;
+        default = true;
+        description = "Whether Seerr should use HTTPS for Jellyfin.";
+      };
+
+      urlBase = lib.mkOption {
+        type = lib.types.str;
+        default = "";
+        description = "Optional Jellyfin base path.";
+      };
+
+      externalHostname = lib.mkOption {
+        type = lib.types.nullOr lib.types.str;
+        default = null;
+        description = "Optional external Jellyfin hostname to apply when Seerr stores one.";
+        example = "jellyfin.<homelab-domain>";
+      };
+
+      forgotPasswordUrl = lib.mkOption {
+        type = lib.types.nullOr lib.types.str;
+        default = null;
+        description = "Optional Jellyfin forgot-password URL to apply when Seerr stores one.";
+        example = "https://jellyfin.<homelab-domain>/web/#/forgotpassword";
+      };
+    };
+  };
+
   runtimeEnvScript = pkgs.writeShellScript "${serviceName}-runtime-env" ''
     set -euo pipefail
     umask 0077
@@ -94,6 +138,7 @@
     settings_path=${lib.escapeShellArg "${cfg.dataDir}/settings.json"}
     radarr_json=${lib.escapeShellArg (builtins.toJSON cfg.integrations.radarr)}
     sonarr_json=${lib.escapeShellArg (builtins.toJSON cfg.integrations.sonarr)}
+    jellyfin_json=${lib.escapeShellArg (builtins.toJSON cfg.integrations.jellyfin)}
 
     log() {
       printf 'seerr: %s\n' "$*" >&2
@@ -170,11 +215,48 @@
 
     update_array "radarr" "$radarr_json"
     update_array "sonarr" "$sonarr_json"
+
+    if [[ "$(${jqBin} -r '.enable' <<<"$jellyfin_json")" == "true" ]]; then
+      hostname="$(${jqBin} -r '.hostname' <<<"$jellyfin_json")"
+      port="$(${jqBin} -r '.port' <<<"$jellyfin_json")"
+      use_ssl="$(${jqBin} -r '.useSsl' <<<"$jellyfin_json")"
+      url_base="$(${jqBin} -r '.urlBase' <<<"$jellyfin_json")"
+      external_hostname="$(${jqBin} -r '.externalHostname // empty' <<<"$jellyfin_json")"
+      forgot_password_url="$(${jqBin} -r '.forgotPasswordUrl // empty' <<<"$jellyfin_json")"
+
+      if [[ "$(${jqBin} -r '(.jellyfin | type) // "null"' "$settings_path")" != "object" ]]; then
+        log "settings.json key jellyfin is not an object; skipping"
+      else
+        tmp="$(mktemp -p "$(dirname "$settings_path")" ".settings.json.XXXXXX")"
+
+        ${jqBin} \
+          --arg hostname "$hostname" \
+          --argjson port "$port" \
+          --argjson useSsl "$use_ssl" \
+          --arg urlBase "$url_base" \
+          --arg externalHostname "$external_hostname" \
+          --arg forgotPasswordUrl "$forgot_password_url" '
+            .jellyfin |= (
+              .ip = $hostname
+              | .port = $port
+              | .useSsl = $useSsl
+              | .urlBase = $urlBase
+              | if has("externalHostname") and ($externalHostname != "") then .externalHostname = $externalHostname else . end
+              | if has("jellyfinForgotPasswordUrl") and ($forgotPasswordUrl != "") then .jellyfinForgotPasswordUrl = $forgotPasswordUrl else . end
+            )' \
+          "$settings_path" > "$tmp"
+
+        chmod 0600 "$tmp"
+        mv -f "$tmp" "$settings_path"
+        log "updated jellyfin settings in $settings_path"
+      fi
+    fi
   '';
 
   hasDeclarativeIntegrations =
     cfg.integrations.radarr.enable
-    || cfg.integrations.sonarr.enable;
+    || cfg.integrations.sonarr.enable
+    || cfg.integrations.jellyfin.enable;
 in {
   options.services.seerr = {
     enable = lib.mkEnableOption "Seerr service (Docker Compose)";
@@ -276,6 +358,12 @@ in {
         default = {};
         description = "Declarative Seerr Sonarr backend settings to reconcile after startup.";
       };
+
+      jellyfin = lib.mkOption {
+        type = lib.types.submodule seerrJellyfinIntegrationSubmodule;
+        default = {};
+        description = "Declarative Seerr Jellyfin media-server settings to reconcile after startup.";
+      };
     };
   };
 
@@ -336,6 +424,10 @@ in {
       {
         assertion = (!cfg.integrations.sonarr.enable) || lib.hasPrefix "/" cfg.integrations.sonarr.configXmlPath;
         message = "services.seerr.integrations.sonarr.configXmlPath must be an absolute path when enabled.";
+      }
+      {
+        assertion = (!cfg.integrations.jellyfin.enable) || (builtins.match "^[^[:space:]]+$" cfg.integrations.jellyfin.hostname != null);
+        message = "services.seerr.integrations.jellyfin.hostname must not contain whitespace when enabled.";
       }
     ];
 
