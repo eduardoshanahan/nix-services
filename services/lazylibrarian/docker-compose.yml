@@ -15,12 +15,16 @@ services:
       - PUID=${LAZYLIBRARIAN_PUID}
       - PGID=${LAZYLIBRARIAN_PGID}
       - UMASK=002
+      - SSL_CERT_FILE=/etc/ssl/certs/ca-certificates-with-homelab.pem
+      - CURL_CA_BUNDLE=/etc/ssl/certs/ca-certificates-with-homelab.pem
+      - REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates-with-homelab.pem
 
     volumes:
       - "${LAZYLIBRARIAN_DATA_DIR}:/config"
       - "${LAZYLIBRARIAN_DOWNLOADS_DIR}:${LAZYLIBRARIAN_DOWNLOADS_MOUNT_PATH}"
       - "${LAZYLIBRARIAN_BOOKS_DIR}:${LAZYLIBRARIAN_BOOKS_MOUNT_PATH}"
       - "${LAZYLIBRARIAN_CWA_INGEST_DIR}:${LAZYLIBRARIAN_CWA_INGEST_MOUNT_PATH}"
+      - "/etc/ssl/certs/ca-certificates-with-homelab.pem:/etc/ssl/certs/ca-certificates-with-homelab.pem:ro"
 
     logging:
       driver: "json-file"

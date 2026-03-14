@@ -15,11 +15,14 @@ services:
       - PUID=${SONARR_PUID}
       - PGID=${SONARR_PGID}
       - UMASK=002
+      - SSL_CERT_FILE=/etc/ssl/certs/ca-certificates-with-homelab.pem
+      - CURL_CA_BUNDLE=/etc/ssl/certs/ca-certificates-with-homelab.pem
 
     volumes:
       - "${SONARR_DATA_DIR}:/config"
       - "${SONARR_MEDIA_DIR}:${SONARR_MEDIA_MOUNT_PATH}"
       - "${SONARR_DOWNLOADS_DIR}:${SONARR_DOWNLOADS_MOUNT_PATH}"
+      - "/etc/ssl/certs/ca-certificates-with-homelab.pem:/etc/ssl/certs/ca-certificates-with-homelab.pem:ro"
 
     logging:
       driver: "json-file"

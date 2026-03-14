@@ -15,11 +15,14 @@ services:
       - PUID=${RADARR_PUID}
       - PGID=${RADARR_PGID}
       - UMASK=002
+      - SSL_CERT_FILE=/etc/ssl/certs/ca-certificates-with-homelab.pem
+      - CURL_CA_BUNDLE=/etc/ssl/certs/ca-certificates-with-homelab.pem
 
     volumes:
       - "${RADARR_DATA_DIR}:/config"
       - "${RADARR_MEDIA_DIR}:${RADARR_MEDIA_MOUNT_PATH}"
       - "${RADARR_DOWNLOADS_DIR}:${RADARR_DOWNLOADS_MOUNT_PATH}"
+      - "/etc/ssl/certs/ca-certificates-with-homelab.pem:/etc/ssl/certs/ca-certificates-with-homelab.pem:ro"
 
     logging:
       driver: "json-file"

@@ -15,9 +15,12 @@ services:
       - PUID=${PROWLARR_PUID}
       - PGID=${PROWLARR_PGID}
       - UMASK=002
+      - SSL_CERT_FILE=/etc/ssl/certs/ca-certificates-with-homelab.pem
+      - CURL_CA_BUNDLE=/etc/ssl/certs/ca-certificates-with-homelab.pem
 
     volumes:
       - "${PROWLARR_DATA_DIR}:/config"
+      - "/etc/ssl/certs/ca-certificates-with-homelab.pem:/etc/ssl/certs/ca-certificates-with-homelab.pem:ro"
 
     logging:
       driver: "json-file"

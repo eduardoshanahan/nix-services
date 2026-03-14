@@ -262,7 +262,9 @@
       set -euo pipefail
 
       container_name=${instance.containerName}
-      timeout_seconds=180
+      # Ghost's health window is longer than the simpler services, so the
+      # systemd post-start wait needs to cover it plus a little boot-time slack.
+      timeout_seconds=240
       deadline=$((SECONDS + timeout_seconds))
 
       while true; do

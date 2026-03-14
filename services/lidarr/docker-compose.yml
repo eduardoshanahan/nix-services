@@ -15,11 +15,14 @@ services:
       - PUID=${LIDARR_PUID}
       - PGID=${LIDARR_PGID}
       - UMASK=002
+      - SSL_CERT_FILE=/etc/ssl/certs/ca-certificates-with-homelab.pem
+      - CURL_CA_BUNDLE=/etc/ssl/certs/ca-certificates-with-homelab.pem
 
     volumes:
       - "${LIDARR_DATA_DIR}:/config"
       - "${LIDARR_MEDIA_DIR}:${LIDARR_MEDIA_MOUNT_PATH}"
       - "${LIDARR_DOWNLOADS_DIR}:${LIDARR_DOWNLOADS_MOUNT_PATH}"
+      - "/etc/ssl/certs/ca-certificates-with-homelab.pem:/etc/ssl/certs/ca-certificates-with-homelab.pem:ro"
 
     logging:
       driver: "json-file"

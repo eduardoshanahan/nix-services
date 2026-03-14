@@ -7,7 +7,9 @@
     set -euo pipefail
 
     container_name=${cfg.containerName}
-    timeout_seconds=120
+    # Match the container health window (start_period + interval * retries)
+    # and leave a little margin for cold boots.
+    timeout_seconds=180
     deadline=$((SECONDS + timeout_seconds))
 
     while true; do

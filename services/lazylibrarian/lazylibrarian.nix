@@ -218,6 +218,7 @@ in {
 
         ExecStartPre = [
           "${pkgs.runtimeShell} -c 'mkdir -p ${lib.escapeShellArg cfg.dataDir}${lib.optionalString (cfg.downloadsDir != null) " ${lib.escapeShellArg cfg.downloadsDir}"}${lib.optionalString (cfg.booksDir != null) " ${lib.escapeShellArg cfg.booksDir}"}${lib.optionalString (cfg.cwaIngestDir != null) " ${lib.escapeShellArg cfg.cwaIngestDir}"} && chown ${toString cfg.uid}:${toString cfg.gid} ${lib.escapeShellArg cfg.dataDir} && chmod 0750 ${lib.escapeShellArg cfg.dataDir}${lib.optionalString (cfg.booksDir != null) " && chmod 0775 ${lib.escapeShellArg cfg.booksDir}"}${lib.optionalString (cfg.cwaIngestDir != null) " && chmod 0775 ${lib.escapeShellArg cfg.cwaIngestDir}"}'"
+          "${pkgs.runtimeShell} -c 'test -s /etc/ssl/certs/ca-certificates-with-homelab.pem'"
           "${pkgs.runtimeShell} -c 'test -s ${composeDir}/docker-compose.yml'"
           "${pkgs.runtimeShell} -c 'for i in $(seq 1 30); do ${dockerBin} info >/dev/null 2>&1 && exit 0; sleep 1; done; echo \"lazylibrarian: docker daemon is not ready\" >&2; exit 1'"
           "${pkgs.runtimeShell} -c '${dockerBin} compose config >/dev/null'"
