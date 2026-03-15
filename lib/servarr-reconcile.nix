@@ -5,6 +5,8 @@
 }: let
   jqBin = "${pkgs.jq}/bin/jq";
   awkBin = "${pkgs.gawk}/bin/awk";
+  catBin = "${pkgs.coreutils}/bin/cat";
+  trBin = "${pkgs.coreutils}/bin/tr";
 
   urlRegex = "^https?://[^[:space:]]+$";
 
@@ -41,6 +43,34 @@
         type = lib.types.str;
         default = "";
         description = "Optional qBittorrent URL base/path.";
+      };
+
+      username = lib.mkOption {
+        type = lib.types.str;
+        default = "";
+        description = "qBittorrent Web UI username to apply in the arr app.";
+        example = "eduardo";
+      };
+
+      passwordFile = lib.mkOption {
+        type = lib.types.str;
+        default = "";
+        description = "Absolute path to a runtime secret file containing the qBittorrent Web UI password.";
+        example = "/run/secrets/qbittorrent-webui-password";
+      };
+
+      categoryField = lib.mkOption {
+        type = lib.types.str;
+        default = "";
+        description = "Servarr qBittorrent field name to reconcile for the app-specific category.";
+        example = "movieCategory";
+      };
+
+      categoryValue = lib.mkOption {
+        type = lib.types.str;
+        default = "";
+        description = "qBittorrent category value to apply for this arr app.";
+        example = "radarr";
       };
     };
   };
@@ -210,17 +240,65 @@
           return 0
         fi
 
-        local host port_value use_ssl url_base clients ids id current payload
+        local host port_value use_ssl url_base username password_file password_value category_field category_value
+        local clients ids id current payload schema template
         host="$(${jqBin} -r '.host' <<<"$qbittorrent_json")"
         port_value="$(${jqBin} -r '.port' <<<"$qbittorrent_json")"
         use_ssl="$(${jqBin} -r '.useSsl' <<<"$qbittorrent_json")"
         url_base="$(${jqBin} -r '.urlBase' <<<"$qbittorrent_json")"
+        username="$(${jqBin} -r '.username' <<<"$qbittorrent_json")"
+        password_file="$(${jqBin} -r '.passwordFile' <<<"$qbittorrent_json")"
+        category_field="$(${jqBin} -r '.categoryField' <<<"$qbittorrent_json")"
+        category_value="$(${jqBin} -r '.categoryValue' <<<"$qbittorrent_json")"
+
+        if [[ ! -r "$password_file" ]]; then
+          log "qBittorrent password file is not readable at $password_file"
+          return 1
+        fi
+
+        password_value="$(${catBin} "$password_file" | ${trBin} -d '\r\n')"
 
         clients="$(api_get "/downloadclient")"
         ids="$(${jqBin} -r '.[] | select(((.implementation // "") == "QBittorrent") or ((.configContract // "") == "QBittorrentSettings")) | .id' <<<"$clients")"
 
         if [[ -z "$ids" ]]; then
-          echo "$service_name: no qBittorrent download client found to reconcile" >&2
+          schema="$(api_get "/downloadclient/schema")"
+          template="$(${jqBin} -c '
+            map(select(
+              ((.implementation // "") == "QBittorrent")
+              or ((.configContract // "") == "QBittorrentSettings")
+            ))
+            | .[0] // empty' <<<"$schema")"
+
+          if [[ -z "$template" ]]; then
+            log "no qBittorrent download-client schema found; skipping create"
+            return 0
+          fi
+
+          payload="$(${jqBin} -c \
+            --arg host "$host" \
+            --argjson port "$port_value" \
+            --argjson useSsl "$use_ssl" \
+            --arg urlBase "$url_base" \
+            --arg username "$username" \
+            --arg password "$password_value" \
+            --arg categoryField "$category_field" \
+            --arg categoryValue "$category_value" '
+              .name = (if ((.name // "") == "") then "qBittorrent" else .name end)
+              | .enable = true
+              | .fields |= map(
+                  if .name == "host" then .value = $host
+                  elif .name == "port" then .value = $port
+                  elif .name == "useSsl" then .value = $useSsl
+                  elif .name == "urlBase" then .value = $urlBase
+                  elif .name == "username" then .value = $username
+                  elif .name == "password" then .value = $password
+                  elif .name == $categoryField then .value = $categoryValue
+                  else .
+                  end
+                )' <<<"$template")"
+          api_post "/downloadclient" "$payload"
+          log "created qBittorrent download client"
           return 0
         fi
 
@@ -231,12 +309,19 @@
             --arg host "$host" \
             --argjson port "$port_value" \
             --argjson useSsl "$use_ssl" \
-            --arg urlBase "$url_base" '
+            --arg urlBase "$url_base" \
+            --arg username "$username" \
+            --arg password "$password_value" \
+            --arg categoryField "$category_field" \
+            --arg categoryValue "$category_value" '
               .fields |= map(
                 if .name == "host" then .value = $host
                 elif .name == "port" then .value = $port
                 elif .name == "useSsl" then .value = $useSsl
                 elif .name == "urlBase" then .value = $urlBase
+                elif .name == "username" then .value = $username
+                elif .name == "password" then .value = $password
+                elif .name == $categoryField then .value = $categoryValue
                 else .
                 end
               )' <<<"$current")"

@@ -188,6 +188,22 @@ in {
         message = "services.radarrCompose.integrations.qbittorrent.host must not contain whitespace when enabled.";
       }
       {
+        assertion = (!cfg.integrations.qbittorrent.enable) || (cfg.integrations.qbittorrent.username != "");
+        message = "services.radarrCompose.integrations.qbittorrent.username must be non-empty when enabled.";
+      }
+      {
+        assertion = (!cfg.integrations.qbittorrent.enable) || lib.hasPrefix "/" cfg.integrations.qbittorrent.passwordFile;
+        message = "services.radarrCompose.integrations.qbittorrent.passwordFile must be an absolute path when enabled.";
+      }
+      {
+        assertion = (!cfg.integrations.qbittorrent.enable) || (cfg.integrations.qbittorrent.categoryField != "");
+        message = "services.radarrCompose.integrations.qbittorrent.categoryField must be non-empty when enabled.";
+      }
+      {
+        assertion = (!cfg.integrations.qbittorrent.enable) || (cfg.integrations.qbittorrent.categoryValue != "");
+        message = "services.radarrCompose.integrations.qbittorrent.categoryValue must be non-empty when enabled.";
+      }
+      {
         assertion = (!cfg.integrations.prowlarr.enable) || (builtins.match servarrReconcile.urlRegex cfg.integrations.prowlarr.url != null);
         message = "services.radarrCompose.integrations.prowlarr.url must be an absolute http(s) URL when enabled.";
       }
