@@ -144,6 +144,22 @@
                 >/dev/null
       }
 
+      api_post() {
+        local endpoint="$1"
+        local payload="$2"
+        local api_key
+        api_key="$(get_api_key)"
+        printf '%s' "$payload" \
+          | ${dockerBin} exec -i "$container_name" \
+              curl -fsS \
+                -X POST \
+                -H "Content-Type: application/json" \
+                -H "X-Api-Key: $api_key" \
+                --data-binary @- \
+                "$(api_url "$endpoint")" \
+                >/dev/null
+      }
+
       wait_for_api() {
         local probe_endpoint="$1"
         local deadline=$((SECONDS + 180))
@@ -328,6 +344,22 @@
                 >/dev/null
       }
 
+      api_post() {
+        local endpoint="$1"
+        local payload="$2"
+        local api_key
+        api_key="$(get_api_key)"
+        printf '%s' "$payload" \
+          | ${dockerBin} exec -i "$container_name" \
+              curl -fsS \
+                -X POST \
+                -H "Content-Type: application/json" \
+                -H "X-Api-Key: $api_key" \
+                --data-binary @- \
+                "$(api_url "$endpoint")" \
+                >/dev/null
+      }
+
       wait_for_api() {
         local probe_endpoint="$1"
         local deadline=$((SECONDS + 180))
@@ -353,7 +385,7 @@
         local base_url="$2"
         local prowlarr_url="$3"
         local target_config="$4"
-        local target_api_key current_apps id current payload
+        local target_api_key current_apps schema implementation id current payload template
 
         target_api_key="$(get_target_api_key "$target_config")"
         if [[ -z "$target_api_key" ]]; then
@@ -365,7 +397,39 @@
         id="$(${jqBin} -r --arg name "$name" '.[] | select(.name == $name) | .id' <<<"$current_apps" | head -n1)"
 
         if [[ -z "$id" ]]; then
-          echo "prowlarr: application $name does not exist yet; skipping reconcile" >&2
+          schema="$(api_get "/applications/schema")"
+          implementation="$name"
+          template="$(${jqBin} -c \
+            --arg implementation "$implementation" \
+            --arg configContract "''${implementation}Settings" '
+              map(select(
+                ((.implementation // "") == $implementation)
+                or ((.configContract // "") == $configContract)
+              ))
+              | .[0] // empty' <<<"$schema")"
+
+          if [[ -z "$template" ]]; then
+            echo "prowlarr: no application schema found for $name; skipping create" >&2
+            return 0
+          fi
+
+          payload="$(${jqBin} -c \
+            --arg name "$name" \
+            --arg baseUrl "$base_url" \
+            --arg prowlarrUrl "$prowlarr_url" \
+            --arg apiKey "$target_api_key" '
+              .name = $name
+              | .enable = true
+              | .syncLevel = ((.syncLevel // "") | if . == "" then "fullSync" else . end)
+              | .fields |= map(
+                  if .name == "baseUrl" then .value = $baseUrl
+                  elif .name == "prowlarrUrl" then .value = $prowlarrUrl
+                  elif .name == "apiKey" then .value = $apiKey
+                  else .
+                  end
+                )' <<<"$template")"
+          api_post "/applications" "$payload"
+          echo "prowlarr: created application $name" >&2
           return 0
         fi
 
