@@ -11,6 +11,12 @@
     umask 0077
 
     install -d -m 0755 /run/alertmanager
+
+    # Docker can recreate this bind source as a directory after reboot if the
+    # container restarts before systemd re-renders the runtime config.
+    if [[ -e /run/alertmanager/alertmanager.yml && ! -f /run/alertmanager/alertmanager.yml ]]; then
+      rm -rf /run/alertmanager/alertmanager.yml
+    fi
     cp ${composeDir}/alertmanager.yml.tmpl /run/alertmanager/alertmanager.yml
 
     escape_sed() {
