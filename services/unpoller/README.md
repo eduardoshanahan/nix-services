@@ -20,6 +20,7 @@ This module deploys [unpoller](https://github.com/unpoller/unpoller) as a Promet
 - `services.unpollerCompose.listenPort`
 - `services.unpollerCompose.controller.url`
 - `services.unpollerCompose.controller.verifySsl`
+- `services.unpollerCompose.influxdb.enable`
 - `services.unpollerCompose.secretFile`
 - `services.unpollerCompose.image.repository`
 - `services.unpollerCompose.image.tag`
@@ -34,12 +35,12 @@ UP_UNIFI_CONTROLLER_0_USER=unpoller
 UP_UNIFI_CONTROLLER_0_PASS=<password>
 ```
 
-## Known host-specific override
+## InfluxDB output
 
-- `nix-pi/nixos/hosts/private/rpi-box-02.nix` overrides the generated
-  `unpoller` compose file to force `UP_INFLUXDB_DISABLE=true`.
-- That keeps the host in Prometheus-only mode and is currently treated as
-  intentional host policy rather than shared-module behavior.
+- `services.unpollerCompose.influxdb.enable = false` disables the legacy
+  InfluxDB output path and keeps the deployment Prometheus-only.
+- `rpi-box-02` now uses this shared module option instead of replacing the
+  entire compose file.
 
 ## Image pinning strategy
 
@@ -55,6 +56,7 @@ services.unpollerCompose = {
   enable = true;
   controller.url = "https://gateway.internal.example";
   controller.verifySsl = true;
+  influxdb.enable = false;
   secretFile = "/run/secrets/unpoller.env";
 
   listenAddress = "0.0.0.0";

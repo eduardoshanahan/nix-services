@@ -27,11 +27,5 @@ By default the compose command disables `slave_status` collection
 (`--no-collect.slave_status`) to avoid requiring replication/super privileges
 for standard single-instance deployments.
 
-## Known host-specific override
-
-- `nix-pi/nixos/hosts/private/rpi-box-02.nix` still overrides the generated
-  compose file for `mysql-exporter`.
-- The current override preserves the stabilized runtime file mount and pins the
-  collector arguments explicitly for that host.
-- When debugging `rpi-box-02`, check both the shared module and the host
-  override before assuming the live container command line.
+`rpi-box-02` now uses the shared module behavior directly again; it no longer
+needs a host-specific compose override for this service.

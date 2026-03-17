@@ -59,6 +59,15 @@ in {
       };
     };
 
+    influxdb.enable = lib.mkOption {
+      type = lib.types.bool;
+      default = true;
+      description = ''
+        Whether unpoller should keep its legacy InfluxDB output path enabled.
+        Disable this when the deployment is Prometheus-only.
+      '';
+    };
+
     secretFile = runtimeSecrets.mkSecretFileOption {
       description = ''
         Absolute path to a runtime-provisioned env file consumed by unpoller.
@@ -145,6 +154,7 @@ in {
           "UNPOLLER_LISTEN_PORT=${toString cfg.listenPort}"
           "UNPOLLER_CONTROLLER_URL=${cfg.controller.url}"
           "UNPOLLER_CONTROLLER_VERIFY_SSL=${if cfg.controller.verifySsl then "true" else "false"}"
+          "UNPOLLER_INFLUXDB_DISABLE=${if cfg.influxdb.enable then "false" else "true"}"
           "UNPOLLER_IMAGE_REPOSITORY=${cfg.image.repository}"
           "UNPOLLER_IMAGE_TAG=${cfg.image.tag}"
           "UNPOLLER_ENV_FILE=${toString cfg.secretFile}"
