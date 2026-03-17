@@ -9,15 +9,22 @@
   serviceName = "mysql-exporter";
   composeDir = "/etc/${serviceName}";
   dockerBin = "${config.virtualisation.docker.package}/bin/docker";
+  runtimeDir = "/run/${serviceName}";
+  runtimeMyCnfPath = "${runtimeDir}/${serviceName}.my.cnf";
   runtimeMyCnfScript = pkgs.writeShellScript "${serviceName}-runtime-my-cnf" ''
     set -euo pipefail
     umask 0077
 
     secret_file=${lib.escapeShellArg (toString cfg.mysql.passwordFile)}
-    mycnf_file="/run/secrets/${serviceName}.my.cnf"
-    tmp="$(mktemp -p /run/secrets ".${serviceName}.my.cnf.XXXXXX")"
+    mycnf_file=${lib.escapeShellArg runtimeMyCnfPath}
 
-    install -d -m 0700 /run/secrets
+    install -d -m 0755 ${runtimeDir}
+
+    if [[ -e "$mycnf_file" && ! -f "$mycnf_file" ]]; then
+      rm -rf "$mycnf_file"
+    fi
+
+    tmp="$(mktemp -p ${runtimeDir} ".${serviceName}.my.cnf.XXXXXX")"
 
     if [[ ! -s "$secret_file" ]]; then
       echo "mysql-exporter: missing or empty password file: $secret_file" >&2
@@ -146,7 +153,7 @@ in {
           "MYSQL_EXPORTER_PORT=${toString cfg.listenPort}"
           "MYSQL_EXPORTER_MYSQL_HOST=${cfg.mysql.host}"
           "MYSQL_EXPORTER_MYSQL_PORT=${toString cfg.mysql.port}"
-          "MYSQL_EXPORTER_MYCNF_PATH=/run/secrets/${serviceName}.my.cnf"
+          "MYSQL_EXPORTER_MYCNF_PATH=${runtimeMyCnfPath}"
           "MYSQL_EXPORTER_IMAGE_REPOSITORY=${cfg.image.repository}"
           "MYSQL_EXPORTER_IMAGE_TAG=${cfg.image.tag}"
           "TZ=${cfg.timezone}"

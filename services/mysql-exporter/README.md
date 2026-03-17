@@ -20,7 +20,7 @@ This module deploys `mysqld-exporter` via Docker Compose and exposes Prometheus 
 
 - `services.mysqlExporterCompose.mysql.passwordFile` must point to a runtime file containing the MySQL password.
 
-The module writes `/run/secrets/mysql-exporter.my.cnf` and passes it to
+The module writes `/run/mysql-exporter/mysql-exporter.my.cnf` and passes it to
 `mysqld-exporter` via `--config.my-cnf`.
 
 By default the compose command disables `slave_status` collection
