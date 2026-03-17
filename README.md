@@ -34,10 +34,15 @@ documentation is split by responsibility:
 For the current ownership matrix and first contradiction register, see:
 `documentation_unification_block_1.md`.
 
+Compose lifecycle policy note:
+
+- `DOCKER_COMPOSE_RESTART_POLICY_GUIDANCE.md`
+
 Quick pointer map:
 
-- Host setup/provisioning/secrets: `nix-pi` -> `docs/SETUP.md`,
-  `docs/PROVISIONING.md`, `docs/SECRETS.md`.
+- Host setup/provisioning/secrets: sibling repo `nix-pi` ->
+  `../nix-pi/docs/SETUP.md`, `../nix-pi/docs/PROVISIONING.md`,
+  `../nix-pi/docs/SECRETS.md`.
 - Service behavior/options/operations: `nix-services` -> `services/*/README.md`
   and service plans in this repository.
 - Common service docs:
@@ -47,6 +52,8 @@ Quick pointer map:
   - `services/grafana/README.md`
   - `services/smtp-relay/README.md`
   - `services/d2/README.md`
+  - `services/fossflow/README.md`
+  - `services/searxng/README.md`
 
 ## Public Repo Hygiene
 

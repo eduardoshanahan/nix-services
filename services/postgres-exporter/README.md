@@ -22,6 +22,14 @@ The module writes `/run/secrets/postgres-exporter.env` with:
 
 - `DATA_SOURCE_NAME="...dsn..."`
 
+## Known host-specific override
+
+- `nix-pi/nixos/hosts/private/rpi-box-02.nix` overrides the generated
+  `postgres-exporter` compose file to disable selected collectors
+  (`wal`, `stat_bgwriter`) for that host's current Postgres role/version mix.
+- During incident response on `rpi-box-02`, treat the host override as part of
+  the effective runtime contract.
+
 ## Example
 
 ```nix

@@ -34,6 +34,13 @@ UP_UNIFI_CONTROLLER_0_USER=unpoller
 UP_UNIFI_CONTROLLER_0_PASS=<password>
 ```
 
+## Known host-specific override
+
+- `nix-pi/nixos/hosts/private/rpi-box-02.nix` overrides the generated
+  `unpoller` compose file to force `UP_INFLUXDB_DISABLE=true`.
+- That keeps the host in Prometheus-only mode and is currently treated as
+  intentional host policy rather than shared-module behavior.
+
 ## Image pinning strategy
 
 - Default policy is pinned tags only.

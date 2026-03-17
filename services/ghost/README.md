@@ -75,6 +75,16 @@ This module deploys Ghost behind Traefik using a checked-in Docker Compose file.
 - This is required when Ghost needs to verify internal HTTPS endpoints behind a
   private CA, such as its own ActivityPub self-check.
 
+## Known host-specific override
+
+- `nix-pi/nixos/hosts/private/rpi-box-02.nix` overrides the `ghost-blog`
+  compose file for the `blog` instance.
+- That override currently adds
+  `mail__options__tls__rejectUnauthorized=false` for the internal SMTP relay
+  path to avoid auth-code email failures on that host.
+- If Ghost mail behavior differs from the shared module docs, check the host
+  override before changing the shared service.
+
 ## Image pinning strategy
 
 - Default policy is pinned tags only.

@@ -56,3 +56,13 @@ errors.
 
 In that case, set `ignoreTls = true` in the monitor definition in the Kuma UI
 for affected monitors, or ensure the container trusts your internal CA.
+
+## Known host-specific override
+
+- `nix-pi/nixos/hosts/private/rpi-box-02.nix` adds a companion
+  `uptime-kuma-monitor-sync` unit plus `/etc/uptime-kuma/desired-monitors.json`
+  as a declarative monitor source of truth.
+- The same host also extends `uptime-kuma-compose.service.restartTriggers` so
+  monitor-definition changes force a managed restart/sync cycle.
+- On `rpi-box-02`, monitor inventory is therefore partly host policy, not just
+  state managed through the UI.
