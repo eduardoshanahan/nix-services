@@ -343,7 +343,7 @@
       "        expr: sum by (namespace, deployment) (clamp_min(kube_deployment_spec_replicas{job=\"kube-state-metrics\"} - kube_deployment_status_replicas_available{job=\"kube-state-metrics\"}, 0)) > 0"
       "        for: 15m"
       "        labels:"
-      "          severity: warning"
+      "          severity: critical"
       "        annotations:"
       "          summary: \"Deployment replicas unavailable: {{ $labels.namespace }}/{{ $labels.deployment }}\""
       "          description: \"Deployment {{ $labels.namespace }}/{{ $labels.deployment }} has unavailable replicas for more than 15 minutes.\""
