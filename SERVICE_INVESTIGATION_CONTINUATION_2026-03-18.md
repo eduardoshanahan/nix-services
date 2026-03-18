@@ -115,9 +115,12 @@ ssh rpi-box-02 "curl -fsS http://127.0.0.1:9187/metrics | sed -n '1,20p'"
 ssh rpi-box-02 "curl -fsS http://127.0.0.1:9130/metrics | sed -n '1,20p'"
 ```
 
-## Important local-only note
+## Archived precursor note
 
-The root-workspace handoff file
-`/home/eduardo/Programming/gitea.<homelab-domain>/hhlab-insfrastructure/service_investigation_followups_2026-03-17.md`
-contains more detailed running notes, but it is not inside a git repo. This
-continuation file is the committed summary intended to survive across sessions.
+The older root-workspace follow-up file from 2026-03-17 was consolidated and
+removed during the root-doc cleanup pass. Its still-relevant residue now points
+to:
+
+- `../nix-pi/docs/ROOT_SESSION_DOCS_ARCHIVE_SUMMARY_2026-03-18.md`
+- this continuation file as the committed service-investigation summary that
+  should survive across sessions
