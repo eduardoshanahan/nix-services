@@ -36,6 +36,9 @@ documentation is split by responsibility:
 For the current ownership matrix and first contradiction register, see:
 `documentation_unification_block_1.md`.
 
+For the ongoing “did the docs move with the code?” gate, see:
+`DOC_SYNC_CHECKLIST.md`.
+
 Compose lifecycle policy note:
 
 - `DOCKER_COMPOSE_RESTART_POLICY_GUIDANCE.md`
@@ -49,6 +52,7 @@ Quick pointer map:
   `../nix-pi/docs/HOST_RUNTIME_DIVERGENCES.md`
 - Host-owned Uptime Kuma monitor policy: sibling repo `nix-pi` ->
   `../nix-pi/docs/UPTIME_KUMA_MONITOR_POLICY.md`
+- Documentation sync gate for both repos: `DOC_SYNC_CHECKLIST.md`
 - Service behavior/options/operations: `nix-services` -> `services/*/README.md`
   and service plans in this repository.
 - Common service docs:
