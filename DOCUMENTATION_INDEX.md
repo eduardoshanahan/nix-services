@@ -31,7 +31,7 @@ These are design and rollout references. Unless a new rollout is actively in
 progress, they should be read as recovery/expansion/planning material rather
 than everyday operator truth.
 
-## Continuity / Investigation Notes
+## Session Continuity And Investigation Notes
 
 - `documentation_unification_block_1.md`
 - `SERVICE_INVESTIGATION_CONTINUATION_2026-03-18.md`
@@ -56,3 +56,12 @@ canonical host-side record is:
 For host-owned Uptime Kuma monitor exceptions:
 
 - `../nix-pi/docs/UPTIME_KUMA_MONITOR_POLICY.md`
+
+## Boundary Reminder
+
+- `README.md`
+  - repo overview, ownership boundaries, and primary documentation pointers
+- `services/*/README.md`
+  - shared service behavior, options, and service-local operations
+- `../nix-pi/docs/HOST_RUNTIME_DIVERGENCES.md`
+  - canonical host-specific runtime differences from shared service defaults
