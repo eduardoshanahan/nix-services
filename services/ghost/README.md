@@ -84,6 +84,8 @@ This module deploys Ghost behind Traefik using a checked-in Docker Compose file.
   path to avoid auth-code email failures on that host.
 - If Ghost mail behavior differs from the shared module docs, check the host
   override before changing the shared service.
+- Canonical host-side reference:
+  - `../nix-pi/docs/HOST_RUNTIME_DIVERGENCES.md`
 
 ## Image pinning strategy
 

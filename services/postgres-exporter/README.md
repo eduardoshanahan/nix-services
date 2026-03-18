@@ -31,6 +31,8 @@ disable collectors without replacing the entire compose file.
 
 - `rpi-box-02` now uses shared module options to disable selected collectors
   (`wal`, `stat_bgwriter`) for its current Postgres role/version mix.
+- Canonical host-side reference:
+  - `../nix-pi/docs/HOST_RUNTIME_DIVERGENCES.md`
 
 ## Example
 

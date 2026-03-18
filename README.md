@@ -30,6 +30,8 @@ documentation is split by responsibility:
   systemd runtime patterns, service-level plans, and Synology service runbooks.
 - `nix-pi` owns host lifecycle docs: workstation setup, image build/flash,
   bootstrap, host rebuild/deploy flow, and SOPS provisioning workflow.
+- `nix-pi` also owns the canonical register of intentional host runtime
+  divergences from shared service defaults.
 
 For the current ownership matrix and first contradiction register, see:
 `documentation_unification_block_1.md`.
@@ -43,6 +45,10 @@ Quick pointer map:
 - Host setup/provisioning/secrets: sibling repo `nix-pi` ->
   `../nix-pi/docs/SETUP.md`, `../nix-pi/docs/PROVISIONING.md`,
   `../nix-pi/docs/SECRETS.md`.
+- Host-specific runtime divergence register: sibling repo `nix-pi` ->
+  `../nix-pi/docs/HOST_RUNTIME_DIVERGENCES.md`
+- Host-owned Uptime Kuma monitor policy: sibling repo `nix-pi` ->
+  `../nix-pi/docs/UPTIME_KUMA_MONITOR_POLICY.md`
 - Service behavior/options/operations: `nix-services` -> `services/*/README.md`
   and service plans in this repository.
 - Common service docs:

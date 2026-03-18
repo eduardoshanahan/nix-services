@@ -66,3 +66,6 @@ for affected monitors, or ensure the container trusts your internal CA.
   monitor-definition changes force a managed restart/sync cycle.
 - On `rpi-box-02`, monitor inventory is therefore partly host policy, not just
   state managed through the UI.
+- Canonical host-side references:
+  - `../nix-pi/docs/HOST_RUNTIME_DIVERGENCES.md`
+  - `../nix-pi/docs/UPTIME_KUMA_MONITOR_POLICY.md`

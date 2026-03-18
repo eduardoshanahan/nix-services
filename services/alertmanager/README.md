@@ -42,6 +42,12 @@ This module deploys Alertmanager behind Traefik using a checked-in Docker Compos
 - Mutable tags like `latest` are blocked unless
   `services.alertmanager.image.allowMutableTag = true`.
 
+## Host-side monitoring note
+
+- Host-managed Uptime Kuma monitor policy for deployed Alertmanager checks is
+  canonical in:
+  - `../nix-pi/docs/UPTIME_KUMA_MONITOR_POLICY.md`
+
 ## Example
 
 ```nix

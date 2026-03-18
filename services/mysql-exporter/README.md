@@ -29,3 +29,7 @@ for standard single-instance deployments.
 
 `rpi-box-02` now uses the shared module behavior directly again; it no longer
 needs a host-specific compose override for this service.
+
+Canonical host-side reference for current divergence/alignment status:
+
+- `../nix-pi/docs/HOST_RUNTIME_DIVERGENCES.md`
