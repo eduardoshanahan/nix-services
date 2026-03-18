@@ -9502,6 +9502,50 @@
           }
         ];
       }
+      {
+        id = 10;
+        type = "timeseries";
+        title = "Ready Condition By Node";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 0;
+          y = 30;
+        };
+        targets = [
+          {
+            expr = "kube_node_status_condition{job=\"kube-state-metrics\",condition=\"Ready\",status=\"true\"}";
+            legendFormat = "{{node}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 11;
+        type = "timeseries";
+        title = "Running Pods By Namespace";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 12;
+          y = 30;
+        };
+        targets = [
+          {
+            expr = "sum by (namespace) (kube_pod_status_phase{job=\"kube-state-metrics\",phase=\"Running\"} == 1)";
+            legendFormat = "{{namespace}}";
+            refId = "A";
+          }
+        ];
+      }
     ];
   };
   clusterNodesDashboardJson = builtins.toJSON {
