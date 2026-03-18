@@ -91,6 +91,7 @@ With `services.grafanaCompose.provisioning.dashboards.enableStarter = true`, the
 
 - `Homelab Overview`
 - `Nodes Detail`
+- `Cluster Nodes`
 - `Container Fleet`
 - `DNS & Edge`
 - `NAS Detail`
@@ -126,6 +127,16 @@ With `services.grafanaCompose.provisioning.dashboards.enableStarter = true`, the
   - `Core Jobs Down Count`
   - `Core Alerts Firing`
 - A trend panel (`Core Target Up by Job`) to spot target churn by job group.
+
+`Cluster Nodes` includes:
+
+- Cluster-only target-up coverage for `cluster-pi-01` through `cluster-pi-05`.
+- Host-health panels filtered to the cluster node metrics targets:
+  - CPU
+  - memory available
+  - root filesystem used
+  - load average
+  - temperature
 
 `Edge Service Reliability` includes:
 

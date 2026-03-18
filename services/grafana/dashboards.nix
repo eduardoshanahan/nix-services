@@ -9221,4 +9221,219 @@
       }
     ];
   };
+  clusterNodesDashboardJson = builtins.toJSON {
+    id = null;
+    uid = "cluster-nodes";
+    title = "Cluster Nodes";
+    tags = ["homelab" "cluster" "nodes"];
+    timezone = "browser";
+    schemaVersion = 39;
+    version = 1;
+    refresh = "30s";
+    time = {
+      from = "now-6h";
+      to = "now";
+    };
+    editable = true;
+    panels = [
+      {
+        id = 1;
+        type = "stat";
+        title = "Cluster Nodes Up";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 5;
+          w = 6;
+          x = 0;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          justifyMode = "auto";
+          orientation = "auto";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+          textMode = "auto";
+        };
+        targets = [
+          {
+            expr = "sum(up{job=\"nodes\",instance=~\"cluster-pi-0[1-5]-metrics\\\\..*:9100\"})";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 2;
+        type = "stat";
+        title = "Cluster Nodes Expected";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 5;
+          w = 6;
+          x = 6;
+          y = 0;
+        };
+        options = {
+          colorMode = "background";
+          graphMode = "none";
+          justifyMode = "auto";
+          orientation = "auto";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+          textMode = "value";
+        };
+        targets = [
+          {
+            expr = "5";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 3;
+        type = "timeseries";
+        title = "CPU Usage %";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 12;
+          y = 0;
+        };
+        targets = [
+          {
+            expr = "100 - (avg by (instance) (rate(node_cpu_seconds_total{job=\"nodes\",mode=\"idle\",instance=~\"cluster-pi-0[1-5]-metrics\\\\..*:9100\"}[5m])) * 100)";
+            legendFormat = "{{instance}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 4;
+        type = "timeseries";
+        title = "Memory Available %";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 0;
+          y = 5;
+        };
+        targets = [
+          {
+            expr = "100 * (node_memory_MemAvailable_bytes{job=\"nodes\",instance=~\"cluster-pi-0[1-5]-metrics\\\\..*:9100\"} / node_memory_MemTotal_bytes{job=\"nodes\",instance=~\"cluster-pi-0[1-5]-metrics\\\\..*:9100\"})";
+            legendFormat = "{{instance}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 5;
+        type = "timeseries";
+        title = "Root Disk Used %";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 12;
+          y = 8;
+        };
+        targets = [
+          {
+            expr = "100 * (1 - (node_filesystem_avail_bytes{job=\"nodes\",instance=~\"cluster-pi-0[1-5]-metrics\\\\..*:9100\",mountpoint=\"/\",fstype!~\"tmpfs|overlay\"} / node_filesystem_size_bytes{job=\"nodes\",instance=~\"cluster-pi-0[1-5]-metrics\\\\..*:9100\",mountpoint=\"/\",fstype!~\"tmpfs|overlay\"}))";
+            legendFormat = "{{instance}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 6;
+        type = "timeseries";
+        title = "Load Average (1m)";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 0;
+          y = 13;
+        };
+        targets = [
+          {
+            expr = "node_load1{job=\"nodes\",instance=~\"cluster-pi-0[1-5]-metrics\\\\..*:9100\"}";
+            legendFormat = "{{instance}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 7;
+        type = "timeseries";
+        title = "Node Temperature C";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 12;
+          y = 16;
+        };
+        targets = [
+          {
+            expr = "max by (instance) (node_hwmon_temp_celsius{job=\"nodes\",instance=~\"cluster-pi-0[1-5]-metrics\\\\..*:9100\"})";
+            legendFormat = "{{instance}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 8;
+        type = "timeseries";
+        title = "Target Up By Node";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 24;
+          x = 0;
+          y = 24;
+        };
+        targets = [
+          {
+            expr = "up{job=\"nodes\",instance=~\"cluster-pi-0[1-5]-metrics\\\\..*:9100\"}";
+            legendFormat = "{{instance}}";
+            refId = "A";
+          }
+        ];
+      }
+    ];
+  };
 }
