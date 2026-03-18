@@ -39,6 +39,9 @@ For the current ownership matrix and first contradiction register, see:
 For the ongoing “did the docs move with the code?” gate, see:
 `DOC_SYNC_CHECKLIST.md`.
 
+For the local index of repository-level docs, see:
+`DOCUMENTATION_INDEX.md`.
+
 Compose lifecycle policy note:
 
 - `DOCKER_COMPOSE_RESTART_POLICY_GUIDANCE.md`
@@ -53,6 +56,7 @@ Quick pointer map:
 - Host-owned Uptime Kuma monitor policy: sibling repo `nix-pi` ->
   `../nix-pi/docs/UPTIME_KUMA_MONITOR_POLICY.md`
 - Documentation sync gate for both repos: `DOC_SYNC_CHECKLIST.md`
+- Local repository doc index: `DOCUMENTATION_INDEX.md`
 - Service behavior/options/operations: `nix-services` -> `services/*/README.md`
   and service plans in this repository.
 - Common service docs:
