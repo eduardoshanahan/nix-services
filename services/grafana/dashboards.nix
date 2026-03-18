@@ -9221,6 +9221,289 @@
       }
     ];
   };
+  kubernetesOverviewDashboardJson = builtins.toJSON {
+    id = null;
+    uid = "kubernetes-overview";
+    title = "Kubernetes Overview";
+    tags = ["homelab" "cluster" "kubernetes"];
+    timezone = "browser";
+    schemaVersion = 39;
+    version = 1;
+    refresh = "30s";
+    time = {
+      from = "now-6h";
+      to = "now";
+    };
+    editable = true;
+    panels = [
+      {
+        id = 1;
+        type = "stat";
+        title = "Ready Nodes";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 5;
+          w = 6;
+          x = 0;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          justifyMode = "auto";
+          orientation = "auto";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+          textMode = "auto";
+        };
+        targets = [
+          {
+            expr = "sum(kube_node_status_condition{job=\"kube-state-metrics\",condition=\"Ready\",status=\"true\"})";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 2;
+        type = "stat";
+        title = "Nodes Not Ready";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 5;
+          w = 6;
+          x = 6;
+          y = 0;
+        };
+        options = {
+          colorMode = "background";
+          graphMode = "none";
+          justifyMode = "auto";
+          orientation = "auto";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+          textMode = "value";
+        };
+        targets = [
+          {
+            expr = "sum(kube_node_status_condition{job=\"kube-state-metrics\",condition=\"Ready\",status=\"false\"})";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 3;
+        type = "stat";
+        title = "Running Pods";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 5;
+          w = 6;
+          x = 12;
+          y = 0;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          justifyMode = "auto";
+          orientation = "auto";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+          textMode = "auto";
+        };
+        targets = [
+          {
+            expr = "count(kube_pod_status_phase{job=\"kube-state-metrics\",phase=\"Running\"} == 1)";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 4;
+        type = "stat";
+        title = "Pods Not Healthy";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 5;
+          w = 6;
+          x = 18;
+          y = 0;
+        };
+        options = {
+          colorMode = "background";
+          graphMode = "none";
+          justifyMode = "auto";
+          orientation = "auto";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+          textMode = "value";
+        };
+        targets = [
+          {
+            expr = "count(kube_pod_status_phase{job=\"kube-state-metrics\",phase=~\"Pending|Failed|Unknown\"} == 1)";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 5;
+        type = "timeseries";
+        title = "Container Restarts (15m rate)";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 0;
+          y = 5;
+        };
+        targets = [
+          {
+            expr = "topk(10, sum by (namespace, pod) (rate(kube_pod_container_status_restarts_total{job=\"kube-state-metrics\"}[15m])))";
+            legendFormat = "{{namespace}}/{{pod}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 6;
+        type = "timeseries";
+        title = "Deployment Replica Gap";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 12;
+          y = 5;
+        };
+        targets = [
+          {
+            expr = "sum by (namespace, deployment) (clamp_min(kube_deployment_spec_replicas{job=\"kube-state-metrics\"} - kube_deployment_status_replicas_available{job=\"kube-state-metrics\"}, 0))";
+            legendFormat = "{{namespace}}/{{deployment}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 7;
+        type = "timeseries";
+        title = "DaemonSet Scheduling Gap";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 0;
+          y = 13;
+        };
+        targets = [
+          {
+            expr = "sum by (namespace, daemonset) (clamp_min(kube_daemonset_status_desired_number_scheduled{job=\"kube-state-metrics\"} - kube_daemonset_status_number_ready{job=\"kube-state-metrics\"}, 0))";
+            legendFormat = "{{namespace}}/{{daemonset}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 8;
+        type = "timeseries";
+        title = "StatefulSet Ready Gap";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 12;
+          y = 13;
+        };
+        targets = [
+          {
+            expr = "sum by (namespace, statefulset) (clamp_min(kube_statefulset_replicas{job=\"kube-state-metrics\"} - kube_statefulset_status_replicas_ready{job=\"kube-state-metrics\"}, 0))";
+            legendFormat = "{{namespace}}/{{statefulset}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 9;
+        type = "timeseries";
+        title = "Pod Phases By Namespace";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 9;
+          w = 24;
+          x = 0;
+          y = 21;
+        };
+        fieldConfig = {
+          defaults = {
+            custom = {
+              drawStyle = "bars";
+              fillOpacity = 70;
+              lineWidth = 1;
+              stacking = {
+                group = "A";
+                mode = "normal";
+              };
+            };
+          };
+          overrides = [ ];
+        };
+        options = {
+          legend = {
+            displayMode = "table";
+            placement = "bottom";
+          };
+          tooltip = {
+            mode = "multi";
+            sort = "desc";
+          };
+        };
+        targets = [
+          {
+            expr = "sum by (namespace, phase) (kube_pod_status_phase{job=\"kube-state-metrics\"} == 1)";
+            legendFormat = "{{namespace}} {{phase}}";
+            refId = "A";
+          }
+        ];
+      }
+    ];
+  };
   clusterNodesDashboardJson = builtins.toJSON {
     id = null;
     uid = "cluster-nodes";

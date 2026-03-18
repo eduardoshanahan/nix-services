@@ -42,6 +42,7 @@
     appInternalsDashboardJson
     homeAssistantOperationsDashboardJson
     unifiOverviewDashboardJson
+    kubernetesOverviewDashboardJson
     ;
   inherit (scripts) backupScript healthcheckScript waitForHealthy;
   runtimeEnvScript = pkgs.writeShellScript "${serviceName}-runtime-env" ''
@@ -556,6 +557,10 @@ in {
       text = unifiOverviewDashboardJson;
       mode = "0444";
     };
+    environment.etc."${serviceName}/provisioning/dashboards/kubernetes-overview.json" = lib.mkIf (cfg.provisioning.enable && cfg.provisioning.dashboards.enableStarter) {
+      text = kubernetesOverviewDashboardJson;
+      mode = "0444";
+    };
 
     systemd.services.${serviceName} = {
       description = "Grafana (Docker Compose)";
@@ -590,6 +595,7 @@ in {
           config.environment.etc."${serviceName}/provisioning/dashboards/app-internals.json".source
           config.environment.etc."${serviceName}/provisioning/dashboards/home-assistant-operations.json".source
           config.environment.etc."${serviceName}/provisioning/dashboards/unifi-overview.json".source
+          config.environment.etc."${serviceName}/provisioning/dashboards/kubernetes-overview.json".source
         ]
         ++ lib.optionals (cfg.provisioning.enable && cfg.provisioning.dashboards.enableStarter && cfg.provisioning.datasources.loki.url != null) [
           config.environment.etc."${serviceName}/provisioning/dashboards/nas-file-activity.json".source
@@ -660,6 +666,7 @@ in {
             "${pkgs.runtimeShell} -c 'test -s ${composeDir}/provisioning/dashboards/app-internals.json'"
             "${pkgs.runtimeShell} -c 'test -s ${composeDir}/provisioning/dashboards/home-assistant-operations.json'"
             "${pkgs.runtimeShell} -c 'test -s ${composeDir}/provisioning/dashboards/unifi-overview.json'"
+            "${pkgs.runtimeShell} -c 'test -s ${composeDir}/provisioning/dashboards/kubernetes-overview.json'"
           ]
           ++ lib.optionals (cfg.provisioning.enable && cfg.provisioning.dashboards.enableStarter && cfg.provisioning.datasources.loki.url != null) [
             "${pkgs.runtimeShell} -c 'test -s ${composeDir}/provisioning/dashboards/nas-file-activity.json'"
