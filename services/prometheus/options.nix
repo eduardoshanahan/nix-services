@@ -349,6 +349,13 @@
         description = "Vikunja metrics targets (`host:port`) to scrape.";
       };
 
+      kubeStateMetricsTargets = lib.mkOption {
+        type = lib.types.listOf lib.types.str;
+        default = [];
+        example = ["cluster-pi-01.internal.example:30080"];
+        description = "kube-state-metrics targets (`host:port`) to scrape.";
+      };
+
       vikunjaMetricsPath = lib.mkOption {
         type = lib.types.str;
         default = "/api/v1/metrics";

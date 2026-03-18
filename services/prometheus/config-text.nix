@@ -279,6 +279,10 @@
         dropUpMetric = true;
       })
       ++ (optionalJobLines {
+        name = "kube-state-metrics";
+        targets = cfg.scrape.kubeStateMetricsTargets;
+      })
+      ++ (optionalJobLines {
         name = "alertmanager";
         targets = cfg.scrape.alertmanagerTargets;
       })
