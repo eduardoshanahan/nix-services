@@ -49,12 +49,12 @@ Compose lifecycle policy note:
 Quick documentation pointers:
 
 - Host setup/provisioning/secrets: sibling repo `nix-pi` ->
-  `../nix-pi/docs/SETUP.md`, `../nix-pi/docs/PROVISIONING.md`,
-  `../nix-pi/docs/SECRETS.md`.
+  `../nix-pi/docs/lifecycle/SETUP.md`, `../nix-pi/docs/lifecycle/PROVISIONING.md`,
+  `../nix-pi/docs/lifecycle/SECRETS.md`.
 - Host-specific runtime divergence register: sibling repo `nix-pi` ->
-  `../nix-pi/docs/HOST_RUNTIME_DIVERGENCES.md`
+  `../nix-pi/docs/policy/HOST_RUNTIME_DIVERGENCES.md`
 - Host-owned Uptime Kuma monitor policy: sibling repo `nix-pi` ->
-  `../nix-pi/docs/UPTIME_KUMA_MONITOR_POLICY.md`
+  `../nix-pi/docs/policy/UPTIME_KUMA_MONITOR_POLICY.md`
 - Documentation sync gate for both repos: `docs/policy/DOC_SYNC_CHECKLIST.md`
 - Stable shared policy docs: `docs/policy/`
 - Shared rollout/runbook docs: `docs/plans/`, `docs/recovery/`

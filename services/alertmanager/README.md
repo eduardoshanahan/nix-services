@@ -46,7 +46,7 @@ This module deploys Alertmanager behind Traefik using a checked-in Docker Compos
 
 - Host-managed Uptime Kuma monitor policy for deployed Alertmanager checks is
   canonical in:
-  - `../nix-pi/docs/UPTIME_KUMA_MONITOR_POLICY.md`
+  - `../nix-pi/docs/policy/UPTIME_KUMA_MONITOR_POLICY.md`
 
 ## Example
 

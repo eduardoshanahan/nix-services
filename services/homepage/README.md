@@ -54,7 +54,7 @@ generated Docker Compose file and declarative YAML config files.
 - During incident work, do not assume the generated shared-module shape is the
   exact runtime shape on `rpi-box-02`.
 - Canonical host-side reference:
-  - `../nix-pi/docs/HOST_RUNTIME_DIVERGENCES.md`
+  - `../nix-pi/docs/policy/HOST_RUNTIME_DIVERGENCES.md`
 
 ## Image pinning strategy
 

@@ -32,4 +32,4 @@ needs a host-specific compose override for this service.
 
 Canonical host-side reference for current divergence/alignment status:
 
-- `../nix-pi/docs/HOST_RUNTIME_DIVERGENCES.md`
+- `../nix-pi/docs/policy/HOST_RUNTIME_DIVERGENCES.md`

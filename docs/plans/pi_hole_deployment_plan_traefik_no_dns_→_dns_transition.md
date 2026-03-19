@@ -5,7 +5,7 @@ This document defines the **step-by-step implementation plan** for deploying **P
 > **Current-state note (2026-02-25)**  
 > Services are already deployed and operating. Use this plan as a rebuild-from-scratch, disaster recovery, or expansion reference unless an explicit new rollout is planned.
 > **Documentation boundary note**  
-> This document defines service-side constraints and invariants. For host-by-host operator execution during DNS cutover, use `nix-pi/zero_downtime_dns_migration_checklist.md`.
+> This document defines service-side constraints and invariants. For host-by-host operator execution during DNS cutover, use `nix-pi/docs/plans/zero_downtime_dns_migration_checklist.md`.
 
 This plan is written to be **directly executable by Codex**.
 

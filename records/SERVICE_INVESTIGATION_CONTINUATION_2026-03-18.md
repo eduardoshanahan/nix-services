@@ -121,6 +121,6 @@ The older root-workspace follow-up file from 2026-03-17 was consolidated and
 removed during the root-doc cleanup pass. Its still-relevant residue now points
 to:
 
-- `../nix-pi/docs/ROOT_SESSION_DOCS_ARCHIVE_SUMMARY_2026-03-18.md`
+- `../nix-pi/docs/continuity/ROOT_SESSION_DOCS_ARCHIVE_SUMMARY_2026-03-18.md`
 - this continuation file as the committed service-investigation summary that
   should survive across sessions

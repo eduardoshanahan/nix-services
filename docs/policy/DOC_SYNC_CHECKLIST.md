@@ -11,9 +11,9 @@ reading the docs, the docs must move in the same change.
 - Shared module behavior/options/contracts:
   - `nix-services`
 - Host-specific runtime divergence:
-  - `nix-pi/docs/HOST_RUNTIME_DIVERGENCES.md`
+  - `nix-pi/docs/policy/HOST_RUNTIME_DIVERGENCES.md`
 - Host-managed Uptime Kuma monitor policy/exceptions:
-  - `nix-pi/docs/UPTIME_KUMA_MONITOR_POLICY.md`
+  - `nix-pi/docs/policy/UPTIME_KUMA_MONITOR_POLICY.md`
 
 ## Run This Checklist When You Change
 
@@ -44,11 +44,11 @@ If a change affects a shared service module in `nix-services`:
 
 If a change affects deployed host behavior in `nix-pi`:
 
-1. Update `docs/HOST_RUNTIME_DIVERGENCES.md` when:
+1. Update `docs/policy/HOST_RUNTIME_DIVERGENCES.md` when:
    - a host-local override is added
    - a host-local override is removed
    - the rationale for a divergence changes
-2. Update `docs/UPTIME_KUMA_MONITOR_POLICY.md` when:
+2. Update `docs/policy/UPTIME_KUMA_MONITOR_POLICY.md` when:
    - a declarative monitor target changes
    - a monitor exception is added or removed
    - accepted status-code or TLS behavior changes

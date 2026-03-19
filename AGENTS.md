@@ -166,8 +166,8 @@ copying host truth here.
 ## Host-Specific Reality
 
 Some shared service READMEs intentionally point to host-owned exceptions in
-`../nix-pi/docs/HOST_RUNTIME_DIVERGENCES.md` or
-`../nix-pi/docs/UPTIME_KUMA_MONITOR_POLICY.md`.
+`../nix-pi/docs/policy/HOST_RUNTIME_DIVERGENCES.md` or
+`../nix-pi/docs/policy/UPTIME_KUMA_MONITOR_POLICY.md`.
 
 Do not pull those host-local behaviors into shared modules just to “clean up”
 duplication unless the behavior is becoming reusable.

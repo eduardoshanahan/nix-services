@@ -35,9 +35,9 @@ They are not the day-to-day path for already-deployed stable services.
 | Topic | Canonical repo | Canonical document(s) | Non-canonical repo rule |
 | --- | --- | --- | --- |
 | Repo boundary and architecture model | `nix-services` | `repository_boundary_and_responsibility_guidelines.md`, `architecture_and_implementation_guidelines.md`, `service_deployment_model.md` | Keep only a short pointer paragraph in `nix-pi` |
-| Host setup, provisioning, flashing | `nix-pi` | `docs/SETUP.md`, `docs/PROVISIONING.md`, `sd-image/README.md` | `nix-services` should not duplicate host bootstrap steps |
+| Host setup, provisioning, flashing | `nix-pi` | `docs/lifecycle/SETUP.md`, `docs/lifecycle/PROVISIONING.md`, `sd-image/README.md` | `nix-services` should not duplicate host bootstrap steps |
 | Runtime secrets ownership split | `nix-services` | `runtime_secrets_docker_services.md` | `nix-pi` references this for the contract and documents only host-side secret provisioning |
-| SOPS/age host secret provisioning | `nix-pi` | `docs/SECRETS.md` | `nix-services` references only paths/contracts, not provisioning steps |
+| SOPS/age host secret provisioning | `nix-pi` | `docs/lifecycle/SECRETS.md` | `nix-services` references only paths/contracts, not provisioning steps |
 | Service module options and behavior | `nix-services` | `services/*/README.md` + matching `services/*/*.nix` | `nix-pi` may list enabled services, but links back for details |
 | Deploy/rebuild operator command flow | `nix-pi` | `README.md` (or future `docs/DEPLOY.md`) | `nix-services` may mention integration model, not per-host command recipes |
 | DNS/DHCP migration operations | split by scope | `nix-services`: service design/cutover constraints; `nix-pi`: operator execution checklist | Each side links to the other and avoids re-stating full procedure |
@@ -56,7 +56,7 @@ They are not the day-to-day path for already-deployed stable services.
   - Status: **Resolved on 2026-02-25**.
   - Risk: drift when one is edited first.
   - Resolution: keep canonical in `nix-services`; replace `nix-pi` copy with short pointer.
-  - Evidence: `nix-pi/PUBLIC_REPO_SANITIZATION_POLICY.md` is now pointer-only.
+  - Evidence: `nix-pi/docs/policy/PUBLIC_REPO_SANITIZATION_POLICY.md` is now pointer-only.
 
 ### Divergent duplicates
 
@@ -70,11 +70,11 @@ They are not the day-to-day path for already-deployed stable services.
   - Status: **Resolved on 2026-02-25**.
   - Risk: AI assistant behavior may diverge per repo unexpectedly.
   - Resolution: pick one canonical policy and point from the other repo.
-  - Evidence: `nix-pi/response_style.md` is now pointer-only to `nix-services/response_style.md`.
+  - Evidence: `nix-pi/docs/prompts/response_style.md` is now pointer-only to `nix-services/response_style.md`.
 
 ### Scope overlaps needing boundary wording
 
-- DNS migration content appears in both repos (`nix-pi/zero_downtime_dns_migration_checklist.md`, `nix-services/pi_hole_deployment_plan_traefik_no_dns_→_dns_transition.md`, `nix-services/zero_downtime_pi_hole_dhcp_migration_checklist.md`).
+- DNS migration content appears in both repos (`nix-pi/docs/plans/zero_downtime_dns_migration_checklist.md`, `nix-services/pi_hole_deployment_plan_traefik_no_dns_→_dns_transition.md`, `nix-services/zero_downtime_pi_hole_dhcp_migration_checklist.md`).
   - Status: **Resolved on 2026-02-25**.
   - Risk: contradictory sequencing if both documents evolve independently.
   - Resolution: split responsibility explicitly:
@@ -82,7 +82,7 @@ They are not the day-to-day path for already-deployed stable services.
     - `nix-pi`: operator execution checklist per environment.
   - Evidence:
     - `nix-services/pi_hole_deployment_plan_traefik_no_dns_→_dns_transition.md` now includes an explicit documentation boundary note pointing to `nix-pi`.
-    - `nix-pi/zero_downtime_dns_migration_checklist.md` now declares operator-execution ownership and points back to `nix-services` for constraints.
+    - `nix-pi/docs/plans/zero_downtime_dns_migration_checklist.md` now declares operator-execution ownership and points back to `nix-services` for constraints.
 
 - Monitoring and observability guidance appears in both repos (`nix-pi/README.md` runtime checks vs `nix-services` monitoring/service docs).
   - Status: **Resolved on 2026-02-25**.

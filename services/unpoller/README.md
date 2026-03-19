@@ -42,7 +42,7 @@ UP_UNIFI_CONTROLLER_0_PASS=<password>
 - `rpi-box-02` now uses this shared module option instead of replacing the
   entire compose file.
 - Canonical host-side reference:
-  - `../nix-pi/docs/HOST_RUNTIME_DIVERGENCES.md`
+  - `../nix-pi/docs/policy/HOST_RUNTIME_DIVERGENCES.md`
 
 ## Image pinning strategy
 

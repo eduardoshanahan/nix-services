@@ -2,7 +2,7 @@
 
 Canonical source of truth for host reflash/rejoin procedure lives in:
 
-- `nix-pi/reflash_rejoin_node_runbook.md`
+- `nix-pi/docs/recovery/reflash_rejoin_node_runbook.md`
 
 This file is intentionally pointer-only to avoid drift between repositories.
 

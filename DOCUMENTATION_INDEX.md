@@ -55,11 +55,11 @@ For actual module behavior and options, prefer:
 If the deployed host intentionally differs from shared module behavior, the
 canonical host-side record is:
 
-- `../nix-pi/docs/HOST_RUNTIME_DIVERGENCES.md`
+- `../nix-pi/docs/policy/HOST_RUNTIME_DIVERGENCES.md`
 
 For host-owned Uptime Kuma monitor exceptions:
 
-- `../nix-pi/docs/UPTIME_KUMA_MONITOR_POLICY.md`
+- `../nix-pi/docs/policy/UPTIME_KUMA_MONITOR_POLICY.md`
 
 ## Boundary Reminder
 
@@ -73,5 +73,5 @@ For host-owned Uptime Kuma monitor exceptions:
   - session continuity and investigation notes
 - `services/*/README.md`
   - shared service behavior, options, and service-local operations
-- `../nix-pi/docs/HOST_RUNTIME_DIVERGENCES.md`
+- `../nix-pi/docs/policy/HOST_RUNTIME_DIVERGENCES.md`
   - canonical host-specific runtime differences from shared service defaults
