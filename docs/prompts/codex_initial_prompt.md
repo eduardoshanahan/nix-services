@@ -84,4 +84,4 @@ can be considered complete or deployable.
 
 ## Implementation phase
 
-- Follow the instructions in codex_implementation_prompt.md
+- Follow the instructions in `codex_implementation_prompt.md`

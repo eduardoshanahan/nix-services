@@ -24,7 +24,7 @@ Current decision:
 
 Reference:
 
-- `DOCKER_COMPOSE_RESTART_POLICY_GUIDANCE.md`
+- `../docs/policy/DOCKER_COMPOSE_RESTART_POLICY_GUIDANCE.md`
 
 ### Documentation cleanup
 
@@ -33,7 +33,7 @@ The top-level repo maps and missing service docs were repaired.
 Relevant docs added or updated:
 
 - `README.md`
-- `DOCKER_COMPOSE_RESTART_POLICY_GUIDANCE.md`
+- `../docs/policy/DOCKER_COMPOSE_RESTART_POLICY_GUIDANCE.md`
 - `services/fossflow/README.md`
 - `services/searxng/README.md`
 - service READMEs for:

@@ -1,6 +1,6 @@
 # nix-services
 
-This repository is governed by codex_initial_prompt.md.
+This repository is governed by `docs/prompts/codex_initial_prompt.md`.
 
 This repository defines application services and operational policy
 for ARM64 NixOS hosts.
@@ -34,17 +34,17 @@ documentation is split by responsibility:
   divergences from shared service defaults.
 
 For the current ownership matrix and first contradiction register, see:
-`documentation_unification_block_1.md`.
+`records/documentation_unification_block_1.md`.
 
 For the ongoing documentation sync gate, see:
-`DOC_SYNC_CHECKLIST.md`.
+`docs/policy/DOC_SYNC_CHECKLIST.md`.
 
 For the local documentation index, see:
 `DOCUMENTATION_INDEX.md`.
 
 Compose lifecycle policy note:
 
-- `DOCKER_COMPOSE_RESTART_POLICY_GUIDANCE.md`
+- `docs/policy/DOCKER_COMPOSE_RESTART_POLICY_GUIDANCE.md`
 
 Quick documentation pointers:
 
@@ -55,7 +55,10 @@ Quick documentation pointers:
   `../nix-pi/docs/HOST_RUNTIME_DIVERGENCES.md`
 - Host-owned Uptime Kuma monitor policy: sibling repo `nix-pi` ->
   `../nix-pi/docs/UPTIME_KUMA_MONITOR_POLICY.md`
-- Documentation sync gate for both repos: `DOC_SYNC_CHECKLIST.md`
+- Documentation sync gate for both repos: `docs/policy/DOC_SYNC_CHECKLIST.md`
+- Stable shared policy docs: `docs/policy/`
+- Shared rollout/runbook docs: `docs/plans/`, `docs/recovery/`
+- Session continuity notes: `records/`
 - Local documentation index: `DOCUMENTATION_INDEX.md`
 - Service behavior/options/operations: `nix-services` -> `services/*/README.md`
   and service plans in this repository.
@@ -73,7 +76,7 @@ Quick documentation pointers:
 
 Before commit/push, run the sanitization checklist in:
 
-`PUBLIC_REPO_SANITIZATION_POLICY.md`
+`docs/policy/PUBLIC_REPO_SANITIZATION_POLICY.md`
 
 ## diagrams.net Startup Behavior
 
