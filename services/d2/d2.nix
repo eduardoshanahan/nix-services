@@ -6,6 +6,7 @@
 }: let
   cfg = config.services.d2Compose;
   serviceName = "d2";
+  containerDataDir = "/srv/d2";
   composeDir = "/var/lib/${serviceName}-compose";
   staticDir = "/etc/${serviceName}";
   dockerBin = "${config.virtualisation.docker.package}/bin/docker";
@@ -19,6 +20,12 @@
     if cfg.auth.passwordFile == null
     then defaultGeneratedPasswordFile
     else cfg.auth.passwordFile;
+  effectiveContainerPasswordFile =
+    if !cfg.auth.enable
+    then effectivePasswordFile
+    else if lib.hasPrefix "${cfg.dataDir}/" effectivePasswordFile
+    then "${containerDataDir}/${lib.removePrefix "${cfg.dataDir}/" effectivePasswordFile}"
+    else effectivePasswordFile;
   authEnabledFlag = if cfg.auth.enable then "1" else "0";
   authAutoGenerateFlag = if cfg.auth.passwordFile == null then "1" else "0";
   hostnameRegex = "^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)(\\.([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?))*$";
@@ -110,7 +117,7 @@ in {
           "D2_DEFAULT_FILE=${defaultFileName}"
           "D2_AUTH_ENABLED=${if cfg.auth.enable then "true" else "false"}"
           "D2_AUTH_USERNAME=${cfg.auth.username}"
-          "D2_AUTH_PASSWORD_FILE=${effectivePasswordFile}"
+          "D2_AUTH_PASSWORD_FILE=${effectiveContainerPasswordFile}"
           "TZ=${cfg.timezone}"
         ];
 
