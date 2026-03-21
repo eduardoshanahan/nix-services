@@ -64,7 +64,6 @@ profiles/
 services/
   traefik/
 secrets/        # empty placeholder
-hosts-private/  # empty placeholder
 ```
 
 No Traefik logic may exist outside `services/traefik/`.

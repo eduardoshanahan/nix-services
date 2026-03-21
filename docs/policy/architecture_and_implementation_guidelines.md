@@ -206,7 +206,6 @@ hosts/
 profiles/
 services/
 secrets/        # empty placeholder
-hosts-private/  # empty placeholder
 ```
 
 Naming rules:

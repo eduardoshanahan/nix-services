@@ -58,13 +58,8 @@ Codex MUST NOT add or commit:
 
 ## 4. Private Directories: How to Use Them Safely
 
-Private directories MAY exist in the public repo **only as empty placeholders**.
-
-### Allowed contents
-
-- Empty directories
-- `.gitkeep` files
-- Minimal README explaining intent (no details)
+Private directories should generally live outside the public repo in a sibling
+private companion repo or local untracked workspace.
 
 ### Forbidden contents
 
@@ -75,42 +70,34 @@ Private directories MAY exist in the public repo **only as empty placeholders**.
 
 ### Naming rules
 
-- Use **generic names**
-  - `secrets/`
-  - `private/`
-  - `hosts-private/`
-- Avoid operational detail in names
+- Prefer sibling private companion repos or runtime secret paths over tracked
+  in-repo private placeholders
+- Avoid operational detail in names when documenting private boundaries
   - ❌ `vpn-wireguard-home/`
   - ❌ `dns-prod-zone/`
-  - ✅ `vpn/`
-  - ✅ `dns/`
+  - ✅ `../nix-services-private/`
+  - ✅ `/run/secrets/...`
 
 ---
 
-## 5. Optional Import Pattern (MANDATORY)
+## 5. Optional Private Inputs
 
-Public configuration MUST NOT depend on private files to evaluate.
+Public configuration MUST NOT depend on private tracked files to evaluate.
 
 Private configuration must be **optional**.
 
-### Required pattern
+### Current preferred pattern
 
-```nix
-imports =
-  [
-    ./hosts/base.nix
-  ]
-  ++ lib.optional (builtins.pathExists ./hosts-private/host.nix)
-       ./hosts-private/host.nix;
-```
+- keep shared service modules publicly evaluable on their own
+- keep runtime secrets external (for example `/run/secrets/...`)
+- keep private continuity and operator notes in `../nix-services-private/`
+- keep host-specific private wiring in the owning host repo, not here
 
 This ensures:
 
-- The public repo builds cleanly
-- Private overlays are additive
-- No pressure to add placeholders with values
-
-Codex MUST follow this pattern when referencing private paths.
+- the public repo builds cleanly
+- private state stays outside the published tree
+- no placeholder directories are needed just to model private behavior
 
 ---
 
@@ -120,7 +107,7 @@ Secrets MUST be provided via one of the following **external mechanisms**:
 
 - Files injected at runtime (e.g. `/run/secrets/...`)
 - Encrypted secret management (e.g. sops-nix)
-- Private overlay repository
+- Private companion repository
 
 The public repo may reference secret **paths**, but never secret **values**.
 
