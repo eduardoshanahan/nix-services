@@ -39,8 +39,8 @@ UP_UNIFI_CONTROLLER_0_PASS=<password>
 
 - `services.unpollerCompose.influxdb.enable = false` disables the legacy
   InfluxDB output path and keeps the deployment Prometheus-only.
-- `rpi-box-02` now uses this shared module option instead of replacing the
-  entire compose file.
+- Consumers can use this shared module option instead of replacing the entire
+  compose file.
 - Canonical host-side reference:
   - `../nix-pi/docs/policy/HOST_RUNTIME_DIVERGENCES.md`
 
@@ -66,6 +66,6 @@ services.unpollerCompose = {
 };
 
 services.prometheusCompose.scrape.unpollerTargets = [
-  "rpi-box-02.internal.example:9130"
+  "unpoller.internal.example:9130"
 ];
 ```

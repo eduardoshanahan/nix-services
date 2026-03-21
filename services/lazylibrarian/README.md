@@ -32,9 +32,8 @@ Operational notes:
 - LazyLibrarian docs recommend using a separate "Calibre Books Auto Add
   Directory" when maintaining separate libraries, rather than pointing the base
   destination folder at an existing Calibre library.
-- Intended first deployment shape on `rpi-box-02`:
+- Example deployment shape:
   - URL: `https://lazylibrarian.internal.example/`
-  - host: `rpi-box-02`
   - state path: `/srv/lazylibrarian`
   - downloads path: `/mnt/media/Downloads/qbittorrent`
   - LazyLibrarian books path: `/mnt/media/Books/LazyLibrarian/library`

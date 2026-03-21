@@ -17,21 +17,18 @@ Lidarr is packaged here as a Docker Compose-backed NixOS module.
   state and optional bind-mounted paths so boot-time startup waits for those
   mounts before Docker starts the container.
 - The first-pass deployment intentionally keeps Lidarr on its default internal
-  SQLite database inside `dataDir`; no shared SQL backend on `hhnas4` is
-  required.
+  SQLite database inside `dataDir`; no shared SQL backend is required.
 - The service is intended to run behind Traefik on the shared external
   `traefik` Docker network.
 
 Operational notes:
 
 - Upstream listens on port `8686`.
-- The current `rpi-box-02` media layout exposes music content at
-  `/mnt/media/Music` and qBittorrent completed downloads at
-  `/mnt/media/Downloads/qbittorrent`.
-- Verified intended deployed shape on 2026-03-13:
+- Example deployment shape:
   - URL: `https://lidarr.internal.example/`
-  - host: `rpi-box-02`
   - state path: `/srv/lidarr`
+  - media path: `/mnt/media/Music`
+  - downloads path: `/mnt/media/Downloads/qbittorrent`
   - database: local SQLite in `/srv/lidarr`
 
 Important options:

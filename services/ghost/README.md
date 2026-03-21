@@ -75,15 +75,11 @@ This module deploys Ghost behind Traefik using a checked-in Docker Compose file.
 - This is required when Ghost needs to verify internal HTTPS endpoints behind a
   private CA, such as its own ActivityPub self-check.
 
-## Known host-specific override
+## Host-specific divergence note
 
-- `../nix-pi-private/modules/rpi-box-02.nix` overrides the `ghost-blog`
-  compose file for the `blog` instance.
-- That override currently adds
-  `mail__options__tls__rejectUnauthorized=false` for the internal SMTP relay
-  path to avoid auth-code email failures on that host.
+- Some consumers may apply host-private Ghost overrides in their host repo.
 - If Ghost mail behavior differs from the shared module docs, check the host
-  override before changing the shared service.
+  divergence record before changing the shared service.
 - Canonical host-side reference:
   - `../nix-pi/docs/policy/HOST_RUNTIME_DIVERGENCES.md`
 
@@ -103,7 +99,7 @@ services.ghost.instances = {
     dataDir = "/var/lib/ghost-blog";
     tls = true;
     database = {
-      host = "hhnas4";
+      host = "mysql.internal.example";
       port = 3306;
       name = "ghost_blog";
       user = "ghost_blog";
@@ -125,7 +121,7 @@ services.ghost.instances = {
     dataDir = "/var/lib/ghost-notes";
     tls = true;
     database = {
-      host = "hhnas4";
+      host = "mysql.internal.example";
       port = 3306;
       name = "ghost_notes";
       user = "ghost_notes";

@@ -621,7 +621,7 @@
       {
         id = 9;
         type = "timeseries";
-        title = "Pi Storage Used % (rpi-box-02/03)";
+        title = "Node Storage Used %";
         datasource = {
           type = "prometheus";
           uid = "prometheus";
@@ -634,7 +634,7 @@
         };
         targets = [
           {
-            expr = "100 * (1 - (node_filesystem_avail_bytes{instance=~\"rpi-box-0[23].*\",mountpoint=\"/\",fstype!~\"tmpfs|overlay\"} / node_filesystem_size_bytes{instance=~\"rpi-box-0[23].*\",mountpoint=\"/\",fstype!~\"tmpfs|overlay\"}))";
+            expr = "100 * (1 - (node_filesystem_avail_bytes{mountpoint=\"/\",fstype!~\"tmpfs|overlay\"} / node_filesystem_size_bytes{mountpoint=\"/\",fstype!~\"tmpfs|overlay\"}))";
             legendFormat = "{{instance}} /";
             refId = "A";
           }
@@ -643,7 +643,7 @@
       {
         id = 10;
         type = "timeseries";
-        title = "Pi Disk IO by Device (rpi-box-02/03)";
+        title = "Node Disk IO by Device";
         datasource = {
           type = "prometheus";
           uid = "prometheus";
@@ -656,12 +656,12 @@
         };
         targets = [
           {
-            expr = "sum by (instance, device) (rate(node_disk_read_bytes_total{instance=~\"rpi-box-0[23].*\",device!~\"loop.*|ram.*|zram.*|dm-.*|md.*\"}[5m]))";
+            expr = "sum by (instance, device) (rate(node_disk_read_bytes_total{device!~\"loop.*|ram.*|zram.*|dm-.*|md.*\"}[5m]))";
             legendFormat = "{{instance}} {{device}} read";
             refId = "A";
           }
           {
-            expr = "sum by (instance, device) (rate(node_disk_written_bytes_total{instance=~\"rpi-box-0[23].*\",device!~\"loop.*|ram.*|zram.*|dm-.*|md.*\"}[5m]))";
+            expr = "sum by (instance, device) (rate(node_disk_written_bytes_total{device!~\"loop.*|ram.*|zram.*|dm-.*|md.*\"}[5m]))";
             legendFormat = "{{instance}} {{device}} write";
             refId = "B";
           }
@@ -1632,7 +1632,7 @@
         };
         targets = [
           {
-            expr = "sum by (host) (rate({job=\"synology-file-activity\"} |~ \"(?i)(fail|denied|unauthorized|permission)\"[5m])) or label_replace(vector(0), \"host\", \"nas2\", \"\", \"\") or label_replace(vector(0), \"host\", \"hhnas4\", \"\", \"\")";
+            expr = "sum by (host) (rate({job=\"synology-file-activity\"} |~ \"(?i)(fail|denied|unauthorized|permission)\"[5m])) or on() vector(0)";
             legendFormat = "{{host}}";
             refId = "A";
           }

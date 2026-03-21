@@ -74,7 +74,7 @@
       host = lib.mkOption {
         type = lib.types.str;
         description = "MySQL hostname or IP reachable from the Ghost host.";
-        example = "hhnas4";
+        example = "mysql.internal.example";
       };
 
       port = lib.mkOption {
@@ -408,7 +408,7 @@ in {
       host = lib.mkOption {
         type = lib.types.str;
         description = "MySQL hostname or IP reachable from the Ghost host.";
-        example = "hhnas4";
+        example = "mysql.internal.example";
       };
 
       port = lib.mkOption {

@@ -57,15 +57,14 @@ errors.
 In that case, set `ignoreTls = true` in the monitor definition in the Kuma UI
 for affected monitors, or ensure the container trusts your internal CA.
 
-## Known host-specific override
+## Host-specific divergence note
 
-- `../nix-pi-private/modules/rpi-box-02.nix` adds a companion
-  `uptime-kuma-monitor-sync` unit plus `/etc/uptime-kuma/desired-monitors.json`
-  as a declarative monitor source of truth.
-- The same host also extends `uptime-kuma-compose.service.restartTriggers` so
+- Some consumers add a companion monitor-sync unit and declarative monitor file
+  in their host repo.
+- Those hosts may also extend `uptime-kuma-compose.service.restartTriggers` so
   monitor-definition changes force a managed restart/sync cycle.
-- On `rpi-box-02`, monitor inventory is therefore partly host policy, not just
-  state managed through the UI.
+- In those deployments, monitor inventory is partly host policy rather than
+  state managed only through the UI.
 - Canonical host-side references:
   - `../nix-pi/docs/policy/HOST_RUNTIME_DIVERGENCES.md`
   - `../nix-pi/docs/policy/UPTIME_KUMA_MONITOR_POLICY.md`

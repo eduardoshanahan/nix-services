@@ -285,7 +285,7 @@ This gives you visibility for:
 - Host model validation: DS215j-class ARMv7 with DSM 7.1.1.
 - Docker/Container Manager is not available on this NAS class.
 - Monitoring path is Pi-side:
-  - scrape NAS via SNMP using `snmp-exporter` on `rpi-box-02`
+- scrape NAS via SNMP using `snmp-exporter` on a monitoring host
   - keep DSM log forwarding to Promtail/Loki for file and security activity
 
 ### Synology scaffold created

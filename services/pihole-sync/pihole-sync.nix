@@ -79,12 +79,11 @@ in {
     source = {
       host = lib.mkOption {
         type = lib.types.str;
-        description = "Source host to pull the Teleporter archive from (for example `rpi-box-01`).";
+        description = "Source host to pull the Teleporter archive from (for example `dns-primary.internal.example`).";
       };
 
       user = lib.mkOption {
         type = lib.types.str;
-        default = "eduardo";
         description = "SSH user used to connect to the source host.";
       };
     };

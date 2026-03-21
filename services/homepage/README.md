@@ -45,14 +45,12 @@ generated Docker Compose file and declarative YAML config files.
 - `docker.yaml` is generated from `services.homepageDashboard.config.docker` and
   is augmented automatically when Docker integration is enabled.
 
-## Known host-specific override
+## Host-specific divergence note
 
-- `../nix-pi-private/modules/rpi-box-02.nix` intentionally overrides
-  `/etc/homepage/config/docker.yaml` with a multi-host Docker inventory so the
-  Homepage instance on `rpi-box-02` can query remote Docker APIs on other
-  homelab nodes.
+- Some consumers may override `/etc/homepage/config/docker.yaml` in their host
+  repo to expose a multi-host Docker inventory.
 - During incident work, do not assume the generated shared-module shape is the
-  exact runtime shape on `rpi-box-02`.
+  exact runtime shape on every host.
 - Canonical host-side reference:
   - `../nix-pi/docs/policy/HOST_RUNTIME_DIVERGENCES.md`
 

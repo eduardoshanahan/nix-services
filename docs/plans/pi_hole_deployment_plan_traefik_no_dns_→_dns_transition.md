@@ -263,7 +263,7 @@ Codex MUST ensure:
 Two acceptable options:
 
 1. Keep `.local` names and maintain them via local DNS
-2. Introduce a private zone (e.g., `home.arpa`) later
+2. Introduce a private zone (e.g., `internal.example`) later
 
 Do not introduce public domains in this plan.
 

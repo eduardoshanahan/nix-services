@@ -8,17 +8,15 @@ Prowlarr is packaged here as a Docker Compose-backed NixOS module.
 - Persistent state stays under `services.prowlarrCompose.dataDir` and should be pointed
   at a dedicated host path such as `/srv/prowlarr`.
 - The first-pass deployment intentionally keeps Prowlarr on its default internal
-  SQLite database inside `dataDir`; no shared SQL backend on `hhnas4` is
-  required.
+  SQLite database inside `dataDir`; no shared SQL backend is required.
 - The service is intended to run behind Traefik on the shared external
   `traefik` Docker network.
 
 Operational notes:
 
 - Upstream listens on port `9696`.
-- Verified intended deployed shape on 2026-03-12:
+- Example deployment shape:
   - URL: `https://prowlarr.internal.example/`
-  - host: `rpi-box-02`
   - state path: `/srv/prowlarr`
   - database: local SQLite in `/srv/prowlarr`
 

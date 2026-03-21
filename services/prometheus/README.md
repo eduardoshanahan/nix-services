@@ -129,16 +129,16 @@ services.prometheusCompose = {
       "node-c.internal.example:9080"
     ];
     snmpExporterTargets = [
-      "rpi-box-02-metrics.internal.example:9116"
+      "snmp-exporter.internal.example:9116"
     ];
     postgresExporterTargets = [
-      "rpi-box-02-metrics.internal.example:9187"
+      "postgres-exporter.internal.example:9187"
     ];
     redisExporterTargets = [
-      "rpi-box-02-metrics.internal.example:9121"
+      "redis-exporter.internal.example:9121"
     ];
     mysqlExporterTargets = [
-      "rpi-box-02-metrics.internal.example:9104"
+      "mysql-exporter.internal.example:9104"
     ];
     grafanaTargets = [
       "grafana:3000"
@@ -147,13 +147,13 @@ services.prometheusCompose = {
       "dns-node.internal.example:9617"
     ];
     cadvisorTargets = [
-      "rpi-box-01-metrics.internal.example:8081"
+      "pihole-exporter.internal.example:8081"
     ];
     unpollerTargets = [
-      "rpi-box-02.internal.example:9130"
+      "unpoller.internal.example:9130"
     ];
     giteaTargets = [
-      "gitea.internal.example:3000"
+      "forge.internal.example:3000"
     ];
   };
 

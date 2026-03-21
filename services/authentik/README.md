@@ -6,8 +6,8 @@ Docker Compose-based Authentik module for NixOS hosts.
 
 - This module is intended for current Authentik versions where Redis is no
   longer a required runtime dependency.
-- Postgres should be provided externally (for this homelab, shared Postgres on
-  `hhnas4`).
+- Postgres should be provided externally (for example a shared
+  `postgres.internal.example` service).
 
 ## Main options
 

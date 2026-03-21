@@ -69,7 +69,7 @@ to other LAN hosts times out.
 ```nix
 services.tailscaleCompose = {
   enable = true;
-  hostname = "rpi-box-01";
+  hostname = "subnet-router-1";
   advertiseRoutes = [ "198.51.100.0/24" ];
   acceptRoutes = true;
   acceptDns = false;

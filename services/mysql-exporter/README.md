@@ -27,8 +27,8 @@ By default the compose command disables `slave_status` collection
 (`--no-collect.slave_status`) to avoid requiring replication/super privileges
 for standard single-instance deployments.
 
-`rpi-box-02` now uses the shared module behavior directly again; it no longer
-needs a host-specific compose override for this service.
+Consumers can use the shared module behavior directly without needing a
+service-specific compose override.
 
 Canonical host-side reference for current divergence/alignment status:
 

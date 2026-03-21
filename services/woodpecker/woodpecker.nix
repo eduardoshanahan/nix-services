@@ -236,7 +236,7 @@ in {
 
       hostname = lib.mkOption {
         type = lib.types.str;
-        default = "rpi-box-02";
+        default = "woodpecker-agent";
         description = "Logical agent hostname reported to Woodpecker.";
       };
 

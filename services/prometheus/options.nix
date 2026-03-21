@@ -240,35 +240,35 @@
       snmpExporterTargets = lib.mkOption {
         type = lib.types.listOf lib.types.str;
         default = [];
-        example = ["rpi-box-02-metrics.internal.example:9116"];
+        example = ["snmp-exporter.internal.example:9116"];
         description = "SNMP exporter targets (`host:port`) to scrape.";
       };
 
       postgresExporterTargets = lib.mkOption {
         type = lib.types.listOf lib.types.str;
         default = [];
-        example = ["rpi-box-02-metrics.internal.example:9187"];
+        example = ["postgres-exporter.internal.example:9187"];
         description = "PostgreSQL exporter targets (`host:port`) to scrape.";
       };
 
       redisExporterTargets = lib.mkOption {
         type = lib.types.listOf lib.types.str;
         default = [];
-        example = ["rpi-box-02-metrics.internal.example:9121"];
+        example = ["redis-exporter.internal.example:9121"];
         description = "Redis exporter targets (`host:port`) to scrape.";
       };
 
       mysqlExporterTargets = lib.mkOption {
         type = lib.types.listOf lib.types.str;
         default = [];
-        example = ["rpi-box-02-metrics.internal.example:9104"];
+        example = ["mysql-exporter.internal.example:9104"];
         description = "MySQL exporter targets (`host:port`) to scrape.";
       };
 
       mongodbExporterTargets = lib.mkOption {
         type = lib.types.listOf lib.types.str;
         default = [];
-        example = ["rpi-box-02-metrics.internal.example:9216"];
+        example = ["mongodb-exporter.internal.example:9216"];
         description = "MongoDB exporter targets (`host:port`) to scrape.";
       };
 
@@ -303,28 +303,28 @@
       cadvisorTargets = lib.mkOption {
         type = lib.types.listOf lib.types.str;
         default = [];
-        example = ["rpi-box-01-metrics.internal.example:8081"];
+        example = ["pihole-exporter.internal.example:8081"];
         description = "cAdvisor targets (`host:port`) to scrape.";
       };
 
       unpollerTargets = lib.mkOption {
         type = lib.types.listOf lib.types.str;
         default = [];
-        example = ["rpi-box-02.internal.example:9130"];
+        example = ["unpoller.internal.example:9130"];
         description = "UniFi Poller (unpoller) targets (`host:port`) to scrape.";
       };
 
       giteaTargets = lib.mkOption {
         type = lib.types.listOf lib.types.str;
         default = [];
-        example = ["gitea.internal.example:3000"];
+        example = ["forge.internal.example:3000"];
         description = "Gitea metrics targets (`host:port`) to scrape.";
       };
 
       githubProfileTargets = lib.mkOption {
         type = lib.types.listOf lib.types.str;
         default = [];
-        example = ["rpi-box-02-metrics.internal.example:9145"];
+        example = ["cadvisor.internal.example:9145"];
         description = "GitHub profile exporter targets (`host:port`) to scrape.";
       };
 

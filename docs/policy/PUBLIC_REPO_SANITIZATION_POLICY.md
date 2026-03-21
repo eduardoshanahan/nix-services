@@ -4,7 +4,7 @@ Use this checklist before every commit/push to avoid leaking internal topology o
 
 ## What must NOT be published
 
-- Real internal hostnames/FQDNs (example: `*.home.arpa`).
+- Real internal hostnames/FQDNs (example: `*.internal.example`).
 - Real LAN IPs (example: `192.168.x.x`, `10.x.x.x` tied to real infra).
 - Real SNMP communities, API tokens, passwords, keys, certs.
 - Real private service URLs and reverse-proxy host rules.

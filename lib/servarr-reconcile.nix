@@ -49,7 +49,7 @@
         type = lib.types.str;
         default = "";
         description = "qBittorrent Web UI username to apply in the arr app.";
-        example = "eduardo";
+        example = "media-user";
       };
 
       passwordFile = lib.mkOption {

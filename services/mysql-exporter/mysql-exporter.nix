@@ -87,7 +87,7 @@ in {
       host = lib.mkOption {
         type = lib.types.str;
         description = "MySQL hostname reachable from exporter container.";
-        example = "hhnas4.internal.example";
+        example = "mysql.internal.example";
       };
 
       port = lib.mkOption {

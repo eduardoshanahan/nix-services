@@ -6,8 +6,8 @@ CLI.
 
 It is designed for scheduled pull-based sync on a backup resolver, for example:
 
-- `rpi-box-01` as the primary Pi-hole
-- `rpi-box-02` as the secondary Pi-hole
+- `dns-primary.internal.example` as the primary Pi-hole
+- `dns-secondary.internal.example` as the secondary Pi-hole
 
 ## Why this approach
 
@@ -86,8 +86,8 @@ source host key without an interactive prompt.
     enable = true;
 
     source = {
-      host = "rpi-box-01";
-      user = "eduardo";
+      host = "dns-primary.internal.example";
+      user = "dns-sync";
     };
 
     ssh.identityFile = config.sops.secrets.pihole-sync-ssh-key.path;

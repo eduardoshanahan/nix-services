@@ -21,6 +21,6 @@ Prometheus scrape target example:
 
 ```nix
 services.prometheusCompose.scrape.mongodbExporterTargets = [
-  "rpi-box-02-metrics.internal.example:9216"
+  "mongodb-exporter.internal.example:9216"
 ];
 ```
