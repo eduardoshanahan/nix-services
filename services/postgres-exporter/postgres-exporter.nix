@@ -15,9 +15,7 @@
       "--disable-default-metrics"
       "--disable-settings-metrics"
       "--collector.stat_database"
-      "--collector.stat_database_conflicts"
       "--collector.stat_user_tables"
-      "--collector.stat_activity"
       "--collector.replication_slot"
       "--collector.database_wraparound"
       "--collector.long_running_transactions"
@@ -27,13 +25,13 @@
       "--collector.xlog_location"
       "--collector.stat_statements"
       "--collector.replication"
-      "--collector.archive"
-      "--collector.bgwriter"
       "--collector.stat_wal_receiver"
       "--collector.statio_user_tables"
     ]
-    ++ lib.optional cfg.collectors.wal.enable "--collector.wal"
-    ++ lib.optional cfg.collectors.statBgwriter.enable "--collector.stat_bgwriter";
+    ++ [
+      (if cfg.collectors.wal.enable then "--collector.wal" else "--no-collector.wal")
+      (if cfg.collectors.statBgwriter.enable then "--collector.stat_bgwriter" else "--no-collector.stat_bgwriter")
+    ];
   composeText =
     let
       commandBlock =
@@ -153,8 +151,12 @@ in {
       description = "PostgreSQL Prometheus exporter (Docker Compose)";
 
       wantedBy = ["multi-user.target"];
+      requires = ["docker.service"];
       after = ["docker.service" "network-online.target"];
       wants = ["network-online.target"];
+      restartTriggers = [
+        config.environment.etc."${serviceName}/docker-compose.yml".source
+      ];
 
       serviceConfig = {
         Type = "oneshot";

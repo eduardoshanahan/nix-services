@@ -14,9 +14,7 @@ services:
       - --disable-default-metrics
       - --disable-settings-metrics
       - --collector.stat_database
-      - --collector.stat_database_conflicts
       - --collector.stat_user_tables
-      - --collector.stat_activity
       - --collector.replication_slot
       - --collector.database_wraparound
       - --collector.long_running_transactions
@@ -26,8 +24,6 @@ services:
       - --collector.xlog_location
       - --collector.stat_statements
       - --collector.replication
-      - --collector.archive
-      - --collector.bgwriter
       - --collector.stat_wal_receiver
       - --collector.statio_user_tables
       - --collector.wal

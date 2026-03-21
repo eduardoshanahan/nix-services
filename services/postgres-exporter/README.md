@@ -27,6 +27,10 @@ The module writes `/run/secrets/postgres-exporter.env` with:
 Collector toggles are exposed as first-class module options so hosts can
 disable collectors without replacing the entire compose file.
 
+The generated systemd unit also uses restart triggers for the rendered Compose
+file, so collector or image changes converge on the host during rebuilds
+without requiring a separate manual restart.
+
 ## Known host-specific override
 
 - `rpi-box-02` now uses shared module options to disable selected collectors
