@@ -1,0 +1,46 @@
+services:
+  calibre-web-automated:
+    image: ${CALIBRE_WEB_AUTOMATED_IMAGE_REPOSITORY}:${CALIBRE_WEB_AUTOMATED_IMAGE_TAG}
+    container_name: ${CALIBRE_WEB_AUTOMATED_CONTAINER_NAME}
+    restart: unless-stopped
+    mem_limit: 1536m
+    pids_limit: 512
+    cpus: "2.0"
+
+    expose:
+      - "8083"
+
+    environment:
+      - TZ=${TZ}
+      - PUID=${CALIBRE_WEB_AUTOMATED_PUID}
+      - PGID=${CALIBRE_WEB_AUTOMATED_PGID}
+      - UMASK=002
+      - NETWORK_SHARE_MODE=${CALIBRE_WEB_AUTOMATED_NETWORK_SHARE_MODE}
+      - TRUSTED_PROXY_COUNT=${CALIBRE_WEB_AUTOMATED_TRUSTED_PROXY_COUNT}
+
+    volumes:
+      - "${CALIBRE_WEB_AUTOMATED_DATA_DIR}:/config"
+      - "${CALIBRE_WEB_AUTOMATED_LIBRARY_DIR}:${CALIBRE_WEB_AUTOMATED_LIBRARY_MOUNT_PATH}"
+      - "${CALIBRE_WEB_AUTOMATED_INGEST_DIR}:${CALIBRE_WEB_AUTOMATED_INGEST_MOUNT_PATH}"
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=${CALIBRE_WEB_AUTOMATED_NETWORK}"
+      - "traefik.http.routers.calibre-web-automated.rule=Host(`${CALIBRE_WEB_AUTOMATED_HOST}`)"
+      - "traefik.http.services.calibre-web-automated.loadbalancer.server.port=8083"
+      - "traefik.http.routers.calibre-web-automated.entrypoints=${CALIBRE_WEB_AUTOMATED_ENTRYPOINTS}"
+      - "traefik.http.routers.calibre-web-automated.tls=${CALIBRE_WEB_AUTOMATED_TLS}"
+
+    networks:
+      - traefik
+
+networks:
+  traefik:
+    external: true
+    name: ${CALIBRE_WEB_AUTOMATED_NETWORK}

@@ -1,0 +1,47 @@
+services:
+  postgres-exporter:
+    image: ${POSTGRES_EXPORTER_IMAGE_REPOSITORY}:${POSTGRES_EXPORTER_IMAGE_TAG}
+    container_name: ${POSTGRES_EXPORTER_CONTAINER_NAME}
+    restart: unless-stopped
+
+    environment:
+      - TZ
+
+    env_file:
+      - /run/secrets/postgres-exporter.env
+
+    command:
+      - --disable-default-metrics
+      - --disable-settings-metrics
+      - --collector.stat_database
+      - --collector.stat_user_tables
+      - --collector.replication_slot
+      - --collector.database_wraparound
+      - --collector.long_running_transactions
+      - --collector.process_idle
+      - --collector.postmaster
+      - --collector.locks
+      - --collector.xlog_location
+      - --collector.stat_statements
+      - --collector.replication
+      - --collector.stat_wal_receiver
+      - --collector.statio_user_tables
+      - --collector.wal
+      - --collector.stat_bgwriter
+
+    ports:
+      - "${POSTGRES_EXPORTER_PORT}:9187"
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+    networks:
+      - traefik
+
+networks:
+  traefik:
+    external: true
+    name: ${POSTGRES_EXPORTER_NETWORK}

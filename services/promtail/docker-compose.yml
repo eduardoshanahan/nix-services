@@ -1,0 +1,29 @@
+services:
+  promtail:
+    image: ${PROMTAIL_IMAGE_REPOSITORY}:${PROMTAIL_IMAGE_TAG}
+    container_name: ${PROMTAIL_CONTAINER_NAME}
+    restart: unless-stopped
+    init: true
+    network_mode: host
+
+    command: ["-config.file=/etc/promtail/config.yml"]
+
+    volumes:
+      - "/etc/promtail/config.yml:/etc/promtail/config.yml:ro"
+      - "/var/log:/var/log:ro"
+      - "/run/log/journal:/run/log/journal:ro"
+      - "/etc/machine-id:/etc/machine-id:ro"
+      - "${PROMTAIL_DATA_DIR}:/var/lib/promtail"
+
+    healthcheck:
+      test: ["CMD-SHELL", "wget --spider -q http://127.0.0.1:${PROMTAIL_HTTP_PORT}/ready || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 8
+      start_period: 20s
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"

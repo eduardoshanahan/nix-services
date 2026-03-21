@@ -1,0 +1,45 @@
+services:
+  prowlarr:
+    image: ${PROWLARR_IMAGE_REPOSITORY}:${PROWLARR_IMAGE_TAG}
+    container_name: ${PROWLARR_CONTAINER_NAME}
+    restart: unless-stopped
+    mem_limit: 512m
+    pids_limit: 256
+    cpus: "1.0"
+
+    expose:
+      - "9696"
+
+    environment:
+      - TZ=${TZ}
+      - PUID=${PROWLARR_PUID}
+      - PGID=${PROWLARR_PGID}
+      - UMASK=002
+      - SSL_CERT_FILE=/etc/ssl/certs/ca-certificates-with-homelab.pem
+      - CURL_CA_BUNDLE=/etc/ssl/certs/ca-certificates-with-homelab.pem
+
+    volumes:
+      - "${PROWLARR_DATA_DIR}:/config"
+      - "/etc/ssl/certs/ca-certificates-with-homelab.pem:/etc/ssl/certs/ca-certificates-with-homelab.pem:ro"
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=${PROWLARR_NETWORK}"
+      - "traefik.http.routers.prowlarr.rule=Host(`${PROWLARR_HOST}`)"
+      - "traefik.http.services.prowlarr.loadbalancer.server.port=9696"
+      - "traefik.http.routers.prowlarr.entrypoints=${PROWLARR_ENTRYPOINTS}"
+      - "traefik.http.routers.prowlarr.tls=${PROWLARR_TLS}"
+
+    networks:
+      - traefik
+
+networks:
+  traefik:
+    external: true
+    name: ${PROWLARR_NETWORK}

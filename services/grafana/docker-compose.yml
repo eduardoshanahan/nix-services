@@ -1,0 +1,50 @@
+services:
+  grafana:
+    image: ${GRAFANA_IMAGE_REPOSITORY}:${GRAFANA_IMAGE_TAG}
+    container_name: ${GRAFANA_CONTAINER_NAME}
+    restart: unless-stopped
+    init: true
+
+    expose:
+      - "3000"
+
+    environment:
+      - TZ
+      - GF_METRICS_ENABLED=true
+      - GF_METRICS_DISABLE_TOTAL_STATS=false
+
+    env_file:
+      - ${GRAFANA_ENV_FILE}
+
+    volumes:
+      - "${GRAFANA_DATA_DIR}:/var/lib/grafana"
+      - "/etc/grafana/provisioning:/etc/grafana/provisioning:ro"
+
+    healthcheck:
+      test: ["CMD-SHELL", "wget --spider -q http://127.0.0.1:3000/api/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 8
+      start_period: 30s
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=${GRAFANA_NETWORK}"
+      - "traefik.http.routers.grafana.rule=Host(`${GRAFANA_HOSTNAME}`)"
+      - "traefik.http.services.grafana.loadbalancer.server.port=3000"
+      - "traefik.http.routers.grafana.entrypoints=${GRAFANA_ENTRYPOINTS}"
+      - "traefik.http.routers.grafana.tls=${GRAFANA_TLS}"
+
+    networks:
+      - traefik
+
+networks:
+  traefik:
+    external: true
+    name: ${GRAFANA_NETWORK}

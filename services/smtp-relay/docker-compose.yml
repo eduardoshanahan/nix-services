@@ -1,0 +1,15 @@
+services:
+  smtp-relay:
+    image: "${SMTP_RELAY_IMAGE_REPOSITORY}:${SMTP_RELAY_IMAGE_TAG}"
+    container_name: "${SMTP_RELAY_CONTAINER_NAME}"
+    restart: unless-stopped
+    ports:
+      - "${SMTP_RELAY_LISTEN_ADDRESS}:${SMTP_RELAY_LISTEN_PORT}:587"
+    env_file:
+      - "${SMTP_RELAY_RUNTIME_ENV_FILE}"
+    environment:
+      - TZ=${TZ}
+      - RELAYHOST=${SMTP_RELAY_UPSTREAM_HOST}
+      - RELAYHOST_USERNAME=${SMTP_RELAY_UPSTREAM_USERNAME}
+      - ALLOWED_SENDER_DOMAINS=${SMTP_RELAY_ALLOWED_SENDER_DOMAINS}
+      - POSTFIX_myhostname=${SMTP_RELAY_HOSTNAME}

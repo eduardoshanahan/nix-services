@@ -1,0 +1,32 @@
+services:
+  unpoller:
+    image: ${UNPOLLER_IMAGE_REPOSITORY}:${UNPOLLER_IMAGE_TAG}
+    container_name: ${UNPOLLER_CONTAINER_NAME}
+    restart: unless-stopped
+
+    env_file:
+      - ${UNPOLLER_ENV_FILE}
+
+    environment:
+      - UP_LISTEN=0.0.0.0:9130
+      - UP_UNIFI_CONTROLLER_0_URL=${UNPOLLER_CONTROLLER_URL}
+      - UP_UNIFI_CONTROLLER_0_VERIFY_SSL=${UNPOLLER_CONTROLLER_VERIFY_SSL}
+      - UP_INFLUXDB_DISABLE=${UNPOLLER_INFLUXDB_DISABLE}
+      - TZ
+
+    ports:
+      - "${UNPOLLER_LISTEN_ADDRESS}:${UNPOLLER_LISTEN_PORT}:9130"
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+    networks:
+      - traefik
+
+networks:
+  traefik:
+    external: true
+    name: ${UNPOLLER_NETWORK}

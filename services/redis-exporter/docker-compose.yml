@@ -1,0 +1,30 @@
+services:
+  redis-exporter:
+    image: ${REDIS_EXPORTER_IMAGE_REPOSITORY}:${REDIS_EXPORTER_IMAGE_TAG}
+    container_name: ${REDIS_EXPORTER_CONTAINER_NAME}
+    restart: unless-stopped
+
+    environment:
+      - REDIS_ADDR=${REDIS_EXPORTER_REDIS_ADDR}
+      - REDIS_USER=${REDIS_USER}
+      - TZ
+
+    env_file:
+      - /run/secrets/redis-exporter.env
+
+    ports:
+      - "${REDIS_EXPORTER_PORT}:9121"
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+    networks:
+      - traefik
+
+networks:
+  traefik:
+    external: true
+    name: ${REDIS_EXPORTER_NETWORK}

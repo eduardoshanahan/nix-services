@@ -1,0 +1,41 @@
+services:
+  dozzle:
+    image: ${DOZZLE_IMAGE_REPOSITORY}:${DOZZLE_IMAGE_TAG}
+    container_name: ${DOZZLE_CONTAINER_NAME}
+    restart: unless-stopped
+    init: true
+
+    expose:
+      - "8080"
+
+    environment:
+      - DOZZLE_NO_ANALYTICS=true
+      - DOZZLE_LEVEL=info
+      - DOZZLE_REMOTE_HOST=${DOZZLE_REMOTE_HOST}
+      - TZ=${TZ}
+
+    volumes:
+      - "${DOZZLE_DATA_DIR}:/data:rw"
+      - "${DOZZLE_SOCKET_PATH}:/var/run/docker.sock:ro"
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=${DOZZLE_NETWORK}"
+      - "traefik.http.routers.dozzle.rule=Host(`${DOZZLE_HOSTNAME}`)"
+      - "traefik.http.services.dozzle.loadbalancer.server.port=8080"
+      - "traefik.http.routers.dozzle.entrypoints=${DOZZLE_ENTRYPOINTS}"
+      - "traefik.http.routers.dozzle.tls=${DOZZLE_TLS}"
+
+    networks:
+      - traefik
+
+networks:
+  traefik:
+    external: true
+    name: ${DOZZLE_NETWORK}

@@ -1,0 +1,32 @@
+services:
+  pihole-exporter:
+    image: ${PIHOLE_EXPORTER_IMAGE_REPOSITORY}:${PIHOLE_EXPORTER_IMAGE_TAG}
+    container_name: ${PIHOLE_EXPORTER_CONTAINER_NAME}
+    restart: unless-stopped
+
+    environment:
+      - PIHOLE_HOSTNAME=${PIHOLE_EXPORTER_PIHOLE_HOSTNAME}
+      - PIHOLE_PORT=${PIHOLE_EXPORTER_PIHOLE_PORT}
+      - PIHOLE_PROTOCOL=${PIHOLE_EXPORTER_PIHOLE_PROTOCOL}
+      - PORT=9617
+      - TZ
+
+    env_file:
+      - /run/secrets/pihole-exporter.env
+
+    ports:
+      - "${PIHOLE_EXPORTER_PORT}:9617"
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+    networks:
+      - traefik
+
+networks:
+  traefik:
+    external: true
+    name: ${PIHOLE_EXPORTER_NETWORK}

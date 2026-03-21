@@ -1,0 +1,54 @@
+services:
+  seerr:
+    image: ${SEERR_IMAGE_REPOSITORY}:${SEERR_IMAGE_TAG}
+    container_name: ${SEERR_CONTAINER_NAME}
+    restart: unless-stopped
+    init: true
+    mem_limit: 512m
+    pids_limit: 256
+    cpus: "1.0"
+
+    expose:
+      - "5055"
+
+    env_file:
+      - ${SEERR_RUNTIME_ENV_FILE}
+
+    environment:
+      - LOG_LEVEL=info
+      - PORT=5055
+      - TZ=${TZ}
+      - NODE_ENV=production
+      - DB_TYPE=postgres
+      - DB_HOST=${SEERR_DB_HOST}
+      - DB_PORT=${SEERR_DB_PORT}
+      - DB_NAME=${SEERR_DB_NAME}
+      - DB_USER=${SEERR_DB_USER}
+      - DB_USE_SSL=false
+      - NODE_EXTRA_CA_CERTS=/etc/seerr/homelab-root-ca.crt
+
+    volumes:
+      - "${SEERR_DATA_DIR}:/app/config"
+      - "/etc/ssl/certs/homelab-root-ca.crt:/etc/seerr/homelab-root-ca.crt:ro"
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=${SEERR_NETWORK}"
+      - "traefik.http.routers.seerr.rule=Host(`${SEERR_HOST}`)"
+      - "traefik.http.services.seerr.loadbalancer.server.port=5055"
+      - "traefik.http.routers.seerr.entrypoints=${SEERR_ENTRYPOINTS}"
+      - "traefik.http.routers.seerr.tls=${SEERR_TLS}"
+
+    networks:
+      - traefik
+
+networks:
+  traefik:
+    external: true
+    name: ${SEERR_NETWORK}

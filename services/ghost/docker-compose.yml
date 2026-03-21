@@ -1,0 +1,68 @@
+services:
+  ghost:
+    image: ${GHOST_IMAGE_REPOSITORY}:${GHOST_IMAGE_TAG}
+    container_name: ${GHOST_CONTAINER_NAME}
+    restart: unless-stopped
+    init: true
+
+    expose:
+      - "2368"
+
+    env_file:
+      - ${GHOST_RUNTIME_ENV_FILE}
+
+    environment:
+      - TZ
+      - url=${GHOST_URL}
+      - NODE_ENV=production
+      - NODE_EXTRA_CA_CERTS=/etc/ghost/homelab-root-ca.crt
+      - database__client=mysql
+      - database__connection__host=${GHOST_DATABASE_HOST}
+      - database__connection__port=${GHOST_DATABASE_PORT}
+      - database__connection__user=${GHOST_DATABASE_USER}
+      - database__connection__database=${GHOST_DATABASE_NAME}
+      - mail__transport=${GHOST_MAIL_TRANSPORT}
+      - mail__from=${GHOST_MAIL_FROM}
+      - mail__options__host=${GHOST_MAIL_HOST}
+      - mail__options__port=${GHOST_MAIL_PORT}
+      - mail__options__secure=${GHOST_MAIL_SECURE}
+      - mail__options__auth__user=${GHOST_MAIL_USER}
+
+    volumes:
+      - "${GHOST_DATA_DIR}:/var/lib/ghost/content"
+      - "/etc/ssl/certs/homelab-root-ca.crt:/etc/ghost/homelab-root-ca.crt:ro"
+
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "require('http').get('http://127.0.0.1:2368/', (r) => process.exit(r.statusCode < 500 ? 0 : 1)).on('error', () => process.exit(1));",
+        ]
+      interval: 15s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=${GHOST_NETWORK}"
+      - "traefik.http.routers.${GHOST_TRAEFIK_ROUTER_NAME}.rule=Host(`${GHOST_HOSTNAME}`)"
+      - "traefik.http.services.${GHOST_TRAEFIK_SERVICE_NAME}.loadbalancer.server.port=2368"
+      - "traefik.http.routers.${GHOST_TRAEFIK_ROUTER_NAME}.entrypoints=${GHOST_ENTRYPOINTS}"
+      - "traefik.http.routers.${GHOST_TRAEFIK_ROUTER_NAME}.tls=${GHOST_TLS}"
+
+    networks:
+      - traefik
+
+networks:
+  traefik:
+    external: true
+    name: ${GHOST_NETWORK}

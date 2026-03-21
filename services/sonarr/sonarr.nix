@@ -1,0 +1,288 @@
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}: let
+  cfg = config.services.sonarrCompose;
+  serviceName = "sonarr";
+  composeDir = "/etc/${serviceName}";
+  dockerBin = "${config.virtualisation.docker.package}/bin/docker";
+  hostnameRegex = "^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)(\\.([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?))*$";
+  networkRegex = "^[a-zA-Z0-9][a-zA-Z0-9_.-]*$";
+  servarrReconcile = import ../../lib/servarr-reconcile.nix {
+    inherit lib pkgs dockerBin;
+  };
+  reconcileScript = servarrReconcile.writeArrReconcileScript {
+    scriptName = "${serviceName}-reconcile-integrations";
+    inherit serviceName;
+    containerName = cfg.containerName;
+    networkName = cfg.network;
+    configXmlPath = "${cfg.dataDir}/config.xml";
+    port = 8989;
+    apiPath = "/api/v3";
+    qbittorrent = cfg.integrations.qbittorrent;
+    prowlarr = cfg.integrations.prowlarr;
+  };
+  hasDeclarativeIntegrations =
+    cfg.integrations.qbittorrent.enable
+    || cfg.integrations.prowlarr.enable;
+in {
+  options.services.sonarrCompose = {
+    enable = lib.mkEnableOption "Sonarr service (Docker Compose)";
+
+    containerName = lib.mkOption {
+      type = lib.types.str;
+      default = "sonarr";
+      description = "Docker container name.";
+    };
+
+    hostname = lib.mkOption {
+      type = lib.types.str;
+      description = "Hostname used for the Traefik router `Host()` rule.";
+    };
+
+    timezone = lib.mkOption {
+      type = lib.types.str;
+      default = "UTC";
+      description = "Timezone passed to the container via `TZ`.";
+    };
+
+    network = lib.mkOption {
+      type = lib.types.str;
+      default = "traefik";
+      description = "External Docker network name used by Traefik and downstream services.";
+    };
+
+    dataDir = lib.mkOption {
+      type = lib.types.str;
+      default = "/var/lib/sonarr";
+      description = "Persistent host path used for Sonarr config/state.";
+    };
+
+    mediaDir = lib.mkOption {
+      type = lib.types.nullOr lib.types.str;
+      default = null;
+      description = "Optional host path bind-mounted into the container for TV library access.";
+    };
+
+    mediaMountPath = lib.mkOption {
+      type = lib.types.str;
+      default = "/tv";
+      description = "Container path used for the optional TV library bind mount.";
+    };
+
+    downloadsDir = lib.mkOption {
+      type = lib.types.nullOr lib.types.str;
+      default = null;
+      description = "Optional host path bind-mounted into the container for downloader completed files.";
+    };
+
+    downloadsMountPath = lib.mkOption {
+      type = lib.types.str;
+      default = "/downloads";
+      description = "Container path used for the optional downloader bind mount.";
+    };
+
+    uid = lib.mkOption {
+      type = lib.types.int;
+      default = 1000;
+      description = "UID passed to the container as `PUID`.";
+    };
+
+    gid = lib.mkOption {
+      type = lib.types.int;
+      default = 1000;
+      description = "GID passed to the container as `PGID`.";
+    };
+
+    image = {
+      repository = lib.mkOption {
+        type = lib.types.str;
+        default = "lscr.io/linuxserver/sonarr";
+        description = "Container image repository.";
+      };
+
+      tag = lib.mkOption {
+        type = lib.types.str;
+        default = "latest";
+        description = "Container image tag.";
+      };
+
+      allowMutableTag = lib.mkOption {
+        type = lib.types.bool;
+        default = true;
+        description = "Allow mutable tags such as `latest`.";
+      };
+    };
+
+    tls = lib.mkEnableOption "TLS on the Sonarr Traefik router";
+
+    integrations = {
+      qbittorrent = lib.mkOption {
+        type = lib.types.submodule servarrReconcile.qbittorrentSubmodule;
+        default = {};
+        description = "Declarative qBittorrent settings to reconcile after Sonarr starts.";
+      };
+
+      prowlarr = lib.mkOption {
+        type = lib.types.submodule servarrReconcile.prowlarrIndexerSubmodule;
+        default = {};
+        description = "Declarative Prowlarr-backed indexer URL settings to reconcile after Sonarr starts.";
+      };
+    };
+  };
+
+  config = lib.mkIf cfg.enable {
+    assertions = [
+      {
+        assertion = builtins.match hostnameRegex cfg.hostname != null;
+        message = "services.sonarrCompose.hostname must be a valid DNS hostname.";
+      }
+      {
+        assertion = builtins.match networkRegex cfg.network != null;
+        message = "services.sonarrCompose.network may only contain letters, numbers, `.`, `_`, and `-`.";
+      }
+      {
+        assertion = builtins.match "^[^[:space:]]+$" cfg.image.repository != null;
+        message = "services.sonarrCompose.image.repository must not contain whitespace.";
+      }
+      {
+        assertion = builtins.match "^[^[:space:]]+$" cfg.image.tag != null;
+        message = "services.sonarrCompose.image.tag must not contain whitespace.";
+      }
+      {
+        assertion = cfg.image.allowMutableTag || cfg.image.tag != "latest";
+        message = "services.sonarrCompose.image.tag must be pinned (not `latest`) unless services.sonarrCompose.image.allowMutableTag = true.";
+      }
+      {
+        assertion = lib.hasPrefix "/" cfg.dataDir;
+        message = "services.sonarrCompose.dataDir must be an absolute path.";
+      }
+      {
+        assertion = cfg.mediaDir == null || lib.hasPrefix "/" cfg.mediaDir;
+        message = "services.sonarrCompose.mediaDir must be null or an absolute path.";
+      }
+      {
+        assertion = lib.hasPrefix "/" cfg.mediaMountPath;
+        message = "services.sonarrCompose.mediaMountPath must be an absolute path.";
+      }
+      {
+        assertion = cfg.downloadsDir == null || lib.hasPrefix "/" cfg.downloadsDir;
+        message = "services.sonarrCompose.downloadsDir must be null or an absolute path.";
+      }
+      {
+        assertion = lib.hasPrefix "/" cfg.downloadsMountPath;
+        message = "services.sonarrCompose.downloadsMountPath must be an absolute path.";
+      }
+      {
+        assertion = cfg.uid >= 0;
+        message = "services.sonarrCompose.uid must be non-negative.";
+      }
+      {
+        assertion = cfg.gid >= 0;
+        message = "services.sonarrCompose.gid must be non-negative.";
+      }
+      {
+        assertion = (!cfg.integrations.qbittorrent.enable) || (builtins.match "^[^[:space:]]+$" cfg.integrations.qbittorrent.host != null);
+        message = "services.sonarrCompose.integrations.qbittorrent.host must not contain whitespace when enabled.";
+      }
+      {
+        assertion = (!cfg.integrations.qbittorrent.enable) || (cfg.integrations.qbittorrent.username != "");
+        message = "services.sonarrCompose.integrations.qbittorrent.username must be non-empty when enabled.";
+      }
+      {
+        assertion = (!cfg.integrations.qbittorrent.enable) || lib.hasPrefix "/" cfg.integrations.qbittorrent.passwordFile;
+        message = "services.sonarrCompose.integrations.qbittorrent.passwordFile must be an absolute path when enabled.";
+      }
+      {
+        assertion = (!cfg.integrations.qbittorrent.enable) || (cfg.integrations.qbittorrent.categoryField != "");
+        message = "services.sonarrCompose.integrations.qbittorrent.categoryField must be non-empty when enabled.";
+      }
+      {
+        assertion = (!cfg.integrations.qbittorrent.enable) || (cfg.integrations.qbittorrent.categoryValue != "");
+        message = "services.sonarrCompose.integrations.qbittorrent.categoryValue must be non-empty when enabled.";
+      }
+      {
+        assertion = (!cfg.integrations.prowlarr.enable) || (builtins.match servarrReconcile.urlRegex cfg.integrations.prowlarr.url != null);
+        message = "services.sonarrCompose.integrations.prowlarr.url must be an absolute http(s) URL when enabled.";
+      }
+    ];
+
+    virtualisation.docker.enable = true;
+
+    environment.etc."${serviceName}/docker-compose.yml".source = ./docker-compose.yml;
+
+    systemd.services.${serviceName} = {
+      description = "Sonarr (Docker Compose)";
+      wantedBy = ["multi-user.target"];
+      requires = ["docker.service"];
+      after = ["docker.service" "network-online.target" "remote-fs.target"];
+      wants = ["network-online.target" "remote-fs.target"];
+      unitConfig.RequiresMountsFor =
+        [cfg.dataDir]
+        ++ lib.optionals (cfg.mediaDir != null) [cfg.mediaDir]
+        ++ lib.optionals (cfg.downloadsDir != null) [cfg.downloadsDir];
+      restartTriggers = [
+        config.environment.etc."${serviceName}/docker-compose.yml".source
+      ];
+
+      serviceConfig = {
+        Type = "oneshot";
+        RemainAfterExit = true;
+        WorkingDirectory = composeDir;
+        TimeoutStartSec = 900;
+        Restart = "on-failure";
+        RestartSec = 10;
+
+        Environment = [
+          "SONARR_CONTAINER_NAME=${cfg.containerName}"
+          "SONARR_IMAGE_REPOSITORY=${cfg.image.repository}"
+          "SONARR_IMAGE_TAG=${cfg.image.tag}"
+          "SONARR_NETWORK=${cfg.network}"
+          "SONARR_HOST=${cfg.hostname}"
+          "SONARR_ENTRYPOINTS=${if cfg.tls then "websecure" else "web"}"
+          "SONARR_TLS=${if cfg.tls then "true" else "false"}"
+          "SONARR_DATA_DIR=${cfg.dataDir}"
+          "SONARR_MEDIA_DIR=${if cfg.mediaDir == null then "" else cfg.mediaDir}"
+          "SONARR_MEDIA_MOUNT_PATH=${cfg.mediaMountPath}"
+          "SONARR_DOWNLOADS_DIR=${if cfg.downloadsDir == null then "" else cfg.downloadsDir}"
+          "SONARR_DOWNLOADS_MOUNT_PATH=${cfg.downloadsMountPath}"
+          "SONARR_PUID=${toString cfg.uid}"
+          "SONARR_PGID=${toString cfg.gid}"
+          "TZ=${cfg.timezone}"
+        ];
+
+        ExecStartPre = [
+          "${pkgs.runtimeShell} -c 'mkdir -p ${lib.escapeShellArg cfg.dataDir} && chown ${toString cfg.uid}:${toString cfg.gid} ${lib.escapeShellArg cfg.dataDir} && chmod 0750 ${lib.escapeShellArg cfg.dataDir}'"
+          "${pkgs.runtimeShell} -c 'test -s /etc/ssl/certs/ca-certificates-with-homelab.pem'"
+          "${pkgs.runtimeShell} -c 'test -s ${composeDir}/docker-compose.yml'"
+          "${pkgs.runtimeShell} -c 'for i in $(seq 1 30); do ${dockerBin} info >/dev/null 2>&1 && exit 0; sleep 1; done; echo \"sonarr: docker daemon is not ready\" >&2; exit 1'"
+          "${pkgs.runtimeShell} -c '${dockerBin} compose config >/dev/null'"
+          "${pkgs.runtimeShell} -c '${dockerBin} network inspect ${cfg.network} >/dev/null 2>&1 || ${dockerBin} network create ${cfg.network}'"
+        ];
+
+        ExecStart = "${dockerBin} compose up -d";
+        ExecStop = "${dockerBin} compose down";
+      };
+    };
+
+    systemd.services."${serviceName}-reconcile" = lib.mkIf hasDeclarativeIntegrations {
+      description = "Reconcile declarative ${serviceName} integrations";
+      wantedBy = ["${serviceName}.service"];
+      requires = ["${serviceName}.service"];
+      after = ["${serviceName}.service" "network-online.target"];
+      wants = ["network-online.target"];
+      partOf = ["${serviceName}.service"];
+
+      serviceConfig = {
+        Type = "oneshot";
+        TimeoutStartSec = 300;
+        Restart = "on-failure";
+        RestartSec = 30;
+        ExecStartPre = "${pkgs.coreutils}/bin/sleep 45";
+        ExecStart = reconcileScript;
+      };
+    };
+  };
+}

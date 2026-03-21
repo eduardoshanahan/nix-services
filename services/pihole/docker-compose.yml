@@ -1,0 +1,40 @@
+services:
+  pihole:
+    image: pihole/pihole:2026.02.0
+    container_name: ${PIHOLE_CONTAINER_NAME}
+    restart: unless-stopped
+
+    ports:
+      - "53:53/tcp"
+      - "53:53/udp"
+
+    environment:
+      - TZ
+
+    env_file:
+      - /run/secrets/pihole.env
+
+    volumes:
+      - pihole-etc-pihole:/etc/pihole
+      - pihole-etc-dnsmasq:/etc/dnsmasq.d
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=${PIHOLE_NETWORK}"
+      - "traefik.http.routers.pihole.rule=Host(`${PIHOLE_HOSTNAME}`)"
+      - "traefik.http.services.pihole.loadbalancer.server.port=80"
+      - "traefik.http.routers.pihole.entrypoints=${PIHOLE_ENTRYPOINTS}"
+      - "traefik.http.routers.pihole.tls=${PIHOLE_TLS}"
+
+
+    networks:
+      - traefik
+
+volumes:
+  pihole-etc-pihole:
+  pihole-etc-dnsmasq:
+
+networks:
+  traefik:
+    external: true
+    name: ${PIHOLE_NETWORK}

@@ -1,0 +1,56 @@
+services:
+  fossflow:
+    image: ${FOSSFLOW_IMAGE}
+    container_name: ${FOSSFLOW_CONTAINER_NAME}
+    restart: unless-stopped
+    init: true
+    mem_limit: 512m
+    pids_limit: 256
+    cpus: "1.0"
+
+    expose:
+      - "80"
+
+    environment:
+      - NODE_ENV=production
+      - ENABLE_SERVER_STORAGE=${FOSSFLOW_ENABLE_SERVER_STORAGE}
+      - STORAGE_PATH=${FOSSFLOW_STORAGE_PATH}
+      - ENABLE_GIT_BACKUP=false
+      - TZ=${TZ}
+
+    volumes:
+      - "${FOSSFLOW_DATA_DIR}:${FOSSFLOW_STORAGE_PATH}:rw"
+
+    healthcheck:
+      test: ["CMD-SHELL", "wget --spider -q http://127.0.0.1:80/ || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 8
+      start_period: 25s
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=${FOSSFLOW_NETWORK}"
+      - "traefik.http.routers.fossflow.rule=Host(`${FOSSFLOW_HOSTNAME}`)"
+      - "traefik.http.services.fossflow.loadbalancer.server.port=80"
+      - "traefik.http.routers.fossflow.entrypoints=${FOSSFLOW_ENTRYPOINTS}"
+      - "traefik.http.routers.fossflow.tls=${FOSSFLOW_TLS}"
+      - "traefik.http.routers.fossflow.middlewares=fossflow-sec@docker"
+      - "traefik.http.middlewares.fossflow-sec.headers.stsSeconds=31536000"
+      - "traefik.http.middlewares.fossflow-sec.headers.frameDeny=true"
+      - "traefik.http.middlewares.fossflow-sec.headers.contentTypeNosniff=true"
+      - "traefik.http.middlewares.fossflow-sec.headers.referrerPolicy=no-referrer"
+
+    networks:
+      - traefik
+
+networks:
+  traefik:
+    external: true
+    name: ${FOSSFLOW_NETWORK}

@@ -1,0 +1,47 @@
+services:
+  radarr:
+    image: ${RADARR_IMAGE_REPOSITORY}:${RADARR_IMAGE_TAG}
+    container_name: ${RADARR_CONTAINER_NAME}
+    restart: unless-stopped
+    mem_limit: 1024m
+    pids_limit: 512
+    cpus: "2.0"
+
+    expose:
+      - "7878"
+
+    environment:
+      - TZ=${TZ}
+      - PUID=${RADARR_PUID}
+      - PGID=${RADARR_PGID}
+      - UMASK=002
+      - SSL_CERT_FILE=/etc/ssl/certs/ca-certificates-with-homelab.pem
+      - CURL_CA_BUNDLE=/etc/ssl/certs/ca-certificates-with-homelab.pem
+
+    volumes:
+      - "${RADARR_DATA_DIR}:/config"
+      - "${RADARR_MEDIA_DIR}:${RADARR_MEDIA_MOUNT_PATH}"
+      - "${RADARR_DOWNLOADS_DIR}:${RADARR_DOWNLOADS_MOUNT_PATH}"
+      - "/etc/ssl/certs/ca-certificates-with-homelab.pem:/etc/ssl/certs/ca-certificates-with-homelab.pem:ro"
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=${RADARR_NETWORK}"
+      - "traefik.http.routers.radarr.rule=Host(`${RADARR_HOST}`)"
+      - "traefik.http.services.radarr.loadbalancer.server.port=7878"
+      - "traefik.http.routers.radarr.entrypoints=${RADARR_ENTRYPOINTS}"
+      - "traefik.http.routers.radarr.tls=${RADARR_TLS}"
+
+    networks:
+      - traefik
+
+networks:
+  traefik:
+    external: true
+    name: ${RADARR_NETWORK}

@@ -1,0 +1,43 @@
+services:
+  alertmanager:
+    image: ${ALERTMANAGER_IMAGE_REPOSITORY}:${ALERTMANAGER_IMAGE_TAG}
+    container_name: ${ALERTMANAGER_CONTAINER_NAME}
+    restart: unless-stopped
+    init: true
+
+    command:
+      - "--config.file=/etc/alertmanager/alertmanager.yml"
+      - "--storage.path=/alertmanager"
+      - "--web.external-url=${ALERTMANAGER_EXTERNAL_URL}"
+
+    expose:
+      - "9093"
+
+    environment:
+      - TZ
+
+    volumes:
+      - "${ALERTMANAGER_CONFIG_FILE}:/etc/alertmanager/alertmanager.yml:ro"
+      - "${ALERTMANAGER_DATA_DIR}:/alertmanager"
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=${ALERTMANAGER_NETWORK}"
+      - "traefik.http.routers.alertmanager.rule=Host(`${ALERTMANAGER_HOSTNAME}`)"
+      - "traefik.http.services.alertmanager.loadbalancer.server.port=9093"
+      - "traefik.http.routers.alertmanager.entrypoints=${ALERTMANAGER_ENTRYPOINTS}"
+      - "traefik.http.routers.alertmanager.tls=${ALERTMANAGER_TLS}"
+
+    networks:
+      - traefik
+
+networks:
+  traefik:
+    external: true
+    name: ${ALERTMANAGER_NETWORK}

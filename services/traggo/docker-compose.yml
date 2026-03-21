@@ -1,0 +1,41 @@
+services:
+  traggo:
+    image: ${TRAGGO_IMAGE_REPOSITORY}:${TRAGGO_IMAGE_TAG}
+    container_name: ${TRAGGO_CONTAINER_NAME}
+    restart: unless-stopped
+    init: true
+
+    expose:
+      - "3030"
+
+    env_file:
+      - "${TRAGGO_ADMIN_ENV_FILE}"
+
+    environment:
+      - TZ=${TZ}
+      - TRAGGO_DEFAULT_USER_NAME=${TRAGGO_DEFAULT_USER_NAME}
+
+    volumes:
+      - "${TRAGGO_DATA_DIR}:/opt/traggo/data:rw"
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=${TRAGGO_NETWORK}"
+      - "traefik.http.routers.traggo.rule=Host(`${TRAGGO_HOSTNAME}`)"
+      - "traefik.http.services.traggo.loadbalancer.server.port=3030"
+      - "traefik.http.routers.traggo.entrypoints=${TRAGGO_ENTRYPOINTS}"
+      - "traefik.http.routers.traggo.tls=${TRAGGO_TLS}"
+
+    networks:
+      - traefik
+
+networks:
+  traefik:
+    external: true
+    name: ${TRAGGO_NETWORK}
