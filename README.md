@@ -99,6 +99,22 @@ For Docker Compose-based modules, the pattern is:
 - The module passes that path to Compose via `env_file` (Compose reads the file at runtime; Nix does not read its contents).
 - The operator must ensure the secret file exists before enabling the service (e.g. `/run/secrets/service.env`).
 
+## Current Private Model
+
+As of 2026-03-21, `nix-services` does not currently require an evaluation-time
+private companion flake.
+
+Current operating model:
+
+- runtime secrets stay on `/run/secrets/...`
+- host-specific private wiring stays in `nix-pi` / `nix-pi-private`
+- shared service docs may point to host-owned divergences, but the shared repo
+  itself remains publicly evaluable without sibling private inputs
+
+Audit record:
+
+- `records/NIX_SERVICES_PRIVATE_COMPANION_AUDIT_2026-03-21.md`
+
 ## Pre-commit Hooks (via `prek`)
 
 This repo uses pre-commit hooks defined in `.pre-commit-config.yaml`.
