@@ -356,6 +356,22 @@
         description = "kube-state-metrics targets (`host:port`) to scrape.";
       };
 
+      kubeStateMetricsScheme = lib.mkOption {
+        type = lib.types.enum ["http" "https"];
+        default = "http";
+        example = "https";
+        description = "URL scheme for job `kube-state-metrics`.";
+      };
+
+      kubeStateMetricsTlsInsecureSkipVerify = lib.mkOption {
+        type = lib.types.bool;
+        default = false;
+        description = ''
+          Whether Prometheus should skip TLS verification for job
+          `kube-state-metrics`.
+        '';
+      };
+
       vikunjaMetricsPath = lib.mkOption {
         type = lib.types.str;
         default = "/api/v1/metrics";

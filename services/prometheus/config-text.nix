@@ -25,6 +25,30 @@
       ++ [""]
     );
 
+  optionalJobLinesWithScheme = {
+    name,
+    targets,
+    scheme,
+    tlsInsecureSkipVerify ? false,
+  }:
+    lib.optionals (targets != []) (
+      [
+        "  - job_name: \"${name}\""
+        "    scheme: ${scheme}"
+        "    static_configs:"
+        "      - targets:"
+      ]
+      ++ (mkTargetLines {
+        inherit targets;
+        indent = "        ";
+      })
+      ++ lib.optionals (scheme == "https") [
+        "    tls_config:"
+        "      insecure_skip_verify: ${if tlsInsecureSkipVerify then "true" else "false"}"
+      ]
+      ++ [""]
+    );
+
   optionalJobLinesWithMetricsPath = {
     name,
     metricsPath,
@@ -278,9 +302,11 @@
         targets = cfg.scrape.vikunjaTargets;
         dropUpMetric = true;
       })
-      ++ (optionalJobLines {
+      ++ (optionalJobLinesWithScheme {
         name = "kube-state-metrics";
         targets = cfg.scrape.kubeStateMetricsTargets;
+        scheme = cfg.scrape.kubeStateMetricsScheme;
+        tlsInsecureSkipVerify = cfg.scrape.kubeStateMetricsTlsInsecureSkipVerify;
       })
       ++ (optionalJobLines {
         name = "alertmanager";
