@@ -24,7 +24,7 @@ class of document quickly.
 - `docs/plans/tls_enablement_plan_post_dns_traefik.md`
 - `docs/plans/pi_hole_deployment_plan_traefik_no_dns_→_dns_transition.md`
 - `docs/plans/zero_downtime_pi_hole_dhcp_migration_checklist.md`
-- `docs/plans/traefik_first_deployment_plan_pre_dns_operator_validated.md`
+- `docs/plans/traefik_first_deployment_plan_pre_dns.md`
 - `docs/plans/change_management_and_upgrade_plan.md`
 
 These are design and rollout references. Unless a new rollout is actively in

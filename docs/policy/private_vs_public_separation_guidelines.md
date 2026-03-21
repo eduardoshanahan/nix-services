@@ -26,12 +26,11 @@ If a file or value would compromise security if published, it **does not belong 
 
 The following are explicitly allowed and encouraged:
 
-- Nix flakes, modules, and profiles
-- Host *roles* (e.g. "dns-box", "edge-box")
+- Nix flakes and modules
+- Non-identifying service roles (e.g. "primary", "secondary")
 - Service definitions (Pi-hole, Traefik, etc.)
 - Docker and Docker Compose orchestration logic
 - Build-time configuration
-- Placeholder directory structure for private data
 
 All of the above must be **generic**, **reusable**, and **non-identifying**.
 

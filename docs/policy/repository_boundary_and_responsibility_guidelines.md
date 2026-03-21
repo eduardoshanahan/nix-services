@@ -69,12 +69,11 @@ The services repository exists to answer a different question:
 
 This repository MAY contain:
 
-- Hosts (thin selectors)
-- Profiles (policy and cross‑cutting concerns)
 - Services as reusable modules
 - Docker Compose–based applications
 - Orchestration logic via NixOS + systemd
-- Optional private overlays and secret references
+- Service-side policy, plans, and recovery docs
+- Runtime secret path contracts
 
 ### Forbidden contents (Services Repository)
 
@@ -83,6 +82,7 @@ This repository MUST NOT:
 - Re‑implement Raspberry Pi hardware support
 - Fork or copy foundation logic
 - Assume responsibility for bootstrapping hardware
+- Own host placement, bootstrap, or private host overlays
 
 All hardware and image concerns MUST come from the foundation repo.
 
@@ -164,7 +164,7 @@ When unsure, **do not add code** and request clarification.
 ## 8. Summary
 
 - Foundation repo = hardware + boot + images
-- Services repo = hosts + services + policy
+- Services repo = shared services + service docs + policy
 - Clear dependency direction
 - No responsibility overlap
 

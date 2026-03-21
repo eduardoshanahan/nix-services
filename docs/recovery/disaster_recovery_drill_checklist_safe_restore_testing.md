@@ -1,11 +1,10 @@
 # Disaster Recovery Drill Checklist (Safe Restore Testing)
 
-> **Operator-validated checklist**  
-> This document defines a **repeatable disaster recovery drill** to safely test backups and restores **without risking live service availability**.
->
-> Codex MUST NOT automate, infer, or execute any steps in this document.
-> **Current-state note (2026-02-25)**  
-> Services are already deployed and operating. Use this checklist as a rebuild-from-scratch, disaster recovery, or expansion reference unless an explicit new rollout is planned.
+This document defines a **repeatable disaster recovery drill** to safely test
+backups and restores **without risking live service availability**.
+
+Treat it as an operational checklist for recovery testing, rebuild rehearsal,
+and backup validation.
 
 This checklist validates that the **Backup & Restore Plan** actually works under realistic failure conditions.
 
@@ -13,7 +12,7 @@ It builds on:
 
 - *Backup & Restore Plan (Volumes + Pi-hole State)*
 - *Pi-hole Deployment Plan (Traefik + No-DNS → DNS Transition)*
-- *Traefik-First Deployment Plan (Pre-DNS, Operator-Validated)*
+- *Traefik-First Deployment Plan (Pre-DNS)*
 
 ---
 
@@ -31,14 +30,14 @@ This drill is:
 
 ---
 
-## 1. Safety Rules (MANDATORY)
+## 1. Safety Rules
 
-Before starting a drill, the operator MUST ensure:
+Before starting a drill, ensure:
 
 - [ ] The drill is performed on a **non-primary box**, or
 - [ ] The box is temporarily removed from active DNS (DHCP/router)
 
-The drill MUST NOT:
+The drill must not:
 
 - Interrupt primary DNS service
 - Modify router/DHCP configuration permanently
@@ -48,7 +47,7 @@ If safety cannot be guaranteed, DO NOT proceed.
 
 ---
 
-## 2. Drill Frequency (RECOMMENDED)
+## 2. Drill Frequency
 
 - Initial drill: after first successful backup
 - Routine drill: every **3–6 months**
@@ -100,7 +99,7 @@ This simulates the most common real failure.
 - [ ] Traefik starts automatically
 - [ ] Services start with empty state
 
-If this fails, STOP — backup quality is irrelevant until this works.
+If this fails, stop there; backup quality is irrelevant until this works.
 
 ---
 
@@ -123,7 +122,7 @@ If this fails, STOP — backup quality is irrelevant until this works.
 - [ ] DNS queries resolve correctly
 - [ ] Logs show expected activity
 
-If validation fails, STOP and investigate.
+If validation fails, stop and investigate.
 
 ---
 
@@ -156,7 +155,7 @@ If you have primary + secondary Pi-hole:
 - [ ] DNS queries still succeed
 - [ ] Secondary Pi-hole logs show activity
 
-This step MUST NOT affect all clients.
+This step must not affect all clients.
 
 ---
 
@@ -172,7 +171,7 @@ No configuration drift should remain.
 
 ---
 
-## 9. Documentation (MANDATORY)
+## 9. Documentation
 
 Record the following:
 
@@ -212,7 +211,7 @@ If any condition is not met, the system is **not DR-ready**.
 
 ## 12. Summary
 
-- DR drills are mandatory, not optional
+- DR drills should be regular, not one-off
 - Always test restores, not just backups
 - Prefer secondary or isolated systems
 - Fix the plan when drills reveal gaps

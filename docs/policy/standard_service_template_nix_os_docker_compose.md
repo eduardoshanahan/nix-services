@@ -11,7 +11,7 @@ This template is compatible with:
 - NixOS
 - Docker + Docker Compose
 - Traefik-first routing
-- Operator-validated plans
+- Operator-facing rollout and recovery docs
 
 ---
 

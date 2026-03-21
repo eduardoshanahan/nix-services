@@ -1,11 +1,7 @@
 # Backup & Restore Plan (Volumes + Pi-hole State)
 
-> **Operator-validated plan**  
-> This document contains both declarative steps (implemented by Codex) and operational validation gates (validated by a human operator).
->
-> Codex MUST NOT attempt to automate, infer, or “satisfy” operator-validated checks.
-> **Current-state note (2026-02-25)**  
-> Services are already deployed and operating. Use this plan as a rebuild-from-scratch, disaster recovery, or expansion reference unless an explicit new rollout is planned.
+This document defines the backup and restore strategy for stateful services and
+should be read as an operating, recovery, and expansion reference.
 
 This document defines the **backup and restore strategy** for stateful services deployed via Docker Compose on NixOS, with special focus on **Pi-hole state** and other persistent volumes.
 
@@ -36,7 +32,7 @@ It builds on:
 
 ## 1. Backup Scope Definition
 
-### 1.1 What MUST be backed up
+### 1.1 What should be backed up
 
 The following data is considered **critical state**:
 
@@ -50,7 +46,7 @@ Only **persistent volumes** are backed up.
 
 ---
 
-### 1.2 What MUST NOT be backed up
+### 1.2 What should not be backed up
 
 The following MUST NOT be included in backups:
 
@@ -61,7 +57,7 @@ The following MUST NOT be included in backups:
 
 ---
 
-## 2. Backup Strategy (MANDATORY)
+## 2. Backup Strategy
 
 ### 2.1 Backup model
 
@@ -84,7 +80,7 @@ The following tools are acceptable:
 - `borg`
 - `restic`
 
-Codex MUST NOT assume one specific tool unless instructed.
+Do not assume one specific tool unless instructed.
 
 ---
 
@@ -127,11 +123,11 @@ For Pi-hole:
 - Backups MAY be taken while the container is running
 - For maximum safety, the operator MAY stop Pi-hole briefly
 
-Codex MUST NOT automate service shutdown.
+Do not automate service shutdown.
 
 ---
 
-## 4. Backup Schedule (OPERATOR-DEFINED)
+## 4. Backup Schedule
 
 Recommended baseline:
 
@@ -146,7 +142,7 @@ Scheduling (cron, systemd timers) is operator-defined and not committed.
 
 ### 5.1 Restore prerequisites
 
-Before restoring, the operator MUST ensure:
+Before restoring, ensure:
 
 - Host boots successfully into NixOS
 - Docker and Traefik are deployed
@@ -166,13 +162,13 @@ High-level restore steps:
 4. Start the Pi-hole service
 5. Validate UI and DNS behavior
 
-Codex MUST NOT automate restore actions.
+Do not automate restore actions.
 
 ---
 
 ### 5.3 Restore validation
 
-After restore, the operator MUST validate:
+After restore, validate:
 
 - [ ] Pi-hole UI loads correctly
 - [ ] Blocklists and settings are present
@@ -216,7 +212,7 @@ No secrets are committed to the repository.
 
 ---
 
-## 8. Summary: Mandatory Execution Order
+## 8. Summary: Recommended Execution Order
 
 1. Operator defines backup destination and tool
 2. Operator performs regular backups of `/var/lib/<service>`
@@ -224,4 +220,4 @@ No secrets are committed to the repository.
 4. Operator restores service data
 5. Operator validates service behavior
 
-Codex MUST NOT skip steps or automate operator actions.
+Do not skip steps or automate operator actions.

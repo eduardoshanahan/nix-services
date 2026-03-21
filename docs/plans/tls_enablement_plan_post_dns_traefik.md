@@ -1,17 +1,15 @@
 # TLS Enablement Plan (Post-DNS, Traefik)
 
-> **Operator-validated plan**  
-> This document contains both declarative steps (implemented by Codex) and operational validation gates (validated by a human operator).
->
-> Codex MUST NOT attempt to automate, infer, or “satisfy” operator-validated checks.
-> **Current-state note (2026-02-25)**  
-> Services are already deployed and operating. Use this plan as a rebuild-from-scratch, disaster recovery, or expansion reference unless an explicit new rollout is planned.
+This document is a TLS design and rollout reference for services routed through
+Traefik after DNS is available. The stack is already deployed; treat this as a
+recovery, expansion, or redesign guide rather than a live rollout checklist.
 
-This document defines the **step-by-step plan** to enable **TLS/HTTPS** on services routed through **Traefik**, **after DNS is active and stable**.
+This document defines the steps to enable **TLS/HTTPS** on services routed
+through **Traefik**, **after DNS is active and stable**.
 
 It builds on:
 
-- *Traefik-First Deployment Plan (Pre-DNS, Operator-Validated)*
+- *Traefik-First Deployment Plan (Pre-DNS)*
 - *Pi-hole Deployment Plan (Traefik + No-DNS → DNS Transition)*
 
 ---
@@ -32,13 +30,10 @@ It builds on:
 
 ---
 
-## 1. Preconditions (OPERATOR-VALIDATED, MUST be true)
+## 1. Preconditions
 
-These preconditions are **not enforced by code**.
-
-Codex MUST assume they have been **manually validated by the operator** before proceeding.
-
-The operator MUST confirm:
+These preconditions are **not enforced by code** and should be verified before
+using this plan:
 
 - [ ] Pi-hole DNS is active and stable
 - [ ] Clients resolve service hostnames via Pi-hole
@@ -51,15 +46,13 @@ The operator MUST confirm:
 - **HTTP routing**: Access service UI over plain HTTP
 - **Traefik health**: Dashboard reachable and error-free
 
-If any item fails, STOP and resolve it before continuing.
+If any item fails, resolve it before continuing.
 
 ---
 
-## 2. TLS Strategy Selection (MANDATORY DECISION)
+## 2. TLS Strategy Selection
 
-Before implementation, the operator MUST choose **one** TLS strategy.
-
-Codex MUST NOT choose on behalf of the operator.
+Before implementation, choose **one** TLS strategy.
 
 ### Option A — Internal CA (recommended for homelab)
 
@@ -93,7 +86,7 @@ Certificates and keys:
 - MUST be provided via external paths (e.g. `/run/secrets`)
 - MAY be generated manually by the operator
 
-Codex MUST reference **paths only**, never values.
+Reference **paths only**, never values.
 
 Recommended declarative pattern:
 
@@ -108,7 +101,7 @@ Recommended declarative pattern:
 
 ### 3.2 Traefik static TLS configuration
 
-Codex MUST:
+Implementation should:
 
 - Extend Traefik configuration to:
   - Enable HTTPS entrypoint (443)
@@ -133,7 +126,7 @@ For each HTTP service:
 - Enable TLS on the Traefik router
 - Reuse the same certificate or wildcard where appropriate
 
-Codex MUST NOT duplicate certificate material.
+Do not duplicate certificate material.
 
 ---
 
@@ -158,13 +151,13 @@ Once HTTPS is validated:
 - Enable HTTP → HTTPS redirection in Traefik
 - Apply redirection globally
 
-Codex MUST ensure this change is reversible.
+Keep this change reversible.
 
 ---
 
-## 5. Validation Checklist (OPERATOR-VALIDATED)
+## 5. Validation Checklist
 
-The operator MUST validate:
+Validate:
 
 - [ ] HTTPS works for all routed services
 - [ ] Certificates are trusted by client devices
@@ -172,7 +165,7 @@ The operator MUST validate:
 - [ ] HTTP redirects correctly to HTTPS (after enforcement)
 - [ ] Services remain reachable after host reboot
 
-Codex MUST NOT proceed until validation passes.
+Do not proceed until validation passes.
 
 ---
 
@@ -208,7 +201,7 @@ These require separate plans.
 
 ---
 
-## 8. Summary: Mandatory Execution Order
+## 8. Summary: Recommended Execution Order
 
 1. Operator validates DNS and HTTP routing
 2. Operator selects TLS strategy
@@ -217,4 +210,4 @@ These require separate plans.
 5. Operator validates HTTPS
 6. Codex enforces HTTP → HTTPS redirect
 
-Codex MUST NOT skip steps.
+Do not skip steps.

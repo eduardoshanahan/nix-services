@@ -1,6 +1,7 @@
 # nix-services
 
-This repository is governed by `docs/prompts/codex_initial_prompt.md`.
+Start with `DOCUMENTATION_INDEX.md` and the stable policy docs under
+`docs/policy/` when orienting yourself in this repository.
 
 This repository defines application services and operational policy
 for ARM64 NixOS hosts.
