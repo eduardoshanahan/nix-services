@@ -47,7 +47,7 @@ generated Docker Compose file and declarative YAML config files.
 
 ## Known host-specific override
 
-- `nix-pi/nixos/hosts/private/rpi-box-02.nix` intentionally overrides
+- `../nix-pi-private/modules/rpi-box-02.nix` intentionally overrides
   `/etc/homepage/config/docker.yaml` with a multi-host Docker inventory so the
   Homepage instance on `rpi-box-02` can query remote Docker APIs on other
   homelab nodes.

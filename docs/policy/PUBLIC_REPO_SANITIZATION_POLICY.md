@@ -18,7 +18,7 @@ Use this checklist before every commit/push to avoid leaking internal topology o
 
 ## Keep real values only in private scope
 
-- `nixos/hosts/private/*`
+- sibling companion repos such as `../nix-pi-private/`
 - secrets files (`sops`, runtime secret files, local `.env`)
 - local operator notes not committed to shared/public repos
 

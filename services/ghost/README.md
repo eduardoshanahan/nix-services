@@ -77,7 +77,7 @@ This module deploys Ghost behind Traefik using a checked-in Docker Compose file.
 
 ## Known host-specific override
 
-- `nix-pi/nixos/hosts/private/rpi-box-02.nix` overrides the `ghost-blog`
+- `../nix-pi-private/modules/rpi-box-02.nix` overrides the `ghost-blog`
   compose file for the `blog` instance.
 - That override currently adds
   `mail__options__tls__rejectUnauthorized=false` for the internal SMTP relay

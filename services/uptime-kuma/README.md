@@ -59,7 +59,7 @@ for affected monitors, or ensure the container trusts your internal CA.
 
 ## Known host-specific override
 
-- `nix-pi/nixos/hosts/private/rpi-box-02.nix` adds a companion
+- `../nix-pi-private/modules/rpi-box-02.nix` adds a companion
   `uptime-kuma-monitor-sync` unit plus `/etc/uptime-kuma/desired-monitors.json`
   as a declarative monitor source of truth.
 - The same host also extends `uptime-kuma-compose.service.restartTriggers` so
