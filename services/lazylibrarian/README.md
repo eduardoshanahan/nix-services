@@ -33,7 +33,7 @@ Operational notes:
   Directory" when maintaining separate libraries, rather than pointing the base
   destination folder at an existing Calibre library.
 - Intended first deployment shape on `rpi-box-02`:
-  - URL: `https://lazylibrarian.<homelab-domain>/`
+  - URL: `https://lazylibrarian.internal.example/`
   - host: `rpi-box-02`
   - state path: `/srv/lazylibrarian`
   - downloads path: `/mnt/media/Downloads/qbittorrent`

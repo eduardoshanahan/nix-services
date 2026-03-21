@@ -17,7 +17,7 @@ Radarr is packaged here as a Docker Compose-backed NixOS module.
   state and optional bind-mounted paths so boot-time startup waits for those
   mounts before Docker starts the container.
 - The first-pass deployment intentionally keeps Radarr on its default internal
-  SQLite database inside `dataDir`; no shared SQL backend on `hhnas4` is
+  SQLite database inside `dataDir`; no shared SQL backend is
   required.
 - The service is intended to run behind Traefik on the shared external
   `traefik` Docker network.
@@ -28,8 +28,7 @@ Operational notes:
 - Media-library and downloader paths still depend on host-level storage
   decisions, but the module can now bind-mount an NAS-backed host path.
 - Verified intended deployed shape on 2026-03-11:
-  - URL: `https://radarr.<homelab-domain>/`
-  - host: `rpi-box-02`
+  - URL: `https://radarr.internal.example/`
   - state path: `/srv/radarr`
   - database: local SQLite in `/srv/radarr`
 
@@ -54,10 +53,10 @@ Example:
 ```nix
 services.radarrCompose = {
   enable = true;
-  hostname = "radarr.${config.lab.domain}";
+  hostname = "radarr.internal.example";
   tls = true;
   dataDir = "/srv/radarr";
-  mediaDir = "/mnt/media";
-  downloadsDir = "/mnt/media/Downloads/qbittorrent";
+  mediaDir = "/srv/media";
+  downloadsDir = "/srv/downloads/qbittorrent";
 };
 ```

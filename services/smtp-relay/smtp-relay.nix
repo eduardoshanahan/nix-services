@@ -89,7 +89,7 @@ in {
     allowedSenderDomains = lib.mkOption {
       type = lib.types.listOf lib.types.str;
       default = [];
-      example = ["<homelab-domain>"];
+      example = ["internal.example"];
       description = ''
         Sender domains allowed by the relay (`ALLOWED_SENDER_DOMAINS`).
         Must be non-empty to avoid accidental open relay behavior.

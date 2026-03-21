@@ -17,7 +17,7 @@ Sonarr is packaged here as a Docker Compose-backed NixOS module.
   state and optional bind-mounted paths so boot-time startup waits for those
   mounts before Docker starts the container.
 - The first-pass deployment intentionally keeps Sonarr on its default internal
-  SQLite database inside `dataDir`; no shared SQL backend on `hhnas4` is
+  SQLite database inside `dataDir`; no shared SQL backend is
   required.
 - The service is intended to run behind Traefik on the shared external
   `traefik` Docker network.
@@ -25,11 +25,10 @@ Sonarr is packaged here as a Docker Compose-backed NixOS module.
 Operational notes:
 
 - Upstream listens on port `8989`.
-- The current `rpi-box-02` media layout exposes TV content at `/mnt/media/TV Shows`
-  and qBittorrent completed downloads at `/mnt/media/Downloads/qbittorrent`.
+- Example media layout exposes TV content at `/srv/media/tv`
+  and qBittorrent completed downloads at `/srv/downloads/qbittorrent`.
 - Verified intended deployed shape on 2026-03-13:
-  - URL: `https://sonarr.<homelab-domain>/`
-  - host: `rpi-box-02`
+  - URL: `https://sonarr.internal.example/`
   - state path: `/srv/sonarr`
   - database: local SQLite in `/srv/sonarr`
 
@@ -54,10 +53,10 @@ Example:
 ```nix
 services.sonarrCompose = {
   enable = true;
-  hostname = "sonarr.${config.lab.domain}";
+  hostname = "sonarr.internal.example";
   tls = true;
   dataDir = "/srv/sonarr";
-  mediaDir = "/mnt/media/TV Shows";
-  downloadsDir = "/mnt/media/Downloads/qbittorrent";
+  mediaDir = "/srv/media/tv";
+  downloadsDir = "/srv/downloads/qbittorrent";
 };
 ```

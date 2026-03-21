@@ -53,8 +53,8 @@ in {
       type = lib.types.listOf lib.types.str;
       default = [];
       example = [
-        "tcp://rpi-box-03.<homelab-domain>:2375|rpi-box-03"
-        "tcp://hhnas4.<homelab-domain>:2375|hhnas4"
+        "tcp://docker-a.internal.example:2375|docker-a"
+        "tcp://docker-b.internal.example:2375|docker-b"
       ];
       description = ''
         Optional list of Dozzle remote Docker hosts (or socket proxies), each in

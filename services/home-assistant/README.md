@@ -19,7 +19,7 @@ Docker Compose-backed Home Assistant deployment managed through a NixOS module.
 {
   services.homeAssistant = {
     enable = true;
-    hostname = "homeassistant.<homelab-domain>";
+    hostname = "homeassistant.internal.example";
     tls = true;
     dataDir = "/srv/prometheus/home-assistant";
     reverseProxy.trustedProxies = [ "172.18.0.0/16" ];

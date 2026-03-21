@@ -24,10 +24,9 @@ Operational notes:
 - PostgreSQL must already contain the `seerr` role and database before the
   service starts.
 - Verified deployed shape on 2026-03-11:
-  - URL: `https://seerr.<homelab-domain>/`
-  - host: `rpi-box-02`
-  - Postgres endpoint: `postgres.<homelab-domain>:5433`
-  - media-server integration: Jellyfin at `https://jellyfin.<homelab-domain>/`
+  - URL: `https://seerr.internal.example/`
+  - Postgres endpoint: `postgres.internal.example:5433`
+  - media-server integration: Jellyfin at `https://media.internal.example/`
 
 Important options:
 
@@ -48,11 +47,11 @@ Example:
 ```nix
 services.seerr = {
   enable = true;
-  hostname = "seerr.${config.lab.domain}";
+  hostname = "seerr.internal.example";
   tls = true;
   dataDir = "/srv/seerr";
   database.postgres = {
-    host = "postgres.${config.lab.domain}";
+    host = "postgres.internal.example";
     port = 5433;
     name = "seerr";
     user = "seerr";

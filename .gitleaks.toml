@@ -8,6 +8,11 @@ regex = '''(?i)(password|passwd|passphrase|secret|token|api[_-]?key|auth[_-]?key
 path = '''(?i)\.(env|ini|cfg|conf|json|jsonc|toml|ya?ml|sh|bash|zsh)$'''
 secretGroup = 0
 
+[[rules.allowlists]]
+description = "Allow the Traefik runtime secrets bind mount path."
+regexes = ['''secrets:/run/secrets:ro''']
+paths = ['''^services/traefik/docker-compose\.yml$''']
+
 [[rules]]
 id = "non-sops-secret-value"
 description = "Require secret-looking entries in secrets/*.yaml to be encrypted with SOPS."

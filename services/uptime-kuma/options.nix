@@ -66,7 +66,7 @@
       mariadb = {
         host = lib.mkOption {
           type = lib.types.str;
-          default = "hhnas4.<homelab-domain>";
+          default = "db.internal.example";
           description = "MariaDB/MySQL host when `database.type = \"mariadb\"`.";
         };
 

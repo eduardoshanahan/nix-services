@@ -21,7 +21,7 @@
       hostname = lib.mkOption {
         type = lib.types.str;
         description = "Backend hostname or FQDN to apply in Seerr.";
-        example = "radarr.<homelab-domain>";
+        example = "radarr.internal.example";
       };
 
       port = lib.mkOption {
@@ -46,7 +46,7 @@
         type = lib.types.nullOr lib.types.str;
         default = null;
         description = "Optional external URL to apply when the Seerr record has that field.";
-        example = "https://radarr.<homelab-domain>";
+        example = "https://radarr.internal.example";
       };
 
       configXmlPath = lib.mkOption {
@@ -64,7 +64,7 @@
       hostname = lib.mkOption {
         type = lib.types.str;
         description = "Jellyfin hostname or FQDN to apply in Seerr.";
-        example = "jellyfin.<homelab-domain>";
+        example = "media.internal.example";
       };
 
       port = lib.mkOption {
@@ -89,14 +89,14 @@
         type = lib.types.nullOr lib.types.str;
         default = null;
         description = "Optional external Jellyfin hostname to apply when Seerr stores one.";
-        example = "jellyfin.<homelab-domain>";
+        example = "media.internal.example";
       };
 
       forgotPasswordUrl = lib.mkOption {
         type = lib.types.nullOr lib.types.str;
         default = null;
         description = "Optional Jellyfin forgot-password URL to apply when Seerr stores one.";
-        example = "https://jellyfin.<homelab-domain>/web/#/forgotpassword";
+        example = "https://media.internal.example/web/#/forgotpassword";
       };
     };
   };
@@ -316,7 +316,7 @@ in {
     database.postgres = {
       host = lib.mkOption {
         type = lib.types.str;
-        default = "postgres.<homelab-domain>";
+        default = "postgres.internal.example";
         description = "PostgreSQL host for Seerr.";
       };
 

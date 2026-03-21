@@ -187,7 +187,7 @@
       host = lib.mkOption {
         type = lib.types.str;
         description = "qBittorrent hostname or URL to apply in LazyLibrarian.";
-        example = "qbittorrent.<homelab-domain>";
+        example = "qbittorrent.internal.example";
       };
 
       port = lib.mkOption {

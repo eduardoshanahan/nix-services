@@ -17,7 +17,7 @@ Operational notes:
 
 - Upstream listens on port `9696`.
 - Verified intended deployed shape on 2026-03-12:
-  - URL: `https://prowlarr.<homelab-domain>/`
+  - URL: `https://prowlarr.internal.example/`
   - host: `rpi-box-02`
   - state path: `/srv/prowlarr`
   - database: local SQLite in `/srv/prowlarr`

@@ -125,7 +125,7 @@ in {
     database.postgres = {
       host = lib.mkOption {
         type = lib.types.str;
-        default = "postgres.<homelab-domain>";
+        default = "postgres.internal.example";
         description = "PostgreSQL host for n8n.";
       };
 

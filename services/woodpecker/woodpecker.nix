@@ -168,7 +168,7 @@ in {
     gitea = {
       url = lib.mkOption {
         type = lib.types.str;
-        default = "https://gitea.<homelab-domain>";
+        default = "https://forge.internal.example";
         description = "Base URL for the Gitea/Forge instance.";
       };
 
@@ -187,7 +187,7 @@ in {
       postgres = {
         host = lib.mkOption {
           type = lib.types.str;
-          default = "postgres.<homelab-domain>";
+          default = "postgres.internal.example";
           description = "PostgreSQL host for the Woodpecker server.";
         };
 

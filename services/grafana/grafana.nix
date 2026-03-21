@@ -197,7 +197,7 @@ in {
       postgres = {
         host = lib.mkOption {
           type = lib.types.str;
-          default = "postgres.<homelab-domain>";
+          default = "postgres.internal.example";
           description = "PostgreSQL host for Grafana when `database.type = \"postgres\"`.";
         };
 
@@ -289,19 +289,19 @@ in {
 
         authUrl = lib.mkOption {
           type = lib.types.str;
-          default = "https://authentik.<homelab-domain>/application/o/authorize/";
+          default = "https://auth.internal.example/application/o/authorize/";
           description = "OIDC authorization endpoint.";
         };
 
         tokenUrl = lib.mkOption {
           type = lib.types.str;
-          default = "https://authentik.<homelab-domain>/application/o/token/";
+          default = "https://auth.internal.example/application/o/token/";
           description = "OIDC token endpoint.";
         };
 
         apiUrl = lib.mkOption {
           type = lib.types.str;
-          default = "https://authentik.<homelab-domain>/application/o/userinfo/";
+          default = "https://auth.internal.example/application/o/userinfo/";
           description = "OIDC user info endpoint.";
         };
 

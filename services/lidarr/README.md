@@ -29,7 +29,7 @@ Operational notes:
   `/mnt/media/Music` and qBittorrent completed downloads at
   `/mnt/media/Downloads/qbittorrent`.
 - Verified intended deployed shape on 2026-03-13:
-  - URL: `https://lidarr.<homelab-domain>/`
+  - URL: `https://lidarr.internal.example/`
   - host: `rpi-box-02`
   - state path: `/srv/lidarr`
   - database: local SQLite in `/srv/lidarr`

@@ -78,7 +78,7 @@ in {
 
         authUrl = lib.mkOption {
           type = lib.types.str;
-          default = "https://authentik.<homelab-domain>/application/o/vikunja/";
+          default = "https://auth.internal.example/application/o/vikunja/";
           description = "OIDC issuer/discovery URL.";
         };
 
@@ -155,7 +155,7 @@ in {
       postgres = {
         host = lib.mkOption {
           type = lib.types.str;
-          default = "postgres.<homelab-domain>";
+          default = "postgres.internal.example";
           description = "PostgreSQL host (used when `database.type = \"postgres\"`).";
         };
 

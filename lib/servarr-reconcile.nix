@@ -14,7 +14,7 @@
     lib.mkOption {
       type = lib.types.str;
       inherit description;
-      example = "https://prowlarr.<homelab-domain>";
+      example = "https://prowlarr.internal.example";
     };
 
   qbittorrentSubmodule = {
@@ -24,7 +24,7 @@
       host = lib.mkOption {
         type = lib.types.str;
         description = "Downloader hostname or FQDN to apply in the arr app.";
-        example = "qbittorrent.<homelab-domain>";
+        example = "qbittorrent.internal.example";
       };
 
       port = lib.mkOption {

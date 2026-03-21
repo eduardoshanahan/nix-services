@@ -1,15 +1,15 @@
-# Woodpecker CI (rpi-box-02)
+# Woodpecker CI
 
-Compose-backed Woodpecker deployment for the NixOS service-host pattern used on
-`rpi-box-02`.
+Compose-backed Woodpecker deployment for the NixOS service-host pattern used in
+this repository.
 
 ## Topology
 
-- Woodpecker server on `rpi-box-02`
-- ARM64 agent on `rpi-box-02`
-- External PostgreSQL on `postgres.<homelab-domain>:5433`
-- Gitea forge on `https://gitea.<homelab-domain>`
-- Separate AMD64 NAS agent deployed from `synology-services/hhnas4/woodpecker-agent`
+- Woodpecker server on a NixOS service host
+- ARM64 agent on the same host
+- External PostgreSQL on `postgres.internal.example:5433`
+- Forge on `https://forge.internal.example`
+- Optional separate AMD64 NAS agent deployed from a sibling infrastructure repo
 
 ## Required secrets
 
@@ -25,7 +25,7 @@ The host wiring expects these SOPS keys:
 Create a Gitea OAuth application with callback URL:
 
 ```text
-https://woodpecker.<homelab-domain>/authorize
+https://woodpecker.internal.example/authorize
 ```
 
 ## Database bootstrap
@@ -60,7 +60,7 @@ Recommended pattern for a private Gitea repository:
 Generate a dedicated deploy key locally:
 
 ```bash
-ssh-keygen -t ed25519 -N '' -C 'woodpecker-ci@<homelab-domain>' -f /tmp/woodpecker-repo-key
+ssh-keygen -t ed25519 -N '' -C 'woodpecker-ci@internal.example' -f /tmp/woodpecker-repo-key
 ```
 
 Use the public key in Gitea as a repository deploy key. Use the private key in
@@ -77,7 +77,7 @@ clone:
       ssh-key-private:
         from_secret: gitea_deploy_key
       ssh-host-key: |
-        [gitea.<homelab-domain>]:2222 ssh-ed25519 <gitea-host-key>
+        [forge.internal.example]:2222 ssh-ed25519 <forge-host-key>
 ```
 
 Then add your normal workflow content under `steps:` and, if needed, platform

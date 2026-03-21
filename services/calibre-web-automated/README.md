@@ -31,7 +31,7 @@ Operational notes:
   validated with a fresh library; Calibre-Web-Automated writes to `metadata.db`.
 - Keep the ingest folder separate from the library folder.
 - Intended first deployment shape on `rpi-box-02`:
-  - URL: `https://calibre.<homelab-domain>/`
+  - URL: `https://calibre.internal.example/`
   - host: `rpi-box-02`
   - state path: `/srv/calibre-web-automated`
   - library path: `/mnt/media/Books/CalibreWebAutomated/library`

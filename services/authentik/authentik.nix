@@ -158,7 +158,7 @@ in {
       postgres = {
         host = lib.mkOption {
           type = lib.types.str;
-          default = "postgres.<homelab-domain>";
+          default = "postgres.internal.example";
           description = "PostgreSQL host for Authentik.";
         };
 
@@ -201,7 +201,7 @@ in {
     bootstrap = {
       email = lib.mkOption {
         type = lib.types.str;
-        default = "admin@<homelab-domain>";
+        default = "admin@internal.example";
         description = "Bootstrap admin email used on first startup.";
       };
 
