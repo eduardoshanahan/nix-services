@@ -17,6 +17,9 @@ LazyLibrarian is packaged here as a Docker Compose-backed NixOS module.
   `services.lazylibrarianCompose.cwaIngestDir`, mounted inside the container at
   `services.lazylibrarianCompose.cwaIngestMountPath`
   (default `/cwa-book-ingest`).
+- The generated systemd unit declares `RequiresMountsFor` for the configured
+  state and optional bind-mounted paths so boot-time startup waits for those
+  mounts before Docker starts the container.
 - The intended connection model is to keep LazyLibrarian off the Calibre
   library itself and use the CWA ingest folder as the handoff point.
 - The service is intended to run behind Traefik on the shared external

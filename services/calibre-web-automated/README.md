@@ -18,6 +18,9 @@ Calibre-Web-Automated is packaged here as a Docker Compose-backed NixOS module.
   (default `/cwa-book-ingest`).
 - When the library lives on a network share such as NFS or SMB, set
   `services.calibreWebAutomatedCompose.networkShareMode = true`.
+- The generated systemd unit now declares `RequiresMountsFor` for the configured
+  state, library, and ingest paths so boot-time startup waits for those mounts
+  before Docker starts the container.
 - The service is intended to run behind Traefik on the shared external
   `traefik` Docker network.
 

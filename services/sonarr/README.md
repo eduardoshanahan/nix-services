@@ -13,6 +13,9 @@ Sonarr is packaged here as a Docker Compose-backed NixOS module.
 - Optional downloader access is provided with `services.sonarrCompose.downloadsDir`,
   mounted inside the container at `services.sonarrCompose.downloadsMountPath`
   (default `/downloads`).
+- The generated systemd unit declares `RequiresMountsFor` for the configured
+  state and optional bind-mounted paths so boot-time startup waits for those
+  mounts before Docker starts the container.
 - The first-pass deployment intentionally keeps Sonarr on its default internal
   SQLite database inside `dataDir`; no shared SQL backend on `hhnas4` is
   required.

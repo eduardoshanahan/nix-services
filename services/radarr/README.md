@@ -13,6 +13,9 @@ Radarr is packaged here as a Docker Compose-backed NixOS module.
 - Optional downloader access is provided with `services.radarrCompose.downloadsDir`,
   mounted inside the container at `services.radarrCompose.downloadsMountPath`
   (default `/downloads`).
+- The generated systemd unit declares `RequiresMountsFor` for the configured
+  state and optional bind-mounted paths so boot-time startup waits for those
+  mounts before Docker starts the container.
 - The first-pass deployment intentionally keeps Radarr on its default internal
   SQLite database inside `dataDir`; no shared SQL backend on `hhnas4` is
   required.

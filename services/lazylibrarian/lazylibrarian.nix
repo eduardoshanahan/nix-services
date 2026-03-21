@@ -405,8 +405,13 @@ in {
       description = "LazyLibrarian (Docker Compose)";
       wantedBy = ["multi-user.target"];
       requires = ["docker.service"];
-      after = ["docker.service" "network-online.target"];
-      wants = ["network-online.target"];
+      after = ["docker.service" "network-online.target" "remote-fs.target"];
+      wants = ["network-online.target" "remote-fs.target"];
+      unitConfig.RequiresMountsFor =
+        [cfg.dataDir]
+        ++ lib.optionals (cfg.downloadsDir != null) [cfg.downloadsDir]
+        ++ lib.optionals (cfg.booksDir != null) [cfg.booksDir]
+        ++ lib.optionals (cfg.cwaIngestDir != null) [cfg.cwaIngestDir];
       restartTriggers = [
         config.environment.etc."${serviceName}/docker-compose.yml".source
       ];
