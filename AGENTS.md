@@ -78,7 +78,6 @@ here. If it is a one-host exception, it probably belongs in `nix-pi`.
 - `docs/policy/`: stable architecture, boundary, lifecycle, and sanitization docs
 - `docs/plans/`: rollout and expansion plans
 - `docs/recovery/`: recovery and rebuild runbooks
-- `docs/prompts/`: historical prompt/context files
 - `records/`: pointer-only directory; private continuity notes live in `../nix-services-private/records/`
 
 Common service shapes in this repo:

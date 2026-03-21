@@ -1,19 +1,16 @@
 # Monitoring & Metrics Plan (Prometheus + Traefik)
 
-> **Operator-validated plan**  
-> This document contains both declarative steps (implemented by Codex) and operational validation gates (validated by a human operator).
->
-> Codex MUST NOT attempt to automate, infer, or “satisfy” operator-validated checks.
-> **Current-state note (2026-02-25)**  
-> Services are already deployed and operating. Use this plan as a rebuild-from-scratch, disaster recovery, or expansion reference unless an explicit new rollout is planned.
-> **Documentation boundary note**  
-> This document defines service-side monitoring architecture, module contracts, and constraints. For host-by-host runtime checks and operator quick commands, use `nix-pi/README.md`.
+This document is a service-side monitoring architecture and rollout reference.
+The stack is already deployed; treat this as a recovery, expansion, or redesign
+guide rather than a live rollout checklist.
+
+For host-by-host runtime checks and operator quick commands, use `nix-pi`.
 
 This document defines the **monitoring and metrics architecture** for the homelab, based on **Prometheus** scraping metrics from **Traefik** and selected services.
 
 It builds on:
 
-- *Traefik-First Deployment Plan (Pre-DNS, Operator-Validated)*
+- *Traefik-First Deployment Plan (Pre-DNS)*
 - *TLS Enablement Plan (Post-DNS, Traefik)*
 - *Standard Service Template (NixOS + Docker Compose)*
 
@@ -52,13 +49,10 @@ It builds on:
 
 ---
 
-## 2. Preconditions (OPERATOR-VALIDATED, MUST be true)
+## 2. Preconditions
 
-These preconditions are **not enforced by code**.
-
-Codex MUST assume they have been **manually validated by the operator** before proceeding.
-
-The operator MUST confirm:
+These preconditions are **not enforced by code** and should be verified before
+using this plan:
 
 - [ ] Traefik is deployed and stable
 - [ ] DNS is active and stable (via Pi-hole)
@@ -71,13 +65,13 @@ The operator MUST confirm:
 - Services are reachable via Traefik
 - Host reboot does not break Traefik
 
-If any item fails, STOP and fix it before continuing.
+If any item fails, fix it before continuing.
 
 ---
 
 ## 3. Traefik Metrics Enablement
 
-### 3.1 Metrics strategy (MANDATORY)
+### 3.1 Metrics strategy
 
 Traefik metrics MUST:
 
@@ -89,7 +83,7 @@ Traefik metrics MUST:
 
 ### 3.2 Traefik configuration changes
 
-Codex MUST extend Traefik configuration to:
+Extend Traefik configuration to:
 
 - Enable Prometheus metrics
 - Bind metrics to a dedicated internal port (e.g. `:8082`)
@@ -170,9 +164,9 @@ Example scrape target:
 
 ---
 
-## 6. Validation Checklist (OPERATOR-VALIDATED)
+## 6. Validation Checklist
 
-The operator MUST validate:
+Validate:
 
 - [ ] Prometheus container is running
 - [ ] Prometheus UI is reachable (if exposed)
@@ -180,7 +174,7 @@ The operator MUST validate:
 - [ ] No metrics ports are exposed on the host
 - [ ] Metrics survive host reboot
 
-Codex MUST NOT proceed until validation passes.
+Do not proceed until validation passes.
 
 ---
 
@@ -217,7 +211,7 @@ Each requires a separate plan.
 
 ---
 
-## 9. Summary: Mandatory Execution Order
+## 9. Summary: Recommended Execution Order
 
 1. Operator validates Traefik and DNS stability
 2. Enable Traefik Prometheus metrics
@@ -225,4 +219,4 @@ Each requires a separate plan.
 4. Configure Prometheus to scrape Traefik
 5. Operator validates metrics visibility
 
-Codex MUST NOT skip steps.
+Do not skip steps.

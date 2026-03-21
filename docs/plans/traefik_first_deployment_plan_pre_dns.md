@@ -1,15 +1,12 @@
 # Traefik-First Deployment Plan (Pre-DNS)
 
-> **Operator-validated plan**  
-> This document contains both declarative steps (implemented by Codex) and operational validation gates (validated by a human operator).
->
-> Codex MUST NOT attempt to automate, infer, or “satisfy” operator-validated checks.
-> **Current-state note (2026-02-25)**  
-> Services are already deployed and operating. Use this plan as a rebuild-from-scratch, disaster recovery, or expansion reference unless an explicit new rollout is planned.
+This document defines the deployment pattern for introducing **Traefik** as the
+first service on ARM64 NixOS boxes, explicitly supporting **deployment and
+testing before DNS is active**.
 
-This document defines the **step-by-step implementation plan** for introducing **Traefik** as the first service on ARM64 NixOS boxes, explicitly supporting **deployment and testing before DNS is active**.
-
-This plan is written to be **directly executable by Codex** and establishes the HTTP foundation required for all subsequent services (including Pi-hole).
+The stack is already deployed; treat this as a rebuild, disaster recovery, or
+expansion reference. It establishes the HTTP foundation required for
+subsequent services such as Pi-hole.
 
 ---
 
@@ -30,13 +27,10 @@ This plan is written to be **directly executable by Codex** and establishes the 
 
 ---
 
-## 1. Preconditions (OPERATOR-VALIDATED, MUST be true)
+## 1. Preconditions
 
-These preconditions are **not enforced by code**.
-
-Codex MUST assume they have been **manually validated by the operator** before proceeding with Traefik implementation.
-
-Before starting Traefik work, the operator MUST confirm:
+These preconditions are **not enforced by code** and should be verified before
+starting Traefik work:
 
 - [ ] Target host boots successfully into **NixOS (ARM64)**
 - [ ] SSH access to the host is available
@@ -49,18 +43,18 @@ Before starting Traefik work, the operator MUST confirm:
 - **Port ownership**: `ss -lntup | grep ':80\|:443'` returns no listeners
 - **Connectivity**: `ping -c 3 1.1.1.1`
 
-If any item fails, STOP and resolve it before continuing.
+If any item fails, resolve it before continuing.
 
 ---
 
-## 2. Repository Preparation (Required First Step)
+## 2. Repository Preparation
 
-Codex MUST ensure the following structure exists:
+The repository should contain the following structure:
 
 ```text
 flake.nix
-hosts/
-profiles/
+lib/
+docs/
 services/
   traefik/
 ```
@@ -83,9 +77,9 @@ services/traefik/
 
 ---
 
-### 3.2 Traefik design requirements (MANDATORY)
+### 3.2 Traefik design requirements
 
-Traefik MUST:
+Traefik should:
 
 - Run via Docker Compose
 - Bind to host ports **80 and 443**
@@ -95,11 +89,11 @@ Traefik MUST:
 
 Traefik permanently owns ports 80 and 443.
 
-TLS automation (Let’s Encrypt) MUST NOT be enabled at this stage.
+TLS automation (for example Let’s Encrypt) should not be enabled at this stage.
 
 ---
 
-## 4. Pre-DNS Routing Strategy (MANDATORY)
+## 4. Pre-DNS Routing Strategy
 
 Until DNS exists, routing MUST rely on **HTTP Host headers**.
 
@@ -111,9 +105,9 @@ The operator may add temporary `/etc/hosts` entries on a client machine:
 <BOX_IP> traefik.local
 ```
 
-Traefik routers MUST use `Host()` rules for these names.
+Traefik routers should use `Host()` rules for these names.
 
-Codex MUST NOT commit `/etc/hosts` entries.
+Do not commit `/etc/hosts` entries.
 
 ---
 
@@ -167,7 +161,7 @@ Hosts MUST NOT modify Traefik behavior directly.
 
 ## 8. Validation Checklist (Traefik Only)
 
-After deployment, the operator MUST validate:
+After deployment, validate:
 
 - [ ] Host boots successfully with Traefik enabled
 - [ ] Docker starts automatically
@@ -176,7 +170,7 @@ After deployment, the operator MUST validate:
 - [ ] Ports 80 and 443 are bound by Traefik only
 - [ ] Rebooting the host restarts Traefik automatically
 
-Codex MUST NOT proceed to other services until this checklist passes.
+Do not proceed to other services until this checklist passes.
 
 ---
 
@@ -192,7 +186,7 @@ This rule is permanent.
 
 ---
 
-## 10. Summary: Mandatory Execution Order
+## 10. Summary: Recommended Execution Order
 
 1. Operator validates preconditions
 2. Repository structure is prepared
@@ -202,4 +196,4 @@ This rule is permanent.
 6. Operator validates Traefik behavior
 7. Only then may additional services be added
 
-Codex MUST NOT skip steps.
+Do not skip steps.

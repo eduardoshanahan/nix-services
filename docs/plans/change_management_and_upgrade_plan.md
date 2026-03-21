@@ -1,13 +1,11 @@
 # Change Management & Upgrade Plan
 
-> **Operator-validated plan**  
-> This document defines how changes and upgrades are introduced safely into the system.
->
-> Codex MUST NOT automate, infer, or execute operator-validated steps.
-> **Current-state note (2026-02-25)**  
-> Services are already deployed and operating. Use this plan as a rebuild-from-scratch, disaster recovery, or expansion reference unless an explicit new rollout is planned.
+This document defines how changes and upgrades are introduced safely into the
+system. The stack is already deployed; treat this as an operating and recovery
+reference rather than a one-time rollout plan.
 
-This plan governs **NixOS rebuilds**, **Docker image upgrades**, and **service configuration changes** across Raspberry Pi ARM64 boxes.
+This document governs **NixOS rebuilds**, **Docker image upgrades**, and
+**service configuration changes** across Raspberry Pi ARM64 boxes.
 
 It builds on:
 
@@ -38,7 +36,7 @@ It builds on:
 
 ## 1. Change Classification
 
-All changes MUST be classified before execution.
+All changes should be classified before execution.
 
 ### 1.1 Configuration-only changes
 
@@ -78,7 +76,7 @@ High-risk changes require additional safeguards.
 
 ---
 
-## 2. General Change Rules (MANDATORY)
+## 2. General Change Rules
 
 For *all* changes:
 
@@ -87,13 +85,13 @@ For *all* changes:
 - [ ] Change scope is documented (what/why)
 - [ ] Only one change type is applied at a time
 
-Codex MUST NOT combine unrelated changes.
+Do not combine unrelated changes.
 
 ---
 
 ## 3. Change Application Order
 
-When multiple boxes exist, changes MUST be applied in this order:
+When multiple boxes exist, changes should be applied in this order:
 
 1. Non-critical box
 2. Secondary Pi-hole box

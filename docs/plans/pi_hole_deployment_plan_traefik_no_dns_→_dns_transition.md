@@ -1,15 +1,16 @@
 # Pi-hole Deployment Plan (Traefik + No-DNS → DNS Transition)
 
-This document defines the **step-by-step implementation plan** for deploying **Pi-hole** behind **Traefik** on ARM64 NixOS boxes, starting **before DNS is active**, and then transitioning to **Pi-hole-provided DNS** once validated.
+This document defines the service-side deployment pattern for **Pi-hole**
+behind **Traefik** on ARM64 NixOS boxes, starting **before DNS is active** and
+then transitioning to **Pi-hole-provided DNS** once validated.
 
-> **Current-state note (2026-02-25)**  
-> Services are already deployed and operating. Use this plan as a rebuild-from-scratch, disaster recovery, or expansion reference unless an explicit new rollout is planned.
-> **Documentation boundary note**  
-> This document defines service-side constraints and invariants. For host-by-host operator execution during DNS cutover, use `nix-pi/docs/plans/zero_downtime_dns_migration_checklist.md`.
+The stack is already deployed; treat this as a rebuild, disaster recovery, or
+expansion reference unless a new rollout is explicitly being planned.
 
-This plan is written to be **directly executable by Codex**.
+For host-by-host operator execution during DNS cutover, use
+`nix-pi/docs/plans/zero_downtime_dns_migration_checklist.md`.
 
-Codex MUST follow this plan **in order** and MUST comply with:
+This document follows and depends on:
 
 - *Private vs Public Separation Guidelines*
 - *Architecture & Implementation Guidelines*
@@ -36,13 +37,10 @@ Codex MUST follow this plan **in order** and MUST comply with:
 
 ---
 
-## 1. Preconditions (OPERATOR-VALIDATED, MUST be true)
+## 1. Preconditions
 
-These preconditions are **not enforced by code**.
-
-Codex MUST assume they have been **manually validated by the operator** before proceeding with any Pi-hole-related implementation.
-
-Before starting Pi-hole work, Codex MUST confirm the operator has verified:
+These preconditions are **not enforced by code** and should be verified before
+starting Pi-hole work:
 
 - [ ] Traefik is deployed and stable on the target box(es)
 - [ ] Traefik owns host ports **80 and 443** (exclusively)
@@ -55,11 +53,11 @@ Before starting Pi-hole work, Codex MUST confirm the operator has verified:
 - **Port ownership**: Verify ports 80 and 443 are bound by Traefik (`ss -lntup | grep ':80\|:443'`).
 - **Reboot test**: Reboot the host and confirm Traefik is running automatically.
 
-If any item fails, STOP and fix Traefik first.
+If any item fails, fix Traefik first.
 
 ---
 
-## 2. Repository Structure (Required)
+## 2. Repository Structure
 
 Create the Pi-hole service directory:
 
@@ -70,11 +68,11 @@ services/
     pihole.nix
 ```
 
-Do not add Pi-hole logic to host files.
+Do not add Pi-hole logic to host files in this repo.
 
 ---
 
-## 3. Pi-hole Deployment Model (MANDATORY)
+## 3. Pi-hole Deployment Model
 
 ### 3.1 Ports
 
@@ -126,11 +124,11 @@ Client (not committed):
 <BOX_IP> pihole-secondary.local
 ```
 
-Traefik routers MUST use `Host()` rules for these names.
+Traefik routers should use `Host()` rules for these names.
 
 ### 4.3 Required validations (UI)
 
-Codex MUST validate:
+Validate:
 
 - [ ] Pi-hole UI loads through Traefik
 - [ ] Admin login works (credentials are not in the repo)
@@ -141,11 +139,11 @@ Do not proceed until this passes.
 
 ---
 
-## 5. Secrets and Configuration Handling (MANDATORY)
+## 5. Secrets and Configuration Handling
 
 Pi-hole requires sensitive configuration (e.g., admin password).
 
-Codex MUST ensure:
+Ensure:
 
 - No secrets are committed
 - Compose references external secret paths only
@@ -167,7 +165,7 @@ Forbidden:
 
 ## 6. NixOS Ownership: systemd-managed Compose
 
-The `services/pihole/pihole.nix` module MUST:
+The `services/pihole/pihole.nix` module should:
 
 - Ensure required directories exist via tmpfiles
 - Deploy the compose file to a deterministic runtime location
@@ -185,7 +183,7 @@ Manual docker commands are forbidden.
 
 ### 7.1 Host-level enablement
 
-Codex MUST enable Pi-hole by importing the module in the correct host files.
+Enable Pi-hole by importing the module in the correct host files.
 
 Primary host imports:
 
@@ -201,7 +199,7 @@ Secondary host imports:
 
 ### 7.2 Role-specific values
 
-Any role-specific values (primary vs secondary) MUST be:
+Any role-specific values (primary vs secondary) should be:
 
 - Non-secret
 - Minimal
@@ -221,7 +219,7 @@ Do not hardcode real domains.
 
 ### 8.1 Preconditions for DNS cutover
 
-Before making Pi-hole the network DNS, Codex MUST verify:
+Before making Pi-hole the network DNS, verify:
 
 - [ ] Port 53 is available and not conflicted (no other resolver binding 53)
 - [ ] Pi-hole DNS service is responding locally
@@ -229,7 +227,7 @@ Before making Pi-hole the network DNS, Codex MUST verify:
 
 ### 8.2 Cutover procedure (operational, not code)
 
-Codex MUST document (but NOT automate) the DNS cutover steps:
+Document, but do not automate, the DNS cutover steps:
 
 1. Configure router/DHCP to advertise two DNS servers:
    - Primary Pi-hole IP
@@ -238,11 +236,11 @@ Codex MUST document (but NOT automate) the DNS cutover steps:
 3. Roll out the DHCP change
 4. Verify clients receive the new DNS settings
 
-Codex MUST NOT commit router configuration.
+Do not commit router configuration.
 
 ### 8.3 Post-cutover validation
 
-Codex MUST validate:
+Validate:
 
 - [ ] Client DNS queries succeed using primary
 - [ ] Client DNS queries succeed using secondary
@@ -255,7 +253,7 @@ Codex MUST validate:
 
 Once Pi-hole is active, you may transition away from client `/etc/hosts`.
 
-Codex MUST ensure:
+Ensure:
 
 - Traefik routing rules do not require host file changes
 - Only DNS entries change
@@ -298,9 +296,9 @@ If Pi-hole fails to start after reboot, tighten systemd dependencies:
 
 ---
 
-## 11. Deliverables (What Codex Must Produce)
+## 11. Deliverables
 
-Codex MUST produce:
+This work should produce:
 
 - `services/pihole/docker-compose.yml` (no secrets)
 - `services/pihole/pihole.nix` (systemd-managed compose)
@@ -312,7 +310,7 @@ Codex MUST produce:
 
 ---
 
-## 12. Summary: Mandatory Execution Order
+## 12. Summary: Recommended Execution Order
 
 1. Verify Traefik stability
 2. Implement Pi-hole module + compose
@@ -323,6 +321,6 @@ Codex MUST produce:
 7. Validate primary/secondary failover
 8. Transition naming from `/etc/hosts` to DNS (optional)
 
-Codex MUST NOT skip steps.
+Do not skip steps.
 
 Refer to [Zero‑Downtime Pi‑hole DHCP Migration Checklist](./zero_downtime_pi_hole_dhcp_migration_checklist.md).

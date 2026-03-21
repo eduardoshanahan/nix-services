@@ -1,57 +1,46 @@
 # Architecture & Implementation Guidelines
 
-This document defines the **mandatory architectural model** for this repository and provides concrete implementation guidance for both **humans** and **Codex / AI-assisted development**.
-
-Codex MUST follow these rules when adding hosts, services, or Docker Compose–based applications.
+This document defines the **mandatory architectural model** for this
+repository and provides concrete implementation guidance for shared service
+modules and their public documentation.
 
 ---
 
 ## 1. Architectural Model (Authoritative)
 
-This repository follows a **single-repository, multi-host, modular-service** architecture.
+This repository is the **shared service layer** in a multi-repository homelab
+architecture.
 
 The core rules are:
 
-- ✅ **One repository** for all hosts and services
-- ✅ **Hosts are thin selectors** (they choose what runs)
+- ✅ **Consumer repos choose placement** (they decide what runs where)
 - ✅ **Services are reusable modules** (they define how things run)
+- ✅ **Public docs stay host-agnostic**
 - ✅ **Docker Compose is owned and orchestrated by NixOS**
 
-No alternative architecture (repo-per-host, repo-per-app, imperative Docker usage) is allowed.
+Imperative Docker usage and host-owned service internals are not allowed here.
 
 ---
 
 ## 2. Separation of Responsibilities
 
-### 2.1 Hosts
+### 2.1 Consumer Repositories
 
-Hosts describe **identity and intent**, not implementation details.
+Consumer repositories such as `nix-pi` describe **identity and intent**, not
+shared service implementation details.
 
-Hosts:
+Consumer repos:
 
-- Import profiles and services
-- Set minimal host-specific values (hostname, role)
-- MUST NOT contain service logic
-- MUST NOT contain Docker Compose definitions
-
-Example (host file):
-
-```nix
-{
-  imports = [
-    ../services/pihole.nix
-    ../services/traefik.nix
-  ];
-}
-```
-
-A host file should remain readable at a glance.
+- import service modules from `nix-services`
+- set minimal host-specific values (hostname, role, private paths)
+- MUST NOT copy shared service logic into host files
+- MUST own hardware, bootstrap, and secret provisioning
 
 ---
 
-### 2.2 Profiles
+### 2.2 Host-Owned Common Layers
 
-Profiles group **cross-cutting concerns** shared by many hosts.
+Cross-cutting host concerns belong in the owning consumer repo, not here.
 
 Examples:
 
@@ -60,11 +49,8 @@ Examples:
 - Common users and SSH settings
 - Logging, time sync, firewall defaults
 
-Profiles:
-
-- MAY enable Docker
-- MUST NOT define application-specific services
-- SHOULD be composable and reusable
+These layers may enable prerequisites for services, but they MUST NOT redefine
+shared service behavior from this repository.
 
 ---
 
@@ -201,9 +187,9 @@ Recommended top-level layout:
 
 ```text
 flake.nix
-hosts/
-profiles/
+lib/
 services/
+docs/
 ```
 
 Naming rules:
@@ -218,7 +204,7 @@ Naming rules:
 
 This architecture intentionally supports:
 
-- Adding more hosts without duplication
+- Adding more consumers without duplicating shared service logic
 - Moving selected services to Kubernetes later
 - Keeping edge / stateful services outside K8s
 
@@ -228,8 +214,7 @@ Codex MUST NOT introduce patterns that block future migration.
 
 ## 9. Summary (Non-Negotiable Rules)
 
-- One repo only
-- Hosts select, services implement
+- Consumer repos select, services implement
 - Docker Compose is declarative and supervised
 - No secrets in repo
 - No imperative Docker usage
