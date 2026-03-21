@@ -58,6 +58,9 @@ This module deploys Vikunja behind Traefik using a checked-in Docker Compose fil
 - `VIKUNJA_SERVICE_PUBLICURL` is derived from `hostname` and `tls`.
 - Auth settings are rendered to `/etc/vikunja/config.yml`.
 - When OpenID is enabled, client credentials are read from runtime secret files mounted into the container.
+- Private PKI trust is provided from the host runtime path
+  `/etc/ssl/certs/homelab-root-ca.crt`; the public repo does not track the CA
+  certificate itself.
 
 ## Postgres Example
 

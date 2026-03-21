@@ -112,7 +112,6 @@ in {
 
     environment.etc."${serviceName}/docker-compose.yml".source = ./docker-compose.yml;
     environment.etc."${serviceName}/config.yml".source = yamlFormat.generate "${serviceName}-config.yml" configYaml;
-    environment.etc."${serviceName}/homelab-root-ca.crt".source = ./certs/homelab-root-ca.crt;
 
     systemd.services.${serviceName} = {
       description = "Vikunja (Docker Compose)";
@@ -124,7 +123,6 @@ in {
       restartTriggers = [
         config.environment.etc."${serviceName}/docker-compose.yml".source
         config.environment.etc."${serviceName}/config.yml".source
-        config.environment.etc."${serviceName}/homelab-root-ca.crt".source
       ];
       startLimitBurst = 3;
       startLimitIntervalSec = 300;
