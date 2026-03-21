@@ -1,11 +1,17 @@
 # `records/`
 
-This directory holds session continuity and investigation notes that are worth
-preserving but are not canonical policy docs.
+This directory is intentionally pointer-only in the public repo.
 
-Use these files for historical context, follow-up work, and rationale recovery.
-Do not treat them as a substitute for:
+Private continuity notes, handoffs, investigation summaries, and migration
+records now live in:
+
+- `../../nix-services-private/records/`
+
+Do not commit session notes or free-form operational records here.
+
+Use the public repo for stable long-term documentation only:
 
 - `../services/*/README.md`
 - `../docs/policy/`
-- host-owned runtime truth in `../../nix-pi/docs/`
+- `../docs/plans/`
+- `../docs/recovery/`

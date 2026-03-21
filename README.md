@@ -33,9 +33,6 @@ documentation is split by responsibility:
 - `nix-pi` also owns the canonical register of intentional host runtime
   divergences from shared service defaults.
 
-For the current ownership matrix and first contradiction register, see:
-`records/documentation_unification_block_1.md`.
-
 For the ongoing documentation sync gate, see:
 `docs/policy/DOC_SYNC_CHECKLIST.md`.
 
@@ -58,7 +55,7 @@ Quick documentation pointers:
 - Documentation sync gate for both repos: `docs/policy/DOC_SYNC_CHECKLIST.md`
 - Stable shared policy docs: `docs/policy/`
 - Shared rollout/runbook docs: `docs/plans/`, `docs/recovery/`
-- Session continuity notes: `records/`
+- Private continuity notes and handoffs: sibling repo `../nix-services-private/records/`
 - Local documentation index: `DOCUMENTATION_INDEX.md`
 - Service behavior/options/operations: `nix-services` -> `services/*/README.md`
   and service plans in this repository.
@@ -108,12 +105,9 @@ Current operating model:
 
 - runtime secrets stay on `/run/secrets/...`
 - host-specific private wiring stays in `nix-pi` / `nix-pi-private`
-- shared service docs may point to host-owned divergences, but the shared repo
-  itself remains publicly evaluable without sibling private inputs
-
-Audit record:
-
-- `records/NIX_SERVICES_PRIVATE_COMPANION_AUDIT_2026-03-21.md`
+- private continuity and handoff notes now live in `../nix-services-private`
+- the shared repo itself remains publicly evaluable without sibling private
+  inputs
 
 ## Pre-commit Hooks (via `prek`)
 

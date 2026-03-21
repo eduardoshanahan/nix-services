@@ -35,15 +35,16 @@ Recovery/runbook docs live in:
 
 - `docs/recovery/`
 
-## Session Continuity And Investigation Notes
+## Private Continuity Notes
 
-- `records/documentation_unification_block_1.md`
-- `records/SERVICE_INVESTIGATION_CONTINUATION_2026-03-18.md`
-- `records/ghost_internal_blog_session_handoff_2026-02-27.md`
-- `docs/plans/synology_monitoring_logs_plan.md`
+Private session continuity notes, handoffs, and investigation records live in:
 
-These preserve verified context across sessions. They are not a substitute for
-service READMEs or host-owned runtime-difference docs in `nix-pi`.
+- `../nix-services-private/records/`
+
+These are intentionally no longer part of the public documentation set.
+
+`docs/plans/synology_monitoring_logs_plan.md` remains here because it is a
+sanitized long-term planning document, not a free-form handoff note.
 
 ## Service-Specific Truth
 
@@ -70,7 +71,7 @@ For host-owned Uptime Kuma monitor exceptions:
 - `docs/plans/` and `docs/recovery/`
   - rollout, expansion, and recovery references
 - `records/`
-  - session continuity and investigation notes
+  - pointer-only reminder that continuity notes now live in the private repo
 - `services/*/README.md`
   - shared service behavior, options, and service-local operations
 - `../nix-pi/docs/policy/HOST_RUNTIME_DIVERGENCES.md`

@@ -39,11 +39,9 @@ When working in `nix-services`, read in this order:
    - `services/*/render.nix`
    - `services/*/options.nix`
    - `services/*/scripts.nix`
-6. session-continuity docs if the task touches prior investigation or rollout work:
-   - `records/SERVICE_INVESTIGATION_CONTINUATION_2026-03-18.md`
-   - `records/ghost_internal_blog_session_handoff_2026-02-27.md`
-   - `records/documentation_unification_block_1.md`
-   - `docs/plans/synology_monitoring_logs_plan.md`
+6. if the task touches prior investigation or rollout work:
+   - read stable public plans in `docs/plans/`
+   - read matching private continuity notes in `../nix-services-private/records/`
 
 If a local doc points to `nix-pi` for host truth, follow the pointer instead of
 duplicating host behavior here.
@@ -81,7 +79,7 @@ here. If it is a one-host exception, it probably belongs in `nix-pi`.
 - `docs/plans/`: rollout and expansion plans
 - `docs/recovery/`: recovery and rebuild runbooks
 - `docs/prompts/`: historical prompt/context files
-- `records/`: session continuity and investigation notes
+- `records/`: pointer-only directory; private continuity notes live in `../nix-services-private/records/`
 
 Common service shapes in this repo:
 
