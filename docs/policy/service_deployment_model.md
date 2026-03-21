@@ -61,7 +61,6 @@ Example (in `nix-pi`):
 ```nix
 {
   imports = [
-    ./profiles/edge-box.nix
     nix-services.services.traefik
     nix-services.services.pihole
   ];

@@ -39,7 +39,6 @@ Example (host file):
 ```nix
 {
   imports = [
-    ../profiles/edge-box.nix
     ../services/pihole.nix
     ../services/traefik.nix
   ];

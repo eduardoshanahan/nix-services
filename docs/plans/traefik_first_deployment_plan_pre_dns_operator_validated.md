@@ -156,7 +156,6 @@ Example:
 ```nix
 {
   imports = [
-    ../profiles/edge-box.nix
     ../services/traefik/traefik.nix
   ];
 }
