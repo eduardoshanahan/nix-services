@@ -110,10 +110,16 @@ Common service shapes in this repo:
 ## Dev Shell And Git
 
 - Prefer running Git commands from `nix develop`.
+- At the start of a session, enter `nix develop`, run `git fetch origin`, then
+  `git pull --rebase origin main`, and review `git status --short --branch`
+  before editing.
 - This repo expects pre-commit tooling from the dev shell; if hooks fail because
   tools are missing, the fix is usually to enter `nix develop`, not to skip hooks.
 - Do not bypass hooks by default just because the host environment lacks the
   required binaries.
+- When the task is complete, commit and push the finished changes to `origin`
+  instead of leaving them only in the local checkout unless the user asks for
+  that.
 
 ## Implementation Patterns To Preserve
 
