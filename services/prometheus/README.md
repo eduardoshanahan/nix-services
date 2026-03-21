@@ -69,6 +69,10 @@ The module ships a baseline `homelab-core` rule group:
 - `services.prometheusCompose.scrape.unpollerTargets`
 - `services.prometheusCompose.scrape.giteaTargets`
 - `services.prometheusCompose.scrape.grafanaTargets`
+- `services.prometheusCompose.scrape.kubeApiServerMetricsTargets`
+- `services.prometheusCompose.scrape.kubeApiServerMetricsScheme`
+- `services.prometheusCompose.scrape.kubeApiServerMetricsPath`
+- `services.prometheusCompose.scrape.kubeApiServerMetricsTlsInsecureSkipVerify`
 - `services.prometheusCompose.scrape.alertmanagerTargets`
 - `services.prometheusCompose.alerting.enable`
 - `services.prometheusCompose.alerting.targets`

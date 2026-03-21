@@ -372,6 +372,36 @@
         '';
       };
 
+      kubeApiServerMetricsTargets = lib.mkOption {
+        type = lib.types.listOf lib.types.str;
+        default = [];
+        example = ["kube-state-metrics.internal.example:443"];
+        description = "Kubernetes API server metrics proxy targets (`host:port`) to scrape.";
+      };
+
+      kubeApiServerMetricsScheme = lib.mkOption {
+        type = lib.types.enum ["http" "https"];
+        default = "http";
+        example = "https";
+        description = "URL scheme for job `kube-apiserver-metrics`.";
+      };
+
+      kubeApiServerMetricsPath = lib.mkOption {
+        type = lib.types.str;
+        default = "/metrics";
+        example = "/apiserver-metrics";
+        description = "Metrics path for job `kube-apiserver-metrics`.";
+      };
+
+      kubeApiServerMetricsTlsInsecureSkipVerify = lib.mkOption {
+        type = lib.types.bool;
+        default = false;
+        description = ''
+          Whether Prometheus should skip TLS verification for job
+          `kube-apiserver-metrics`.
+        '';
+      };
+
       vikunjaMetricsPath = lib.mkOption {
         type = lib.types.str;
         default = "/api/v1/metrics";

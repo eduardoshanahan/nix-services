@@ -75,6 +75,39 @@
       ++ [""]
     );
 
+  optionalJobLinesWithSchemeAndMetricsPath = {
+    name,
+    metricsPath,
+    targets,
+    scheme,
+    tlsInsecureSkipVerify ? false,
+    dropUpMetric ? false,
+  }:
+    lib.optionals (targets != []) (
+      [
+        "  - job_name: \"${name}\""
+        "    scheme: ${scheme}"
+        "    metrics_path: ${metricsPath}"
+        "    static_configs:"
+        "      - targets:"
+      ]
+      ++ (mkTargetLines {
+        inherit targets;
+        indent = "        ";
+      })
+      ++ lib.optionals (scheme == "https") [
+        "    tls_config:"
+        "      insecure_skip_verify: ${if tlsInsecureSkipVerify then "true" else "false"}"
+      ]
+      ++ lib.optionals dropUpMetric [
+        "    metric_relabel_configs:"
+        "      - source_labels: [__name__]"
+        "        regex: up"
+        "        action: drop"
+      ]
+      ++ [""]
+    );
+
   synologySnmpJobLines = lib.optionals (cfg.scrape.synologySnmpTargets != [] && cfg.scrape.synologySnmpExporterAddress != null) (
     [
       "  - job_name: \"synology-snmp\""
@@ -307,6 +340,13 @@
         targets = cfg.scrape.kubeStateMetricsTargets;
         scheme = cfg.scrape.kubeStateMetricsScheme;
         tlsInsecureSkipVerify = cfg.scrape.kubeStateMetricsTlsInsecureSkipVerify;
+      })
+      ++ (optionalJobLinesWithSchemeAndMetricsPath {
+        name = "kube-apiserver-metrics";
+        targets = cfg.scrape.kubeApiServerMetricsTargets;
+        scheme = cfg.scrape.kubeApiServerMetricsScheme;
+        metricsPath = cfg.scrape.kubeApiServerMetricsPath;
+        tlsInsecureSkipVerify = cfg.scrape.kubeApiServerMetricsTlsInsecureSkipVerify;
       })
       ++ (optionalJobLines {
         name = "alertmanager";

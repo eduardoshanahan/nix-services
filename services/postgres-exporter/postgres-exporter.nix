@@ -37,7 +37,7 @@
   composeText =
     let
       commandBlock =
-        lib.concatStringsSep "\n" (map (arg: "      - ${arg}") commandArgs);
+        lib.concatStringsSep "\n" (map (arg: "            - ${arg}") commandArgs);
     in ''
       services:
         postgres-exporter:
