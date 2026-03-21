@@ -63,7 +63,6 @@ hosts/
 profiles/
 services/
   traefik/
-secrets/        # empty placeholder
 ```
 
 No Traefik logic may exist outside `services/traefik/`.

@@ -205,7 +205,6 @@ flake.nix
 hosts/
 profiles/
 services/
-secrets/        # empty placeholder
 ```
 
 Naming rules:
