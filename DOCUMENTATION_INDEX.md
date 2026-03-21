@@ -46,6 +46,10 @@ These are intentionally no longer part of the public documentation set.
 `docs/plans/synology_monitoring_logs_plan.md` remains here because it is a
 sanitized long-term planning document, not a free-form handoff note.
 
+Historical prompt/context artifacts also live privately under:
+
+- `../nix-services-private/records/prompts/`
+
 ## Service-Specific Truth
 
 For actual module behavior and options, prefer:
