@@ -213,6 +213,11 @@
       exit 1
     fi
 
+    if [[ "$(${jqBin} -r '(.public.initialized // false)' "$settings_path")" != "true" ]]; then
+      log "settings.json is not initialized yet; skipping reconciliation"
+      exit 0
+    fi
+
     update_array "radarr" "$radarr_json"
     update_array "sonarr" "$sonarr_json"
 
@@ -475,6 +480,7 @@ in {
           "${pkgs.runtimeShell} -c 'test -s ${composeDir}/docker-compose.yml'"
           "${pkgs.runtimeShell} -c 'test -s /etc/ssl/certs/homelab-root-ca.crt'"
           runtimeEnvScript
+          "${pkgs.runtimeShell} -c 'for i in $(seq 1 60); do if exec 3<>/dev/tcp/${cfg.database.postgres.host}/${toString cfg.database.postgres.port}; then exec 3>&-; exec 3<&-; exit 0; fi; sleep 2; done; echo \"seerr: postgres is not ready at ${cfg.database.postgres.host}:${toString cfg.database.postgres.port}\" >&2; exit 1'"
           "${pkgs.runtimeShell} -c 'for i in $(seq 1 30); do ${dockerBin} info >/dev/null 2>&1 && exit 0; sleep 1; done; echo \"seerr: docker daemon is not ready\" >&2; exit 1'"
           "${pkgs.runtimeShell} -c '${dockerBin} compose config >/dev/null'"
           "${pkgs.runtimeShell} -c '${dockerBin} network inspect ${cfg.network} >/dev/null 2>&1 || ${dockerBin} network create ${cfg.network}'"

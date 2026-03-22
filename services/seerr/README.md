@@ -10,6 +10,9 @@ Seerr is packaged here as a Docker Compose-backed NixOS module.
 - The PostgreSQL password is read from
   `services.seerr.database.postgres.passwordFile` and rendered into
   `/run/secrets/seerr.env` at service start.
+- Startup now waits for PostgreSQL to accept TCP connections before launching
+  the container, which helps avoid first-run config resets during host-wide
+  Docker restarts.
 - The module mounts `/etc/ssl/certs/homelab-root-ca.crt` into the container and
   sets `NODE_EXTRA_CA_CERTS` so Seerr can talk to internal HTTPS services such
   as `https://jellyfin.<lab-domain>/`.
@@ -23,6 +26,9 @@ Operational notes:
   startup; this module ensures the container can trust the homelab TLS chain.
 - PostgreSQL must already contain the `seerr` role and database before the
   service starts.
+- Declarative integration reconciliation only runs when Seerr's
+  `settings.json` is already initialized, so a brand-new instance is left for
+  normal first-time setup.
 - Verified deployed shape on 2026-03-11:
   - URL: `https://seerr.internal.example/`
   - Postgres endpoint: `postgres.internal.example:5433`
