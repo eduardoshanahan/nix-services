@@ -203,7 +203,8 @@
           )' \
         "$settings_path" > "$tmp"
 
-      chmod 0600 "$tmp"
+      chown 1000:1000 "$tmp"
+      chmod 0640 "$tmp"
       mv -f "$tmp" "$settings_path"
       log "updated $key entries in $settings_path"
     }
@@ -251,7 +252,8 @@
             )' \
           "$settings_path" > "$tmp"
 
-        chmod 0600 "$tmp"
+        chown 1000:1000 "$tmp"
+        chmod 0640 "$tmp"
         mv -f "$tmp" "$settings_path"
         log "updated jellyfin settings in $settings_path"
       fi
