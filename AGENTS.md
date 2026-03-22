@@ -95,6 +95,9 @@ Common service shapes in this repo:
 - Assume target hosts are `aarch64-linux` unless explicitly told otherwise.
 - Keep secrets, tokens, private keys, real domains, and real internal IPs out of Git.
 - Public/shared files must stay sanitized and safe to publish.
+- Private continuity notes, environment-specific operator workflow, and other
+  sensitive operational details belong in `../nix-services-private/records/`,
+  not in public docs or records here.
 - Services are imported by consumers; this repo does not deploy to hosts directly.
 - Docker Compose is always owned by NixOS systemd units, never by manual `docker compose up`.
 - Traefik permanently owns host ports `80` and `443`.
