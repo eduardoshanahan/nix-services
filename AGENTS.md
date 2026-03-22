@@ -117,6 +117,10 @@ Common service shapes in this repo:
 - When the task is complete, commit and push the finished changes to `origin`
   instead of leaving them only in the local checkout unless the user asks for
   that.
+- If the task changes service behavior, the work is not finished at commit/push
+  time: update the owning `nix-pi` or `nix-cluster` consumer as needed, do the
+  full host rebuild, and verify on the live host that the fix still works after
+  the rebuild.
 
 ## Implementation Patterns To Preserve
 
