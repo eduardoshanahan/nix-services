@@ -109,6 +109,9 @@
               - "/etc/traefik/tls.yml:/etc/traefik/tls.yml:ro"
               - "/run/secrets:/run/secrets:ro"
 
+            logging:
+              driver: "json-file"
+
             networks:
               - traefik
 

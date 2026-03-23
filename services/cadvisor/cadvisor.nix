@@ -44,6 +44,18 @@ in {
       description = "cAdvisor housekeeping interval.";
     };
 
+    disableMetrics = lib.mkOption {
+      type = lib.types.str;
+      default = "";
+      description = ''
+        Comma-separated list of metric collectors to disable (passed as
+        `--disable_metrics`). Useful on resource-constrained hosts to skip
+        collectors that are expensive or unsupported (e.g. `perf_event` on ARM).
+        Empty string means all default collectors are enabled.
+      '';
+      example = "perf_event,referenced_memory,resctrl,cpu_topology,hugetlb";
+    };
+
     image = {
       repository = lib.mkOption {
         type = lib.types.str;
@@ -113,6 +125,7 @@ in {
           "CADVISOR_LISTEN_PORT=${toString cfg.listenPort}"
           "CADVISOR_DOCKER_DATA_ROOT=${cfg.dockerDataRoot}"
           "CADVISOR_HOUSEKEEPING_INTERVAL=${cfg.housekeepingInterval}"
+          "CADVISOR_DISABLE_METRICS=${cfg.disableMetrics}"
           "CADVISOR_IMAGE_REPOSITORY=${cfg.image.repository}"
           "CADVISOR_IMAGE_TAG=${cfg.image.tag}"
         ];

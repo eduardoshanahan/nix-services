@@ -4,8 +4,16 @@ services:
     container_name: "${CADVISOR_CONTAINER_NAME}"
     restart: unless-stopped
     privileged: true
-    command:
-      - "--housekeeping_interval=${CADVISOR_HOUSEKEEPING_INTERVAL}"
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        args="--housekeeping_interval=${CADVISOR_HOUSEKEEPING_INTERVAL}"
+        disable_metrics="${CADVISOR_DISABLE_METRICS}"
+        if [ -n "$$disable_metrics" ]; then
+          args="$$args --disable_metrics=$$disable_metrics"
+        fi
+        exec /usr/bin/cadvisor $$args
     ports:
       - "${CADVISOR_LISTEN_ADDRESS}:${CADVISOR_LISTEN_PORT}:8080"
     volumes:

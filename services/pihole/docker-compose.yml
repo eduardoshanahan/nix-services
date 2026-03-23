@@ -27,6 +27,9 @@ services:
       - "traefik.http.routers.pihole.tls=${PIHOLE_TLS}"
 
 
+    logging:
+      driver: "json-file"
+
     networks:
       - traefik
 
