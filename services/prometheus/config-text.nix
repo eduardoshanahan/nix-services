@@ -108,6 +108,17 @@
       ++ [""]
     );
 
+  extraStaticJobLines = lib.concatMap (job:
+    optionalJobLinesWithSchemeAndMetricsPath {
+      name = job.jobName;
+      metricsPath = job.metricsPath;
+      targets = job.targets;
+      scheme = job.scheme;
+      tlsInsecureSkipVerify = job.tlsInsecureSkipVerify;
+      dropUpMetric = job.dropUpMetric;
+    }
+  ) cfg.scrape.extraStaticJobs;
+
   synologySnmpJobLines = lib.optionals (cfg.scrape.synologySnmpTargets != [] && cfg.scrape.synologySnmpExporterAddress != null) (
     [
       "  - job_name: \"synology-snmp\""
@@ -352,6 +363,7 @@
         name = "alertmanager";
         targets = cfg.scrape.alertmanagerTargets;
       })
+      ++ extraStaticJobLines
     )
     + "\n";
 

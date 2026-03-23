@@ -421,6 +421,65 @@
         default = ["alertmanager:9093"];
         description = "Alertmanager targets (`host:port`) to scrape.";
       };
+
+      extraStaticJobs = lib.mkOption {
+        default = [];
+        example = [
+          {
+            jobName = "minio";
+            targets = ["minio.internal.example:443"];
+            scheme = "https";
+            metricsPath = "/minio/v2/metrics/cluster";
+          }
+        ];
+        type = lib.types.listOf (lib.types.submodule {
+          options = {
+            jobName = lib.mkOption {
+              type = lib.types.str;
+              example = "minio";
+              description = "Prometheus job name.";
+            };
+
+            targets = lib.mkOption {
+              type = lib.types.listOf lib.types.str;
+              default = [];
+              example = ["minio.internal.example:443"];
+              description = "Static targets (`host:port`) for this scrape job.";
+            };
+
+            scheme = lib.mkOption {
+              type = lib.types.enum ["http" "https"];
+              default = "http";
+              example = "https";
+              description = "URL scheme for this scrape job.";
+            };
+
+            metricsPath = lib.mkOption {
+              type = lib.types.str;
+              default = "/metrics";
+              example = "/minio/v2/metrics/cluster";
+              description = "Metrics path for this scrape job.";
+            };
+
+            tlsInsecureSkipVerify = lib.mkOption {
+              type = lib.types.bool;
+              default = false;
+              description = "Whether Prometheus should skip TLS verification for this scrape job.";
+            };
+
+            dropUpMetric = lib.mkOption {
+              type = lib.types.bool;
+              default = false;
+              description = "Whether to drop the synthetic `up` metric for this job.";
+            };
+          };
+        });
+        description = ''
+          Additional static scrape jobs rendered directly into `prometheus.yml`.
+          Use this for internal services that expose Prometheus metrics on a
+          custom path without needing a dedicated shared-module option.
+        '';
+      };
     };
 
     alerting = {

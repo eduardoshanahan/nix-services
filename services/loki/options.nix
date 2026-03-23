@@ -37,6 +37,15 @@ in {
       description = "Loki retention period.";
     };
 
+    memLimit = lib.mkOption {
+      type = lib.types.str;
+      default = "0";
+      description = ''
+        Docker memory limit for the Loki container.
+        Use "0" for no limit, or a size string such as "256m" or "1g".
+      '';
+    };
+
     image = {
       repository = lib.mkOption {
         type = lib.types.str;

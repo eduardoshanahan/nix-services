@@ -74,6 +74,7 @@ The module ships a baseline `homelab-core` rule group:
 - `services.prometheusCompose.scrape.kubeApiServerMetricsPath`
 - `services.prometheusCompose.scrape.kubeApiServerMetricsTlsInsecureSkipVerify`
 - `services.prometheusCompose.scrape.alertmanagerTargets`
+- `services.prometheusCompose.scrape.extraStaticJobs`
 - `services.prometheusCompose.alerting.enable`
 - `services.prometheusCompose.alerting.targets`
 - `services.prometheusCompose.tls`
@@ -154,6 +155,14 @@ services.prometheusCompose = {
     ];
     giteaTargets = [
       "forge.internal.example:3000"
+    ];
+    extraStaticJobs = [
+      {
+        jobName = "minio";
+        targets = [ "minio.internal.example:443" ];
+        scheme = "https";
+        metricsPath = "/minio/v2/metrics/cluster";
+      }
     ];
   };
 

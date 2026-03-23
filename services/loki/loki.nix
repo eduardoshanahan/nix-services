@@ -80,6 +80,7 @@ in {
           "LOKI_LISTEN_ADDRESS=${cfg.listenAddress}"
           "LOKI_HTTP_PORT=${toString cfg.httpPort}"
           "LOKI_DATA_DIR=${cfg.dataDir}"
+          "LOKI_MEM_LIMIT=${cfg.memLimit}"
         ];
 
         ExecStartPre = [

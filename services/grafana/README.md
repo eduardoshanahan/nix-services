@@ -111,6 +111,7 @@ With `services.grafanaCompose.provisioning.dashboards.enableStarter = true`, the
 
 - Postgres / Redis / MySQL exporter connectivity and core runtime panels.
 - Dolt SQL server metrics and concurrency panels.
+- MinIO shared object-storage container-presence panels from `cadvisor`.
 - Shared-infra DB condition counters (healthy `0` -> `OK`, non-zero -> issue).
 - Compact aggregate summary cards:
   - `Any Exporter Down`

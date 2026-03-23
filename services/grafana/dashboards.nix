@@ -2121,7 +2121,7 @@
     id = null;
     uid = "shared-infra";
     title = "Shared Infra";
-    tags = ["homelab" "shared-infra" "postgres" "redis" "mysql" "mongo" "dolt"];
+    tags = ["homelab" "shared-infra" "postgres" "redis" "mysql" "mongo" "dolt" "minio"];
     timezone = "browser";
     schemaVersion = 39;
     version = 1;
@@ -3813,6 +3813,292 @@
           defaults = {
             min = 0;
             unit = "s";
+          };
+          overrides = [];
+        };
+      }
+      {
+        id = 39;
+        type = "stat";
+        title = "MinIO Metrics Scrape Up";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 8;
+          x = 0;
+          y = 98;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+        };
+        fieldConfig = {
+          defaults = {
+            decimals = 0;
+            min = 0;
+            max = 1;
+            mappings = [
+              {
+                type = "value";
+                options = {
+                  "0" = {
+                    text = "NOT SEEN";
+                  };
+                  "1" = {
+                    text = "SEEN";
+                  };
+                };
+              }
+            ];
+            thresholds = {
+              mode = "absolute";
+              steps = [
+                {
+                  color = "red";
+                  value = null;
+                }
+                {
+                  color = "green";
+                  value = 1;
+                }
+              ];
+            };
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "max(up{job=\"minio\"}) or vector(0)";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 40;
+        type = "stat";
+        title = "MinIO Cluster Health";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 8;
+          x = 8;
+          y = 98;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+        };
+        fieldConfig = {
+          defaults = {
+            decimals = 0;
+            min = 0;
+            max = 1;
+            mappings = [
+              {
+                type = "value";
+                options = {
+                  "0" = {
+                    text = "UNHEALTHY";
+                  };
+                  "1" = {
+                    text = "HEALTHY";
+                  };
+                };
+              }
+            ];
+            thresholds = {
+              mode = "absolute";
+              steps = [
+                {
+                  color = "red";
+                  value = null;
+                }
+                {
+                  color = "green";
+                  value = 1;
+                }
+              ];
+            };
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "max(minio_cluster_health_status{job=\"minio\"}) or vector(0)";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 41;
+        type = "stat";
+        title = "MinIO Capacity Used";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 6;
+          w = 8;
+          x = 16;
+          y = 98;
+        };
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions = {
+            calcs = ["lastNotNull"];
+            fields = "";
+            values = false;
+          };
+        };
+        fieldConfig = {
+          defaults = {
+            decimals = 1;
+            min = 0;
+            max = 100;
+            unit = "percent";
+            thresholds = {
+              mode = "absolute";
+              steps = [
+                {
+                  color = "green";
+                  value = null;
+                }
+                {
+                  color = "yellow";
+                  value = 70;
+                }
+                {
+                  color = "red";
+                  value = 90;
+                }
+              ];
+            };
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "(100 * (1 - (max(minio_cluster_capacity_usable_free_bytes{job=\"minio\"}) / max(minio_cluster_capacity_usable_total_bytes{job=\"minio\"})))) or vector(0)";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 42;
+        type = "timeseries";
+        title = "MinIO S3 Requests/s";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 0;
+          y = 104;
+        };
+        targets = [
+          {
+            expr = "sum(rate(minio_s3_requests_incoming_total{job=\"minio\"}[5m]))";
+            legendFormat = "incoming";
+            refId = "A";
+          }
+          {
+            expr = "sum(rate(minio_s3_requests_rejected_auth_total{job=\"minio\"}[5m]))";
+            legendFormat = "rejected auth";
+            refId = "B";
+          }
+          {
+            expr = "sum(rate(minio_s3_requests_rejected_invalid_total{job=\"minio\"}[5m]))";
+            legendFormat = "rejected invalid";
+            refId = "C";
+          }
+        ];
+        fieldConfig = {
+          defaults = {
+            min = 0;
+            unit = "reqps";
+          };
+          overrides = [];
+        };
+      }
+      {
+        id = 43;
+        type = "timeseries";
+        title = "MinIO S3 Traffic";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 12;
+          y = 104;
+        };
+        targets = [
+          {
+            expr = "sum(rate(minio_s3_traffic_received_bytes{job=\"minio\"}[5m]))";
+            legendFormat = "received";
+            refId = "A";
+          }
+          {
+            expr = "sum(rate(minio_s3_traffic_sent_bytes{job=\"minio\"}[5m]))";
+            legendFormat = "sent";
+            refId = "B";
+          }
+        ];
+        fieldConfig = {
+          defaults = {
+            min = 0;
+            unit = "Bps";
+          };
+          overrides = [];
+        };
+      }
+      {
+        id = 44;
+        type = "timeseries";
+        title = "MinIO Process Memory";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 24;
+          x = 0;
+          y = 112;
+        };
+        targets = [
+          {
+            expr = "max by (server) (minio_node_process_resident_memory_bytes{job=\"minio\"})";
+            legendFormat = "{{server}}";
+            refId = "A";
+          }
+        ];
+        fieldConfig = {
+          defaults = {
+            min = 0;
+            unit = "bytes";
           };
           overrides = [];
         };
