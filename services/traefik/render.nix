@@ -7,6 +7,7 @@
   httpToHttpsRedirectEnabled = cfg.httpToHttpsRedirect;
   metricsEnabled = cfg.metrics.enable;
   plainHttpEnabled = cfg.plainHttp.enable;
+  acmeEnabled = cfg.acme.enable;
   mkYamlList = {
     indent,
     items,
@@ -41,6 +42,16 @@
     ]
     ++ lib.optionals plainHttpEnabled [
       "--entryPoints.webplain.address=:${toString cfg.plainHttp.port}"
+    ]
+    ++ lib.optionals acmeEnabled [
+      "--certificatesResolvers.letsencrypt.acme.email=${cfg.acme.email}"
+      "--certificatesResolvers.letsencrypt.acme.storage=/etc/traefik/acme.json"
+      "--certificatesResolvers.letsencrypt.acme.dnsChallenge=true"
+      "--certificatesResolvers.letsencrypt.acme.dnsChallenge.provider=cloudflare"
+      "--entryPoints.websecure.http.tls.certResolver=letsencrypt"
+    ]
+    ++ lib.optionals (acmeEnabled && cfg.acme.staging) [
+      "--certificatesResolvers.letsencrypt.acme.caServer=https://acme-staging-v02.api.letsencrypt.org/directory"
     ];
 
   portMappings =
@@ -91,6 +102,7 @@
 
             env_file:
               - ''${TRAEFIK_ENV_FILE}
+              - ''${TRAEFIK_ACME_ENV_FILE}
 
             command:
     ${mkYamlList {
@@ -108,6 +120,8 @@
               - "/var/run/docker.sock:/var/run/docker.sock:ro"
               - "/etc/traefik/tls.yml:/etc/traefik/tls.yml:ro"
               - "/run/secrets:/run/secrets:ro"
+    ${lib.optionalString acmeEnabled ''        - "/var/lib/traefik/acme.json:/etc/traefik/acme.json"
+    ''}
 
             logging:
               driver: "json-file"
@@ -144,6 +158,7 @@ in {
     httpToHttpsRedirectEnabled
     metricsEnabled
     plainHttpEnabled
+    acmeEnabled
     tlsFilesCheck
     composeText
     tlsConfigText

@@ -57,6 +57,30 @@ in {
 
     httpToHttpsRedirect = lib.mkEnableOption "global HTTP to HTTPS redirection on Traefik entrypoint `web`";
 
+    acme = {
+      enable = lib.mkEnableOption "ACME/Let's Encrypt certificate management via DNS-01 challenge";
+
+      email = lib.mkOption {
+        type = lib.types.str;
+        description = "Email address for Let's Encrypt account registration and expiry notifications.";
+        example = "admin@example.com";
+      };
+
+      staging = lib.mkOption {
+        type = lib.types.bool;
+        default = false;
+        description = "Use Let's Encrypt staging CA. Enable during initial setup to avoid rate limits.";
+      };
+
+      cloudflareApiTokenFile = runtimeSecrets.mkSecretFileOption {
+        description = ''
+          Absolute path to a runtime-provisioned file containing the Cloudflare API token
+          used for DNS-01 challenge. The token needs Zone → DNS → Edit permission.
+        '';
+        example = "/run/secrets/cloudflare-api-token";
+      };
+    };
+
     metrics = {
       enable = lib.mkEnableOption "Prometheus metrics endpoint on Traefik";
 
