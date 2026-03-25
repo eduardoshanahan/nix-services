@@ -112,7 +112,7 @@
         sonarrComposeModule = import ./services/sonarr/sonarr.nix;
       in {
         nixosModules = {
-          traefik = traefikModule;
+          traefikCompose = traefikModule;
           pihole = piholeModule;
           piholeSync = piholeSyncModule;
           piholeExporter = piholeExporterModule;
@@ -160,7 +160,7 @@
         };
 
         services = {
-          traefik = traefikModule;
+          traefikCompose = traefikModule;
           pihole = piholeModule;
           piholeSync = piholeSyncModule;
           piholeExporter = piholeExporterModule;

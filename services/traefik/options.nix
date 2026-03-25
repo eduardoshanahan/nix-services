@@ -1,7 +1,7 @@
 {lib, ...}: let
   runtimeSecrets = import ../../lib/runtime-secrets.nix {inherit lib;};
 in {
-  options.services.traefik = {
+  options.services.traefikCompose = {
     uiHostname = lib.mkOption {
       type = lib.types.str;
       default = "traefik.local";

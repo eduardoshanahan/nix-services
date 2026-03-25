@@ -4,10 +4,10 @@
   pkgs,
   ...
 }: let
-  cfg = config.services.traefik;
+  cfg = config.services.traefikCompose;
   runtimeSecrets = import ../../lib/runtime-secrets.nix {inherit lib;};
 
-  serviceName = "traefik";
+  serviceName = "traefikCompose";
   composeDir = "/etc/${serviceName}";
   dockerBin = "${config.virtualisation.docker.package}/bin/docker";
 
@@ -88,7 +88,7 @@ in {
     virtualisation.docker.enable = true;
 
     environment.etc."${serviceName}/docker-compose.yml".text = composeText;
-    environment.etc."traefik/tls.yml".text = tlsConfigText;
+    environment.etc."${serviceName}/tls.yml".text = tlsConfigText;
 
     systemd.services.${serviceName} = {
       description = "Traefik ingress (Docker Compose)";
@@ -98,7 +98,7 @@ in {
       wants = ["network-online.target"];
       restartTriggers = [
         config.environment.etc."${serviceName}/docker-compose.yml".source
-        config.environment.etc."traefik/tls.yml".source
+        config.environment.etc."${serviceName}/tls.yml".source
       ];
 
       serviceConfig = {

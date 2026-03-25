@@ -118,7 +118,7 @@
 
             volumes:
               - "/var/run/docker.sock:/var/run/docker.sock:ro"
-              - "/etc/traefik/tls.yml:/etc/traefik/tls.yml:ro"
+              - "/etc/traefikCompose/tls.yml:/etc/traefik/tls.yml:ro"
               - "/run/secrets:/run/secrets:ro"
     ${lib.optionalString acmeEnabled ''        - "/var/lib/traefik/acme.json:/etc/traefik/acme.json"
     ''}
