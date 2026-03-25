@@ -1,0 +1,35 @@
+services:
+  mysql:
+    image: ${MYSQL_IMAGE_REPOSITORY}:${MYSQL_IMAGE_TAG}
+    container_name: ${MYSQL_CONTAINER_NAME}
+    restart: unless-stopped
+
+    env_file:
+      - ${MYSQL_RUNTIME_ENV_FILE}
+
+    environment:
+      - TZ
+
+    volumes:
+      - "${MYSQL_DATA_DIR}:/var/lib/mysql"
+
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "--silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+    networks:
+      - mysql_net
+
+networks:
+  mysql_net:
+    external: true
+    name: ${MYSQL_NETWORK}

@@ -84,6 +84,7 @@
         mongodbExporterModule = import ./services/mongodb-exporter/mongodb-exporter.nix;
         unpollerModule = import ./services/unpoller/unpoller.nix;
         tailscaleModule = import ./services/tailscale/tailscale.nix;
+        mysqlComposeModule = import ./services/mysql/mysql.nix;
         ghostModule = import ./services/ghost/ghost.nix;
         cadvisorModule = import ./services/cadvisor/cadvisor.nix;
         vikunjaComposeModule = import ./services/vikunja/vikunja.nix;
@@ -130,6 +131,7 @@
           mongodbExporterCompose = mongodbExporterModule;
           unpoller = unpollerModule;
           tailscale = tailscaleModule;
+          mysqlCompose = mysqlComposeModule;
           ghost = ghostModule;
           cadvisor = cadvisorModule;
           vikunjaCompose = vikunjaComposeModule;
@@ -177,6 +179,7 @@
           mongodbExporterCompose = mongodbExporterModule;
           unpoller = unpollerModule;
           tailscale = tailscaleModule;
+          mysqlCompose = mysqlComposeModule;
           ghost = ghostModule;
           cadvisor = cadvisorModule;
           vikunjaCompose = vikunjaComposeModule;
