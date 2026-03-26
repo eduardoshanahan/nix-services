@@ -2122,6 +2122,14 @@
     uid = "shared-infra";
     title = "Shared Infra";
     tags = ["homelab" "shared-infra" "postgres" "redis" "mysql" "mongo" "dolt" "minio"];
+    links = [
+      {
+        title = "Adminer";
+        type = "link";
+        url = "https://adminer.internal.example/";
+        targetBlank = true;
+      }
+    ];
     timezone = "browser";
     schemaVersion = 39;
     version = 1;
