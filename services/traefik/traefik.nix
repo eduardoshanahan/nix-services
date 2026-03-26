@@ -88,7 +88,9 @@ in {
     virtualisation.docker.enable = true;
 
     environment.etc."${serviceName}/docker-compose.yml".text = composeText;
-    environment.etc."${serviceName}/tls.yml".text = tlsConfigText;
+    environment.etc = lib.mkIf tlsEnabled {
+      "${serviceName}/tls.yml".text = tlsConfigText;
+    };
 
     systemd.services.${serviceName} = {
       description = "Traefik ingress (Docker Compose)";
@@ -98,6 +100,7 @@ in {
       wants = ["network-online.target"];
       restartTriggers = [
         config.environment.etc."${serviceName}/docker-compose.yml".source
+      ] ++ lib.optionals tlsEnabled [
         config.environment.etc."${serviceName}/tls.yml".source
       ];
 

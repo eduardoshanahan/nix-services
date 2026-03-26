@@ -23,9 +23,11 @@
       "--providers.docker=true"
       "--providers.docker.exposedByDefault=false"
       "--providers.docker.network=\${TRAEFIK_NETWORK}"
-      "--providers.file.filename=/etc/traefik/tls.yml"
       "--entryPoints.web.address=:80"
       "--entryPoints.websecure.address=:443"
+    ]
+    ++ lib.optionals tlsEnabled [
+      "--providers.file.filename=/etc/traefik/tls.yml"
     ]
     ++ lib.optionals httpToHttpsRedirectEnabled [
       "--entryPoints.web.http.redirections.entryPoint.to=websecure"
@@ -57,8 +59,10 @@
   volumeMappings =
     [
       "/var/run/docker.sock:/var/run/docker.sock:ro"
-      "/etc/traefikCompose/tls.yml:/etc/traefik/tls.yml:ro"
       "/run/secrets:/run/secrets:ro"
+    ]
+    ++ lib.optionals tlsEnabled [
+      "/etc/traefikCompose/tls.yml:/etc/traefik/tls.yml:ro"
     ]
     ++ lib.optionals acmeEnabled [
       "/var/lib/traefik/acme.json:/etc/traefik/acme.json"
