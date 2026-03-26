@@ -87,10 +87,10 @@ in {
 
     virtualisation.docker.enable = true;
 
-    environment.etc."${serviceName}/docker-compose.yml".text = composeText;
-    environment.etc = lib.mkIf tlsEnabled {
-      "${serviceName}/tls.yml".text = tlsConfigText;
-    };
+    environment.etc = lib.mkMerge [
+      { "${serviceName}/docker-compose.yml".text = composeText; }
+      (lib.mkIf tlsEnabled { "${serviceName}/tls.yml".text = tlsConfigText; })
+    ];
 
     systemd.services.${serviceName} = {
       description = "Traefik ingress (Docker Compose)";
