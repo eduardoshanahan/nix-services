@@ -54,6 +54,16 @@
       "--certificatesResolvers.letsencrypt.acme.caServer=https://acme-staging-v02.api.letsencrypt.org/directory"
     ];
 
+  volumeMappings =
+    [
+      "/var/run/docker.sock:/var/run/docker.sock:ro"
+      "/etc/traefikCompose/tls.yml:/etc/traefik/tls.yml:ro"
+      "/run/secrets:/run/secrets:ro"
+    ]
+    ++ lib.optionals acmeEnabled [
+      "/var/lib/traefik/acme.json:/etc/traefik/acme.json"
+    ];
+
   portMappings =
     [
       "80:80"
@@ -117,10 +127,10 @@
     }}
 
             volumes:
-              - "/var/run/docker.sock:/var/run/docker.sock:ro"
-              - "/etc/traefikCompose/tls.yml:/etc/traefik/tls.yml:ro"
-              - "/run/secrets:/run/secrets:ro"
-    ${lib.optionalString acmeEnabled "              - \"/var/lib/traefik/acme.json:/etc/traefik/acme.json\""}
+    ${mkYamlList {
+      indent = "          ";
+      items = volumeMappings;
+    }}
 
             logging:
               driver: "json-file"
