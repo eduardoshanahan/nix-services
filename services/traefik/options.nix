@@ -2,6 +2,8 @@
   runtimeSecrets = import ../../lib/runtime-secrets.nix {inherit lib;};
 in {
   options.services.traefikCompose = {
+    enable = lib.mkEnableOption "Traefik reverse proxy (Docker Compose)";
+
     uiHostname = lib.mkOption {
       type = lib.types.str;
       default = "traefik.local";

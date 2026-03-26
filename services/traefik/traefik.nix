@@ -57,7 +57,7 @@ in {
   imports = [
     ./options.nix
   ];
-  config = {
+  config = lib.mkIf cfg.enable {
     assertions = [
       {
         assertion = !tlsEnabled || cfg.tls.certFile != null;
