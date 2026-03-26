@@ -213,6 +213,15 @@ With `services.grafanaCompose.provisioning.dashboards.enableStarter = true`, the
   - error-like log rate
   - raw logs panel for direct triage.
 
+## Database access
+
+When you need to run ad-hoc queries against the shared databases, use the
+Adminer UI that runs on the Synology NAS. It is accessible via
+`https://adminer.${config.lab.domain}/` so the same TLS ports (`80`/`443`) stay
+in use; the NAS translates that reverse-proxied host to the container listening
+on `8070`. Keep the real DNS/port wires in the private repo so the Grafana stack
+only publishes the sanitized reference.
+
 ## Healthcheck units
 
 - Service: `grafana-healthcheck.service`

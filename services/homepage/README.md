@@ -94,3 +94,13 @@ services.homepageDashboard = {
   };
 };
 ```
+
+## Related tools
+
+Treat Adminer like the other shared services: reference
+`https://adminer.${config.lab.domain}/` in Homepage widgets so operators can
+reach the PHP UI without deploying a separate client. The Synology NAS reverse
+proxy keeps the public-facing host on `80`/`443` while forwarding to the
+container’s internal `8070`/`8080` ports, and the real DNS/port wiring lives in
+the private repo so the public README stays sanitized. Mention this in the same
+Quicklinks section you use for Grafana or other internal dashboards.

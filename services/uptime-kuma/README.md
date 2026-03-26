@@ -57,6 +57,17 @@ errors.
 In that case, set `ignoreTls = true` in the monitor definition in the Kuma UI
 for affected monitors, or ensure the container trusts your internal CA.
 
+## Adminer access
+
+Adminer provides the shared SQL/MariaDB/Postgres interface for the homelab
+databases and is mounted behind the Synology reverse proxy. Point any Kuma
+monitors that track the database admin UI at `https://adminer.${config.lab.domain}/`
+so they follow the same TLS-public endpoint. The container itself listens on
+port `8080` and the NAS publishes that service internally on port `8070`, but
+the public-facing proxy stays on ports `80`/`443` only. Keep the real DNS name
+and firewall configuration in the private repo so the monitored endpoint always
+matches the live deployment.
+
 ## Host-specific divergence note
 
 - Some consumers add a companion monitor-sync unit and declarative monitor file
