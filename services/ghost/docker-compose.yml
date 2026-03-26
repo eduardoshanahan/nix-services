@@ -58,6 +58,7 @@ services:
       - "traefik.http.services.${GHOST_TRAEFIK_SERVICE_NAME}.loadbalancer.server.port=2368"
       - "traefik.http.routers.${GHOST_TRAEFIK_ROUTER_NAME}.entrypoints=${GHOST_ENTRYPOINTS}"
       - "traefik.http.routers.${GHOST_TRAEFIK_ROUTER_NAME}.tls=${GHOST_TLS}"
+      - "traefik.http.routers.${GHOST_TRAEFIK_ROUTER_NAME}.tls.certresolver=letsencrypt"
 
     networks:
       - traefik
