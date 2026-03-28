@@ -42,6 +42,9 @@ When working in `nix-services`, read in this order:
 6. if the task touches prior investigation or rollout work:
    - read stable public plans in `docs/plans/`
    - read matching private continuity notes in `../nix-services-private/records/`
+   - check for `../nix-services-private/records/<service>/INVESTIGATION.md` and
+     read it before making any changes — it records verified facts and working
+     procedures for that service; create it if it does not exist yet
 
 If a local doc points to `nix-pi` for host truth, follow the pointer instead of
 duplicating host behavior here.
