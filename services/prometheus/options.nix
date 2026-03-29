@@ -482,6 +482,17 @@
       };
     };
 
+    extraAlertRules = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = [];
+      description = ''
+        Additional alert rule lines appended to `alert.rules.yml` after the
+        built-in rules. Each string is one line; use the same indentation
+        convention as the built-in rules (8-space indent for rule entries
+        within the `homelab-core` group).
+      '';
+    };
+
     alerting = {
       enable = lib.mkOption {
         type = lib.types.bool;

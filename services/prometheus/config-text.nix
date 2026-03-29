@@ -368,7 +368,7 @@
     + "\n";
 
   alertRulesText =
-    lib.concatStringsSep "\n" [
+    lib.concatStringsSep "\n" ([
       "groups:"
       "  - name: homelab-core"
       "    rules:"
@@ -830,7 +830,7 @@
       "        annotations:"
       "          summary: \"GitHub commit stats remain pending\""
       "          description: \"GitHub contributor stats stayed pending (0 repos ready) for more than 6 hours.\""
-    ]
+    ] ++ cfg.extraAlertRules)
     + "\n";
 in {
   inherit prometheusConfigText alertRulesText;
