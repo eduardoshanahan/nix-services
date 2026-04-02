@@ -185,12 +185,8 @@ in {
         fi
 
         # URL-encode password for DATABASE_URL
-        encode_url_component() {
-          local value="$1"
-          printf '%s' "$value" | ${pkgs.curl}/bin/curl -Gso /dev/null -w %{url_effective} --data-urlencode @- "" | cut -c 3-
-        }
-
-        encoded_password="$(encode_url_component "$db_password")"
+        # Using Python urllib.parse.quote for reliable URL encoding
+        encoded_password="$(${pkgs.python3}/bin/python3 -c "import sys, urllib.parse; print(urllib.parse.quote(sys.stdin.read().strip(), safe=''))" <<< "$db_password")"
 
         install -d -m 0700 /run/secrets
         tmp="$(mktemp -p /run/secrets '.umami.env.XXXXXX')"
