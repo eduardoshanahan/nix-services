@@ -1,0 +1,17 @@
+services:
+  umami:
+    container_name: ${UMAMI_CONTAINER_NAME}
+    image: ${UMAMI_IMAGE_REPOSITORY}:${UMAMI_IMAGE_TAG}
+    restart: unless-stopped
+    ports:
+      - "${UMAMI_LISTEN_ADDRESS}:${UMAMI_LISTEN_PORT}:3000"
+    env_file:
+      - ${UMAMI_RUNTIME_ENV_FILE}
+    environment:
+      TRACKER_SCRIPT_NAME: ${UMAMI_TRACKER_SCRIPT_NAME}
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3000/api/heartbeat || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s

@@ -110,6 +110,7 @@
         radarrComposeModule = import ./services/radarr/radarr.nix;
         prowlarrComposeModule = import ./services/prowlarr/prowlarr.nix;
         sonarrComposeModule = import ./services/sonarr/sonarr.nix;
+        umamiComposeModule = import ./services/umami/umami.nix;
       in {
         nixosModules = {
           traefikCompose = traefikModule;
@@ -157,6 +158,7 @@
           radarrCompose = radarrComposeModule;
           prowlarrCompose = prowlarrComposeModule;
           sonarrCompose = sonarrComposeModule;
+          umamiCompose = umamiComposeModule;
         };
 
         services = {
