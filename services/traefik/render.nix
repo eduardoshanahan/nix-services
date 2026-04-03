@@ -136,6 +136,9 @@
       items = volumeMappings;
     }}
 
+            extra_hosts:
+              - "host.docker.internal:host-gateway"
+
             logging:
               driver: "json-file"
 
