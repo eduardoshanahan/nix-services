@@ -3,15 +3,43 @@ services:
     container_name: ${UMAMI_CONTAINER_NAME}
     image: ${UMAMI_IMAGE_REPOSITORY}:${UMAMI_IMAGE_TAG}
     restart: unless-stopped
+
+    # When Traefik is enabled, expose port for internal routing
+    # When disabled, map port to host
+    expose:
+      - "3000"
     ports:
       - "${UMAMI_LISTEN_ADDRESS}:${UMAMI_LISTEN_PORT}:3000"
+
     env_file:
       - ${UMAMI_RUNTIME_ENV_FILE}
+
     environment:
       TRACKER_SCRIPT_NAME: ${UMAMI_TRACKER_SCRIPT_NAME}
+
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:3000/api/heartbeat || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 60s
+
+    # Traefik labels - only used when Traefik integration is enabled
+    labels:
+      traefik.enable: ${UMAMI_TRAEFIK_ENABLED:-false}
+      traefik.docker.network: ${UMAMI_TRAEFIK_NETWORK:-traefik}
+      traefik.http.routers.umami.rule: Host(`${UMAMI_TRAEFIK_HOSTNAME:-localhost}`)
+      traefik.http.services.umami.loadbalancer.server.port: "3000"
+      traefik.http.routers.umami.entrypoints: websecure
+      traefik.http.routers.umami.tls: "true"
+      traefik.http.routers.umami.tls.certresolver: letsencrypt
+
+    # Connect to traefik network when enabled
+    networks:
+      - default
+      - traefik
+
+networks:
+  traefik:
+    external: true
+    name: ${UMAMI_TRAEFIK_NETWORK:-traefik}

@@ -34,6 +34,22 @@ in {
       description = "Host TCP port mapped to Umami port 3000.";
     };
 
+    traefik = {
+      enable = lib.mkEnableOption "Traefik integration (disables port mapping)";
+
+      hostname = lib.mkOption {
+        type = lib.types.str;
+        description = "Public hostname for Traefik routing.";
+        example = "analytics.example.com";
+      };
+
+      network = lib.mkOption {
+        type = lib.types.str;
+        default = "traefik";
+        description = "Docker network name for Traefik.";
+      };
+    };
+
     database = {
       type = lib.mkOption {
         type = lib.types.enum ["mysql" "postgresql"];
@@ -140,6 +156,10 @@ in {
       {
         assertion = cfg.appSecretFile != null;
         message = "services.umamiCompose.appSecretFile must be set when enabling Umami.";
+      }
+      {
+        assertion = !cfg.traefik.enable || cfg.traefik.hostname != "";
+        message = "services.umamiCompose.traefik.hostname must be set when Traefik integration is enabled.";
       }
     ];
 
@@ -260,15 +280,21 @@ in {
         RestartSec = 10;
         WorkingDirectory = composeDir;
 
-        Environment = [
-          "UMAMI_CONTAINER_NAME=${cfg.containerName}"
-          "UMAMI_LISTEN_ADDRESS=${cfg.listenAddress}"
-          "UMAMI_LISTEN_PORT=${toString cfg.listenPort}"
-          "UMAMI_IMAGE_REPOSITORY=${cfg.image.repository}"
-          "UMAMI_IMAGE_TAG=${cfg.image.tag}"
-          "UMAMI_RUNTIME_ENV_FILE=${runtimeEnvFile}"
-          "UMAMI_TRACKER_SCRIPT_NAME=${cfg.trackerScriptName}"
-        ];
+        Environment =
+          [
+            "UMAMI_CONTAINER_NAME=${cfg.containerName}"
+            "UMAMI_LISTEN_ADDRESS=${cfg.listenAddress}"
+            "UMAMI_LISTEN_PORT=${toString cfg.listenPort}"
+            "UMAMI_IMAGE_REPOSITORY=${cfg.image.repository}"
+            "UMAMI_IMAGE_TAG=${cfg.image.tag}"
+            "UMAMI_RUNTIME_ENV_FILE=${runtimeEnvFile}"
+            "UMAMI_TRACKER_SCRIPT_NAME=${cfg.trackerScriptName}"
+          ]
+          ++ lib.optionals cfg.traefik.enable [
+            "UMAMI_TRAEFIK_ENABLED=true"
+            "UMAMI_TRAEFIK_HOSTNAME=${cfg.traefik.hostname}"
+            "UMAMI_TRAEFIK_NETWORK=${cfg.traefik.network}"
+          ];
 
         ExecStartPre = [
           "${pkgs.runtimeShell} -c 'test -s ${composeDir}/docker-compose.yml'"
