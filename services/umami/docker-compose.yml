@@ -24,22 +24,19 @@ services:
       retries: 3
       start_period: 60s
 
-    # Traefik labels - only used when Traefik integration is enabled
+    # Traefik labels - configured for host networking
+    # Traefik accesses via VPS Tailscale IP (100.127.17.127:3000)
     labels:
       - "traefik.enable=${UMAMI_TRAEFIK_ENABLED:-false}"
-      - "traefik.docker.network=${UMAMI_TRAEFIK_NETWORK:-traefik}"
       - "traefik.http.routers.umami.rule=Host(`${UMAMI_TRAEFIK_HOSTNAME:-localhost}`)"
-      - "traefik.http.services.umami.loadbalancer.server.port=3000"
+      - "traefik.http.services.umami.loadbalancer.server.url=http://100.127.17.127:3000"
       - "traefik.http.routers.umami.entrypoints=websecure"
       - "traefik.http.routers.umami.tls=true"
       - "traefik.http.routers.umami.tls.certresolver=letsencrypt"
 
-    # Connect to traefik network when enabled
-    networks:
-      - default
-      - traefik
+    # Use host networking to access Tailscale IPs
+    # This allows container to reach Tailscale-connected hosts
+    network_mode: host
 
-networks:
-  traefik:
-    external: true
-    name: ${UMAMI_TRAEFIK_NETWORK:-traefik}
+# Note: When using host networking, ports and network sections are ignored
+# Traefik will access Umami via localhost:3000
