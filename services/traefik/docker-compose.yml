@@ -31,6 +31,9 @@ services:
       - "/etc/traefik/tls.yml:/etc/traefik/tls.yml:ro"
       - "/run/secrets:/run/secrets:ro"
 
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
     networks:
       - traefik
 
