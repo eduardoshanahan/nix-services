@@ -25,11 +25,11 @@ services:
       start_period: 60s
 
     # Traefik labels - configured for host networking
-    # Traefik accesses via VPS Tailscale IP (100.127.17.127:3000)
+    # Traefik accesses via Docker bridge gateway (172.17.0.1:3000)
     labels:
       - "traefik.enable=${UMAMI_TRAEFIK_ENABLED:-false}"
       - "traefik.http.routers.umami.rule=Host(`${UMAMI_TRAEFIK_HOSTNAME:-localhost}`)"
-      - "traefik.http.services.umami.loadbalancer.server.url=http://100.127.17.127:3000"
+      - "traefik.http.services.umami.loadbalancer.server.url=http://172.17.0.1:3000"
       - "traefik.http.routers.umami.entrypoints=websecure"
       - "traefik.http.routers.umami.tls=true"
       - "traefik.http.routers.umami.tls.certresolver=letsencrypt"
@@ -39,4 +39,4 @@ services:
     network_mode: host
 
 # Note: When using host networking, ports and network sections are ignored
-# Traefik will access Umami via localhost:3000
+# Traefik will access Umami via Docker bridge gateway (172.17.0.1:3000)
