@@ -26,13 +26,13 @@ services:
 
     # Traefik labels - only used when Traefik integration is enabled
     labels:
-      traefik.enable: ${UMAMI_TRAEFIK_ENABLED:-false}
-      traefik.docker.network: ${UMAMI_TRAEFIK_NETWORK:-traefik}
-      traefik.http.routers.umami.rule: Host(`${UMAMI_TRAEFIK_HOSTNAME:-localhost}`)
-      traefik.http.services.umami.loadbalancer.server.port: "3000"
-      traefik.http.routers.umami.entrypoints: websecure
-      traefik.http.routers.umami.tls: "true"
-      traefik.http.routers.umami.tls.certresolver: letsencrypt
+      - "traefik.enable=${UMAMI_TRAEFIK_ENABLED:-false}"
+      - "traefik.docker.network=${UMAMI_TRAEFIK_NETWORK:-traefik}"
+      - "traefik.http.routers.umami.rule=Host(`${UMAMI_TRAEFIK_HOSTNAME:-localhost}`)"
+      - "traefik.http.services.umami.loadbalancer.server.port=3000"
+      - "traefik.http.routers.umami.entrypoints=websecure"
+      - "traefik.http.routers.umami.tls=true"
+      - "traefik.http.routers.umami.tls.certresolver=letsencrypt"
 
     # Connect to traefik network when enabled
     networks:
