@@ -49,7 +49,6 @@ Important options:
 - `services.radarrCompose.tls`
 - `services.radarrCompose.importBehavior.copyUsingHardlinks`
 - `services.radarrCompose.downloadClient.enableCompletedDownloadHandling`
-- `services.radarrCompose.downloadClient.removeCompletedDownloads`
 
 Example:
 
@@ -64,7 +63,6 @@ services.radarrCompose = {
   importBehavior.copyUsingHardlinks = false;
   downloadClient = {
     enableCompletedDownloadHandling = true;
-    removeCompletedDownloads = true;
   };
 };
 ```

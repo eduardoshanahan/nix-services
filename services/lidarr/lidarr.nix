@@ -29,7 +29,6 @@
   hasDeclarativeReconciliation =
     cfg.importBehavior.copyUsingHardlinks != true
     || cfg.downloadClient.enableCompletedDownloadHandling != true
-    || cfg.downloadClient.removeCompletedDownloads != false
     || cfg.integrations.qbittorrent.enable
     || cfg.integrations.prowlarr.enable;
 in {

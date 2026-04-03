@@ -49,7 +49,6 @@ Important options:
 - `services.sonarrCompose.tls`
 - `services.sonarrCompose.importBehavior.copyUsingHardlinks`
 - `services.sonarrCompose.downloadClient.enableCompletedDownloadHandling`
-- `services.sonarrCompose.downloadClient.removeCompletedDownloads`
 
 Example:
 
@@ -64,7 +63,6 @@ services.sonarrCompose = {
   importBehavior.copyUsingHardlinks = false;
   downloadClient = {
     enableCompletedDownloadHandling = true;
-    removeCompletedDownloads = true;
   };
 };
 ```

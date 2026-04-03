@@ -48,7 +48,6 @@ Important options:
 - `services.lidarrCompose.tls`
 - `services.lidarrCompose.importBehavior.copyUsingHardlinks`
 - `services.lidarrCompose.downloadClient.enableCompletedDownloadHandling`
-- `services.lidarrCompose.downloadClient.removeCompletedDownloads`
 
 Example:
 
@@ -63,7 +62,6 @@ services.lidarrCompose = {
   importBehavior.copyUsingHardlinks = false;
   downloadClient = {
     enableCompletedDownloadHandling = true;
-    removeCompletedDownloads = true;
   };
 };
 ```

@@ -100,12 +100,6 @@
         default = true;
         description = "Whether completed-download handling is enabled in the arr app.";
       };
-
-      removeCompletedDownloads = lib.mkOption {
-        type = lib.types.bool;
-        default = false;
-        description = "Whether the arr app should remove completed items from the downloader after import.";
-      };
     };
   };
 
@@ -371,16 +365,13 @@
       }
 
       reconcile_download_client_config() {
-        local enable_completed_download_handling remove_completed_downloads current payload
+        local enable_completed_download_handling current payload
         enable_completed_download_handling="$(${jqBin} -r '.enableCompletedDownloadHandling' <<<"$download_client_json")"
-        remove_completed_downloads="$(${jqBin} -r '.removeCompletedDownloads' <<<"$download_client_json")"
 
         current="$(api_get "/config/downloadclient")"
         payload="$(${jqBin} -c \
-          --argjson enableCompletedDownloadHandling "$enable_completed_download_handling" \
-          --argjson removeCompletedDownloads "$remove_completed_downloads" '
-            .enableCompletedDownloadHandling = $enableCompletedDownloadHandling
-            | .removeCompletedDownloads = $removeCompletedDownloads' <<<"$current")"
+          --argjson enableCompletedDownloadHandling "$enable_completed_download_handling" '
+            .enableCompletedDownloadHandling = $enableCompletedDownloadHandling' <<<"$current")"
         api_put "/config/downloadclient" "$payload"
       }
 
