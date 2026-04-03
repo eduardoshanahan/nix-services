@@ -47,6 +47,9 @@ Important options:
 - `services.radarrCompose.image.tag`
 - `services.radarrCompose.image.allowMutableTag`
 - `services.radarrCompose.tls`
+- `services.radarrCompose.importBehavior.copyUsingHardlinks`
+- `services.radarrCompose.downloadClient.enableCompletedDownloadHandling`
+- `services.radarrCompose.downloadClient.removeCompletedDownloads`
 
 Example:
 
@@ -58,5 +61,10 @@ services.radarrCompose = {
   dataDir = "/srv/radarr";
   mediaDir = "/srv/media";
   downloadsDir = "/srv/downloads/qbittorrent";
+  importBehavior.copyUsingHardlinks = false;
+  downloadClient = {
+    enableCompletedDownloadHandling = true;
+    removeCompletedDownloads = true;
+  };
 };
 ```

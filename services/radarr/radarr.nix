@@ -21,11 +21,16 @@
     configXmlPath = "${cfg.dataDir}/config.xml";
     port = 7878;
     apiPath = "/api/v3";
+    importBehavior = cfg.importBehavior;
+    downloadClient = cfg.downloadClient;
     qbittorrent = cfg.integrations.qbittorrent;
     prowlarr = cfg.integrations.prowlarr;
   };
-  hasDeclarativeIntegrations =
-    cfg.integrations.qbittorrent.enable
+  hasDeclarativeReconciliation =
+    cfg.importBehavior.copyUsingHardlinks != true
+    || cfg.downloadClient.enableCompletedDownloadHandling != true
+    || cfg.downloadClient.removeCompletedDownloads != false
+    || cfg.integrations.qbittorrent.enable
     || cfg.integrations.prowlarr.enable;
 in {
   options.services.radarrCompose = {
@@ -117,6 +122,18 @@ in {
     };
 
     tls = lib.mkEnableOption "TLS on the Radarr Traefik router";
+
+    importBehavior = lib.mkOption {
+      type = lib.types.submodule servarrReconcile.importBehaviorSubmodule;
+      default = {};
+      description = "Declarative media-management import behavior reconciliation.";
+    };
+
+    downloadClient = lib.mkOption {
+      type = lib.types.submodule servarrReconcile.downloadClientSubmodule;
+      default = {};
+      description = "Declarative completed-download handling reconciliation.";
+    };
 
     integrations = {
       qbittorrent = lib.mkOption {
@@ -283,7 +300,7 @@ in {
       };
     };
 
-    systemd.services."${serviceName}-reconcile" = lib.mkIf hasDeclarativeIntegrations {
+    systemd.services."${serviceName}-reconcile" = lib.mkIf hasDeclarativeReconciliation {
       description = "Reconcile declarative ${serviceName} integrations";
       wantedBy = ["${serviceName}.service"];
       requires = ["${serviceName}.service"];

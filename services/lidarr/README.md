@@ -46,6 +46,9 @@ Important options:
 - `services.lidarrCompose.image.tag`
 - `services.lidarrCompose.image.allowMutableTag`
 - `services.lidarrCompose.tls`
+- `services.lidarrCompose.importBehavior.copyUsingHardlinks`
+- `services.lidarrCompose.downloadClient.enableCompletedDownloadHandling`
+- `services.lidarrCompose.downloadClient.removeCompletedDownloads`
 
 Example:
 
@@ -57,5 +60,10 @@ services.lidarrCompose = {
   dataDir = "/srv/lidarr";
   mediaDir = "/mnt/media/Music";
   downloadsDir = "/mnt/media/Downloads/qbittorrent";
+  importBehavior.copyUsingHardlinks = false;
+  downloadClient = {
+    enableCompletedDownloadHandling = true;
+    removeCompletedDownloads = true;
+  };
 };
 ```

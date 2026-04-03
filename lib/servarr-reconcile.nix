@@ -83,6 +83,32 @@
     };
   };
 
+  importBehaviorSubmodule = {
+    options = {
+      copyUsingHardlinks = lib.mkOption {
+        type = lib.types.bool;
+        default = true;
+        description = "Whether imports should use hardlinks instead of moving files out of the downloads path.";
+      };
+    };
+  };
+
+  downloadClientSubmodule = {
+    options = {
+      enableCompletedDownloadHandling = lib.mkOption {
+        type = lib.types.bool;
+        default = true;
+        description = "Whether completed-download handling is enabled in the arr app.";
+      };
+
+      removeCompletedDownloads = lib.mkOption {
+        type = lib.types.bool;
+        default = false;
+        description = "Whether the arr app should remove completed items from the downloader after import.";
+      };
+    };
+  };
+
   prowlarrApplicationSubmodule = {
     options = {
       enable = lib.mkOption {
@@ -117,6 +143,8 @@
     configXmlPath,
     port,
     apiPath,
+    importBehavior,
+    downloadClient,
     qbittorrent,
     prowlarr,
   }:
@@ -129,6 +157,8 @@
       service_name=${lib.escapeShellArg serviceName}
       api_path=${lib.escapeShellArg apiPath}
       listen_port=${lib.escapeShellArg (toString port)}
+      import_behavior_json=${lib.escapeShellArg (builtins.toJSON importBehavior)}
+      download_client_json=${lib.escapeShellArg (builtins.toJSON downloadClient)}
       qbittorrent_json=${lib.escapeShellArg (builtins.toJSON qbittorrent)}
       prowlarr_json=${lib.escapeShellArg (builtins.toJSON prowlarr)}
 
@@ -329,6 +359,31 @@
         done <<<"$ids"
       }
 
+      reconcile_media_management() {
+        local copy_using_hardlinks current payload
+        copy_using_hardlinks="$(${jqBin} -r '.copyUsingHardlinks' <<<"$import_behavior_json")"
+
+        current="$(api_get "/config/mediamanagement")"
+        payload="$(${jqBin} -c \
+          --argjson copyUsingHardlinks "$copy_using_hardlinks" '
+            .copyUsingHardlinks = $copyUsingHardlinks' <<<"$current")"
+        api_put "/config/mediamanagement" "$payload"
+      }
+
+      reconcile_download_client_config() {
+        local enable_completed_download_handling remove_completed_downloads current payload
+        enable_completed_download_handling="$(${jqBin} -r '.enableCompletedDownloadHandling' <<<"$download_client_json")"
+        remove_completed_downloads="$(${jqBin} -r '.removeCompletedDownloads' <<<"$download_client_json")"
+
+        current="$(api_get "/config/downloadclient")"
+        payload="$(${jqBin} -c \
+          --argjson enableCompletedDownloadHandling "$enable_completed_download_handling" \
+          --argjson removeCompletedDownloads "$remove_completed_downloads" '
+            .enableCompletedDownloadHandling = $enableCompletedDownloadHandling
+            | .removeCompletedDownloads = $removeCompletedDownloads' <<<"$current")"
+        api_put "/config/downloadclient" "$payload"
+      }
+
       reconcile_prowlarr_indexers() {
         local enabled
         enabled="$(${jqBin} -r '.enable' <<<"$prowlarr_json")"
@@ -363,6 +418,8 @@
       }
 
       wait_for_api "/downloadclient"
+      reconcile_media_management
+      reconcile_download_client_config
       reconcile_qbittorrent
       reconcile_prowlarr_indexers
     '';
@@ -549,6 +606,8 @@
     '';
 in {
   inherit
+    downloadClientSubmodule
+    importBehaviorSubmodule
     mkHttpUrlOption
     prowlarrApplicationSubmodule
     prowlarrIndexerSubmodule
