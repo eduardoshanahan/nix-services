@@ -33,7 +33,7 @@ This module deploys Uptime Kuma behind Traefik using a checked-in Docker Compose
 ## Image pinning strategy
 
 - Default policy is pinned tags only.
-- Default image is `louislam/uptime-kuma:2.1.3`.
+- Default image is `louislam/uptime-kuma:2.2.1`.
 - Mutable tags like `latest` are blocked unless
   `services.uptimeKuma.image.allowMutableTag = true`.
 

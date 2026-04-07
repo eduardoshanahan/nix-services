@@ -40,7 +40,7 @@
 
       tag = lib.mkOption {
         type = lib.types.str;
-        default = "2.1.3";
+        default = "2.2.1";
         description = "Container image tag.";
       };
 
