@@ -38,7 +38,7 @@ This module deploys Alertmanager behind Traefik using a checked-in Docker Compos
 ## Image pinning strategy
 
 - Default policy is pinned tags only.
-- Default image is `prom/alertmanager:v0.27.0`.
+- Default image is `prom/alertmanager:v0.31.1`.
 - Mutable tags like `latest` are blocked unless
   `services.alertmanager.image.allowMutableTag = true`.
 
