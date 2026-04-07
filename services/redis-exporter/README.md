@@ -19,6 +19,7 @@ This module deploys `redis_exporter` via Docker Compose and exposes Prometheus m
 ## Required secret
 
 - `services.redisExporterCompose.redis.passwordFile` must point to a runtime file containing the Redis password.
+- Default image is `oliver006/redis_exporter:v1.82.0`.
 
 The module writes `/run/secrets/redis-exporter.env` with:
 
