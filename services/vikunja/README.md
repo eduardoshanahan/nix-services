@@ -88,7 +88,7 @@ services.vikunjaCompose = {
 ## Image pinning strategy
 
 - Default policy is pinned tags only.
-- Default image is `vikunja/vikunja:2.1.0`.
+- Default image is `vikunja/vikunja:2.2.2`.
 - Mutable tags like `latest` are blocked unless
   `services.vikunjaCompose.image.allowMutableTag = true`.
 
