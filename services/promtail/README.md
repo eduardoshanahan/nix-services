@@ -25,6 +25,11 @@ This module deploys Promtail using a checked-in Docker Compose file.
 - `services.promtailCompose.image.tag`
 - `services.promtailCompose.image.allowMutableTag`
 
+## Image pinning strategy
+
+- Default policy is pinned tags only.
+- Default image is `grafana/promtail:3.6.10`.
+
 ## Example
 
 ```nix
