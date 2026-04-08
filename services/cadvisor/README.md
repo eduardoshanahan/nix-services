@@ -27,7 +27,7 @@ container and host cgroup telemetry.
 ## Image pinning strategy
 
 - Default policy is pinned tags only.
-- Default image is `gcr.io/cadvisor/cadvisor:v0.49.2`.
+- Default image is `gcr.io/cadvisor/cadvisor:v0.55.1`.
 - Mutable tags like `latest` are blocked unless
   `services.cadvisorCompose.image.allowMutableTag = true`.
 
