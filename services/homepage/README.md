@@ -57,7 +57,7 @@ generated Docker Compose file and declarative YAML config files.
 ## Image pinning strategy
 
 - Default policy is pinned tags only.
-- Default image is `ghcr.io/gethomepage/homepage:v1.8.0`.
+- Default image is `ghcr.io/gethomepage/homepage:v1.12.3`.
 - Mutable tags like `latest` are blocked unless
   `services.homepageDashboard.image.allowMutableTag = true`.
 
