@@ -47,7 +47,7 @@ UP_UNIFI_CONTROLLER_0_PASS=<password>
 ## Image pinning strategy
 
 - Default policy is pinned tags only.
-- Default image is `ghcr.io/unpoller/unpoller:v2.16.0`.
+- Default image is `ghcr.io/unpoller/unpoller:v2.39.0`.
 - Mutable tags like `latest` are blocked unless
   `services.unpollerCompose.image.allowMutableTag = true`.
 
