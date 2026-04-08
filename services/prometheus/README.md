@@ -82,7 +82,7 @@ The module ships a baseline `homelab-core` rule group:
 ## Image pinning strategy
 
 - Default policy is pinned tags only.
-- Default image is `prom/prometheus:v3.11.0`.
+- Default image is `prom/prometheus:v3.11.1`.
 - Mutable tags like `latest` are blocked unless
   `services.prometheusCompose.image.allowMutableTag = true`.
 
