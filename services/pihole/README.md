@@ -30,6 +30,10 @@ This module deploys Pi-hole DNS + admin UI using a checked-in Docker Compose fil
 - DNS is exposed on host port `53/tcp` and `53/udp`.
 - UI is exposed through Traefik labels (no host bind for ports `80/443`).
 
+## Image pinning strategy
+
+- Default image is `pihole/pihole:2026.04.0`.
+
 ## Example
 
 ```nix
