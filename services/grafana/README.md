@@ -48,7 +48,7 @@ This module deploys Grafana behind Traefik using a checked-in Docker Compose fil
 ## Image pinning strategy
 
 - Default policy is pinned tags only.
-- Default image is `grafana/grafana:11.6.14`.
+- Default image is `grafana/grafana:12.4.2`.
 - Mutable tags like `latest` are blocked unless
   `services.grafanaCompose.image.allowMutableTag = true`.
 
