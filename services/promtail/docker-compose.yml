@@ -16,7 +16,7 @@ services:
       - "${PROMTAIL_DATA_DIR}:/var/lib/promtail"
 
     healthcheck:
-      test: ["CMD-SHELL", "wget --spider -q http://127.0.0.1:${PROMTAIL_HTTP_PORT}/ready || exit 1"]
+      test: ["CMD-SHELL", "/usr/bin/promtail -version >/dev/null 2>&1 || exit 1"]
       interval: 15s
       timeout: 5s
       retries: 8
