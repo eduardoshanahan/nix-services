@@ -86,7 +86,7 @@ This module deploys Ghost behind Traefik using a checked-in Docker Compose file.
 ## Image pinning strategy
 
 - Default policy is pinned tags only.
-- Default image is `ghost:6.19.2`.
+- Default image is `ghost:6.26.0`.
 - Mutable tags like `latest` are blocked unless
   `services.ghost.image.allowMutableTag = true`.
 
