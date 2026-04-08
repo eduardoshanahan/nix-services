@@ -4,7 +4,7 @@ n8n is packaged here as a Docker Compose-backed NixOS module.
 
 - Compose file lives at `services/n8n/docker-compose.yml`.
 - The module exports `services.n8nCompose`.
-- Current default image is `docker.n8n.io/n8nio/n8n:2.7.4`.
+- Current default image is `docker.n8n.io/n8nio/n8n:2.15.0`.
 - Persistent state stays under `services.n8nCompose.dataDir` and should be
   pointed at a dedicated host path such as `/srv/n8n`.
 - Runtime secrets are read from files and rendered into `/run/secrets/n8n.env`
