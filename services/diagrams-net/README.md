@@ -24,7 +24,7 @@ This module deploys diagrams.net (Draw.io) behind Traefik using a checked-in Doc
 ## Image pinning strategy
 
 - Default policy is pinned tags only.
-- `services.diagramsNet.image.tag` defaults to `29.0.3`.
+- `services.diagramsNet.image.tag` defaults to `29.6.10`.
 - Mutable tags like `latest` are blocked unless
   `services.diagramsNet.image.allowMutableTag = true`.
 
