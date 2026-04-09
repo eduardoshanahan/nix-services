@@ -796,7 +796,7 @@
       "          description: \"smtp-relay.service is not active for more than 3 minutes.\""
       ""
       "      - alert: SmtpRelayContainerNotSeen"
-      "        expr: (max((time() - container_last_seen{job=\"cadvisor\",container_label_com_docker_compose_service=\"smtp-relay\"}) < bool 120) or vector(0)) == 0"
+      "        expr: (count(container_last_seen{job=\"cadvisor\",container_label_com_docker_compose_service=\"smtp-relay\"}) > 0) and ((max((time() - container_last_seen{job=\"cadvisor\",container_label_com_docker_compose_service=\"smtp-relay\"}) < bool 120) or vector(0)) == 0)"
       "        for: 3m"
       "        labels:"
       "          severity: warning"
