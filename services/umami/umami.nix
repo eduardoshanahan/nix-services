@@ -60,7 +60,7 @@ in {
       host = lib.mkOption {
         type = lib.types.str;
         description = "Database hostname or IP reachable from the Umami host.";
-        example = "192.0.2.12";
+        example = "192.0.2.10";
       };
 
       port = lib.mkOption {

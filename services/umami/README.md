@@ -24,7 +24,7 @@ services.umamiCompose = {
 
   database = {
     type = "postgresql";
-    host = "192.0.2.12";  # PostgreSQL host IP
+    host = "192.0.2.10";  # PostgreSQL host IP
     port = 5433;
     name = "umami";
     user = "umami";
