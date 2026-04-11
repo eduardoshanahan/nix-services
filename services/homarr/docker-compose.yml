@@ -1,0 +1,37 @@
+services:
+  homarr:
+    image: ${HOMARR_IMAGE_REPOSITORY}:${HOMARR_IMAGE_TAG}
+    container_name: ${HOMARR_CONTAINER_NAME}
+    restart: unless-stopped
+    init: true
+
+    expose:
+      - "7575"
+
+    env_file:
+      - ${HOMARR_RUNTIME_ENV_FILE}
+
+    environment:
+      - TZ=${TZ}
+      - LOG_LEVEL=info
+      - DOCKER_HOSTNAMES=${HOMARR_DOCKER_HOSTNAMES}
+      - DOCKER_PORTS=${HOMARR_DOCKER_PORTS}
+
+    volumes:
+      - "${HOMARR_DATA_DIR}:/appdata"
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=${HOMARR_NETWORK}"
+      - "traefik.http.routers.homarr.rule=Host(`${HOMARR_HOSTNAME}`)"
+      - "traefik.http.services.homarr.loadbalancer.server.port=7575"
+      - "traefik.http.routers.homarr.entrypoints=${HOMARR_ENTRYPOINTS}"
+      - "traefik.http.routers.homarr.tls=${HOMARR_TLS}"
+
+    networks:
+      - traefik
+
+networks:
+  traefik:
+    external: true
+    name: ${HOMARR_NETWORK}

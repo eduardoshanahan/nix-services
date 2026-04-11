@@ -103,6 +103,7 @@
         searxngComposeModule = import ./services/searxng/searxng.nix;
         d2ComposeModule = import ./services/d2/d2.nix;
         n8nComposeModule = import ./services/n8n/n8n.nix;
+        homarrModule = import ./services/homarr/homarr.nix;
         seerrModule = import ./services/seerr/seerr.nix;
         calibreWebAutomatedComposeModule = import ./services/calibre-web-automated/calibre-web-automated.nix;
         lazylibrarianComposeModule = import ./services/lazylibrarian/lazylibrarian.nix;
@@ -151,6 +152,7 @@
           searxngCompose = searxngComposeModule;
           d2Compose = d2ComposeModule;
           n8nCompose = n8nComposeModule;
+          homarr = homarrModule;
           seerr = seerrModule;
           calibreWebAutomatedCompose = calibreWebAutomatedComposeModule;
           lazylibrarianCompose = lazylibrarianComposeModule;
@@ -200,6 +202,7 @@
           searxngCompose = searxngComposeModule;
           d2Compose = d2ComposeModule;
           n8nCompose = n8nComposeModule;
+          homarr = homarrModule;
           seerr = seerrModule;
           calibreWebAutomatedCompose = calibreWebAutomatedComposeModule;
           lazylibrarianCompose = lazylibrarianComposeModule;
