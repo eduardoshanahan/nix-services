@@ -4,7 +4,7 @@ Homarr is packaged here as a Docker Compose-backed NixOS module.
 
 - Compose file lives at `services/homarr/docker-compose.yml`.
 - The module exports `services.homarr`.
-- Current default image is `ghcr.io/homarr-labs/homarr:v1.44.0`.
+- Current default image is `ghcr.io/homarr-labs/homarr:v1.59.1`.
 - Persistent state stays under `services.homarr.dataDir` and should be pointed
   at a dedicated host path such as `/srv/homarr`.
 - `services.homarr.secretEncryptionKeyFile` must point at a runtime secret file
