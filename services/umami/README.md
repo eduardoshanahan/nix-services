@@ -48,6 +48,7 @@ Two secrets are required:
 2. **App Secret** (`appSecretFile`): Random hash salt for Umami (32-byte hex recommended)
 
 Generate secrets:
+
 ```bash
 # App secret (32-byte hex)
 openssl rand -hex 32
@@ -84,6 +85,7 @@ Add to your website's HTML (in `<head>` or before `</body>`):
 ```
 
 Replace:
+
 - `YOUR_WEBSITE_ID`: Website ID from Umami dashboard
 - `your-umami-host:3000`: Your Umami server address
 - `getinfo`: Your configured `trackerScriptName`
@@ -91,6 +93,7 @@ Replace:
 ## Default Login
 
 First-time login credentials:
+
 - **Username**: `admin`
 - **Password**: `umami`
 
@@ -114,6 +117,7 @@ curl http://your-umami-host:3000/api/heartbeat
 ## Resource Requirements
 
 Typical resource usage:
+
 - **RAM**: ~200MB
 - **CPU**: Minimal (event-driven)
 - **Disk**: Minimal (database stores analytics data)
