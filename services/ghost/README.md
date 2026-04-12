@@ -60,8 +60,9 @@ This module deploys Ghost behind Traefik using a checked-in Docker Compose file.
 
 ## Mail contract
 
-- `services.ghost.mail.passwordFile` (or per-instance `services.ghost.instances.<name>.mail.passwordFile`) must point to a runtime-provisioned file containing only the SMTP password on a single line.
-- When mail is enabled, the module writes `mail__options__auth__pass` into the runtime env file alongside the database password.
+- `services.ghost.mail.passwordFile` (or per-instance `services.ghost.instances.<name>.mail.passwordFile`) is required when using authenticated SMTP and must point to a runtime-provisioned file containing only the SMTP password on a single line.
+- For trusted unauthenticated relays, set `mail.user = ""` and omit `mail.passwordFile`.
+- When a mail password file is configured, the module writes `mail__options__auth__pass` into the runtime env file alongside the database password.
 - Gmail works with:
   - `host = "smtp.gmail.com"`
   - `port = 465`

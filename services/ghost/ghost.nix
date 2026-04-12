@@ -334,8 +334,8 @@
       message = "services.ghost.instances.${name}.database.passwordFile must be set when enabling Ghost.";
     }
     {
-      assertion = !instance.mail.enable || instance.mail.passwordFile != null;
-      message = "services.ghost.instances.${name}.mail.passwordFile must be set when services.ghost.instances.${name}.mail.enable = true.";
+      assertion = !instance.mail.enable || instance.mail.user == "" || instance.mail.passwordFile != null;
+      message = "services.ghost.instances.${name}.mail.passwordFile must be set when authenticated SMTP is enabled for services.ghost.instances.${name}.mail.";
     }
   ];
 
