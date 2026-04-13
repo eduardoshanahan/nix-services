@@ -72,6 +72,16 @@ Use `nix-pi` for:
 Rule: if the change would be useful on more than one host, it probably belongs
 here. If it is a one-host exception, it probably belongs in `nix-pi`.
 
+## Public Vs Private References
+
+Public repos in this workspace may intentionally use anonymized placeholders
+such as `*.internal.example` for Git remotes, service URLs, hostnames, and
+other environment-specific identifiers.
+
+Treat those values as sanitized public-side references, not as the canonical
+live endpoints. Check the matching private sibling repo for the real values
+before assuming a placeholder address is wrong or unavailable.
+
 ## Repo Structure
 
 - `flake.nix`: dev shell plus exported service modules

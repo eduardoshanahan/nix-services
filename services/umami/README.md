@@ -19,12 +19,12 @@ Umami is a simple, fast, privacy-focused alternative to Google Analytics. This m
 ```nix
 services.umamiCompose = {
   enable = true;
-  listenAddress = "10.100.0.1";  # Bind to the host's WireGuard interface
+  listenAddress = "192.0.2.10";  # Example bind address
   listenPort = 3000;
 
   database = {
     type = "postgresql";
-    host = "192.0.2.10";  # PostgreSQL host IP
+    host = "db.internal.example";  # Example database host
     port = 5433;
     name = "umami";
     user = "umami";
@@ -39,6 +39,9 @@ services.umamiCompose = {
   };
 };
 ```
+
+The addresses and hostnames above are sanitized public examples. Keep real
+environment-specific endpoints in the matching private companion repo.
 
 ## Secrets
 

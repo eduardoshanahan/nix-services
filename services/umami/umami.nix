@@ -25,7 +25,7 @@ in {
       type = lib.types.str;
       default = "0.0.0.0";
       description = "Host listen address for the Umami web interface.";
-      example = "10.100.0.1";
+      example = "192.0.2.10";
     };
 
     listenPort = lib.mkOption {
@@ -60,7 +60,7 @@ in {
       host = lib.mkOption {
         type = lib.types.str;
         description = "Database hostname or IP reachable from the Umami host.";
-        example = "192.0.2.10";
+        example = "db.internal.example";
       };
 
       port = lib.mkOption {
