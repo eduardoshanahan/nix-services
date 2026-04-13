@@ -25,7 +25,7 @@ in {
       type = lib.types.str;
       default = "0.0.0.0";
       description = "Host listen address for the Umami web interface.";
-      example = "10.0.0.10";
+      example = "10.100.0.1";
     };
 
     listenPort = lib.mkOption {

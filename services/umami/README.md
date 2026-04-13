@@ -19,7 +19,7 @@ Umami is a simple, fast, privacy-focused alternative to Google Analytics. This m
 ```nix
 services.umamiCompose = {
   enable = true;
-  listenAddress = "10.0.0.10";  # Bind to WireGuard interface
+  listenAddress = "10.100.0.1";  # Bind to the host's WireGuard interface
   listenPort = 3000;
 
   database = {
