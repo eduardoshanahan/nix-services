@@ -120,10 +120,8 @@ Common service shapes in this repo:
   tools are missing, the fix is usually to enter `nix develop`, not to skip hooks.
 - Do not bypass hooks by default just because the host environment lacks the
   required binaries.
-- Narrow exception: if the commit is doc-only and the only failing hook is
-  missing `markdownlint-cli2` in the current environment, it is acceptable to
-  use `git commit --no-verify` after confirming the staged change is limited to
-  docs and noting the reason in the session summary.
+- Do not use `--no-verify` as a workaround for missing local tools; enter
+  `nix develop` and rerun the normal workflow instead.
 - When the task is complete, commit and push the finished changes to `origin`
   instead of leaving them only in the local checkout unless the user asks for
   that.
