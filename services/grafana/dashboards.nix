@@ -7471,7 +7471,7 @@
         };
         targets = [
           {
-            expr = "time() - max(github_profile_last_fetch_unixtime{job=\"github-profile\"})";
+            expr = "time() - max(github_profile_last_success_unixtime{job=\"github-profile\"})";
             refId = "A";
           }
         ];

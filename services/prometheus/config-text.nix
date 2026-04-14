@@ -814,7 +814,7 @@
       "          description: \"github-profile exporter has been down or missing for more than 10 minutes.\""
       ""
       "      - alert: GithubProfileDataStale"
-      "        expr: ((max(github_profile_up{job=\"github-profile\"}) or vector(0)) == 1) and ((time() - max(github_profile_last_fetch_unixtime{job=\"github-profile\"})) > 7200)"
+      "        expr: ((max(github_profile_up{job=\"github-profile\"}) or vector(0)) == 1) and ((time() - max(github_profile_last_success_unixtime{job=\"github-profile\"})) > 7200)"
       "        for: 30m"
       "        labels:"
       "          severity: warning"
@@ -822,14 +822,6 @@
       "          summary: \"GitHub profile data is stale\""
       "          description: \"github-profile metrics have not refreshed in more than 2 hours while exporter remains up.\""
       ""
-      "      - alert: GithubProfileCommitStatsStuckPending"
-      "        expr: ((max(github_profile_up{job=\"github-profile\"}) or vector(0)) == 1) and (max(github_profile_commit_repos_pending{job=\"github-profile\"}) > 0) and (max(github_profile_commit_repos_ready{job=\"github-profile\"}) == 0)"
-      "        for: 6h"
-      "        labels:"
-      "          severity: warning"
-      "        annotations:"
-      "          summary: \"GitHub commit stats remain pending\""
-      "          description: \"GitHub contributor stats stayed pending (0 repos ready) for more than 6 hours.\""
     ] ++ cfg.extraAlertRules)
     + "\n";
 in {
