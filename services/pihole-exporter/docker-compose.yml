@@ -15,7 +15,15 @@ services:
       - /run/secrets/pihole-exporter.env
 
     ports:
-      - "${PIHOLE_EXPORTER_PORT}:9617"
+      - "${PIHOLE_EXPORTER_LISTEN_ADDRESS}:${PIHOLE_EXPORTER_PORT}:9617"
+
+    labels:
+      - "traefik.enable=${PIHOLE_EXPORTER_TRAEFIK_ENABLE}"
+      - "traefik.docker.network=${PIHOLE_EXPORTER_NETWORK}"
+      - "traefik.http.routers.pihole-exporter.rule=Host(`${PIHOLE_EXPORTER_HOSTNAME}`)"
+      - "traefik.http.services.pihole-exporter.loadbalancer.server.port=9617"
+      - "traefik.http.routers.pihole-exporter.entrypoints=${PIHOLE_EXPORTER_ENTRYPOINTS}"
+      - "traefik.http.routers.pihole-exporter.tls=${PIHOLE_EXPORTER_TLS}"
 
     logging:
       driver: "json-file"

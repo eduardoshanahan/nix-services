@@ -45,6 +45,20 @@ in {
       description = "External Docker network name used by Traefik and downstream services.";
     };
 
+    listenAddress = lib.mkOption {
+      type = lib.types.str;
+      default = "0.0.0.0";
+      description = "Host bind address for the exporter port mapping.";
+    };
+
+    hostname = lib.mkOption {
+      type = lib.types.nullOr lib.types.str;
+      default = null;
+      description = "Optional hostname used for a Traefik `Host()` route to exporter metrics.";
+    };
+
+    tls = lib.mkEnableOption "TLS on the optional Traefik router for exporter metrics";
+
     timezone = lib.mkOption {
       type = lib.types.str;
       default = "UTC";
@@ -140,7 +154,12 @@ in {
         Environment = [
           "PIHOLE_EXPORTER_CONTAINER_NAME=${cfg.containerName}"
           "PIHOLE_EXPORTER_NETWORK=${cfg.network}"
+          "PIHOLE_EXPORTER_LISTEN_ADDRESS=${cfg.listenAddress}"
           "PIHOLE_EXPORTER_PORT=${toString cfg.listenPort}"
+          "PIHOLE_EXPORTER_TRAEFIK_ENABLE=${if cfg.hostname != null then "true" else "false"}"
+          "PIHOLE_EXPORTER_HOSTNAME=${if cfg.hostname != null then cfg.hostname else "localhost.invalid"}"
+          "PIHOLE_EXPORTER_ENTRYPOINTS=${if cfg.tls then "websecure" else "web"}"
+          "PIHOLE_EXPORTER_TLS=${if cfg.tls then "true" else "false"}"
           "PIHOLE_EXPORTER_PIHOLE_HOSTNAME=${cfg.pihole.hostname}"
           "PIHOLE_EXPORTER_PIHOLE_PORT=${toString cfg.pihole.port}"
           "PIHOLE_EXPORTER_PIHOLE_PROTOCOL=${cfg.pihole.protocol}"
