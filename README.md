@@ -76,6 +76,15 @@ Before commit/push, run the sanitization checklist in:
 
 `docs/policy/PUBLIC_REPO_SANITIZATION_POLICY.md`
 
+## Session Pre-Flight
+
+Before meaningful implementation work, run:
+
+`nix run .#session-preflight`
+
+This verifies core local docs plus KB index availability from `../hhlab-wiki`
+and points at the relevant KB entries for `nix-services`.
+
 ## diagrams.net Startup Behavior
 
 The `diagrams-net` service uses a Docker healthcheck and a systemd post-start

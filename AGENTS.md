@@ -45,6 +45,7 @@ When working in `nix-services`, read in this order:
    - check for `../nix-services-private/records/<service>/INVESTIGATION.md` and
      read it before making any changes — it records verified facts and working
      procedures for that service; create it if it does not exist yet
+7. related records in `../hhlab-wiki` (decisions, anti-patterns, architecture)
 
 If a local doc points to `nix-pi` for host truth, follow the pointer instead of
 duplicating host behavior here.
@@ -132,6 +133,7 @@ Common service shapes in this repo:
 
 ## Dev Shell And Git
 
+- Run `nix run .#session-preflight` before meaningful implementation work.
 - Prefer running Git commands from `nix develop`.
 - At the start of a session, enter `nix develop`, run `git fetch origin`, then
   `git pull --rebase origin main`, and review `git status --short --branch`
