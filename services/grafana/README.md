@@ -104,6 +104,7 @@ With `services.grafanaCompose.provisioning.dashboards.enableStarter = true`, the
 - `Pi-hole Operations`
 - `Synology SNMP Operations`
 - `UniFi Overview`
+- `Fleet Resources`
 - `NAS File Activity` (only when Loki datasource is configured)
 - `Logs Pipeline` (only when Loki datasource is configured)
 
@@ -212,6 +213,19 @@ With `services.grafanaCompose.provisioning.dashboards.enableStarter = true`, the
   - total log volume
   - error-like log rate
   - raw logs panel for direct triage.
+
+`Fleet Resources` includes:
+
+- CPU usage % per instance: Raspberry Pi nodes (all), cluster nodes, Synology NAS (node_exporter
+  via `synology-nodes` job and SNMP via `synology-snmp-system`), VPS.
+- Memory free % and memory free bytes per instance: node_exporter machines combined with
+  SNMP memory (`memAvailReal` / `memTotalReal` in kB, converted to bytes for the absolute panel).
+- Disk usage % for all real filesystems per instance: node_exporter machines (all non-virtual
+  mountpoints) plus Synology SNMP volumes (`hrStorageDescr=~"/volume.*"`).
+- Disk free bytes and disk used bytes per instance and mountpoint: node_exporter machines only.
+- Temperature per instance: Raspberry Pi nodes and cluster nodes (`node_hwmon_temp_celsius`),
+  Synology NAS via node_exporter (`node_hwmon_temp_celsius{job="synology-nodes"}`) and SNMP
+  (`temperature`, `diskTemperature`). VPS excluded (no hardware sensors).
 
 ## Database access
 

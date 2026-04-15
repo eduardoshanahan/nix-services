@@ -10057,4 +10057,248 @@
       }
     ];
   };
+
+  fleetResourcesDashboardJson = builtins.toJSON {
+    id = null;
+    uid = "fleet-resources";
+    title = "Fleet Resources";
+    tags = ["homelab" "fleet" "resources"];
+    timezone = "browser";
+    schemaVersion = 39;
+    version = 1;
+    refresh = "1m";
+    time = {
+      from = "now-3h";
+      to = "now";
+    };
+    editable = true;
+    panels = [
+      {
+        id = 1;
+        type = "timeseries";
+        title = "CPU Usage %";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 24;
+          x = 0;
+          y = 0;
+        };
+        fieldConfig = {
+          defaults = {
+            unit = "percent";
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "100 - (avg by (instance) (rate(node_cpu_seconds_total{job=~\"nodes|synology-nodes\",mode=\"idle\"}[5m])) * 100)";
+            legendFormat = "{{instance}}";
+            refId = "A";
+          }
+          {
+            expr = "100 - avg by (instance) (ssCpuIdle{job=\"synology-snmp-system\"})";
+            legendFormat = "{{instance}}";
+            refId = "B";
+          }
+        ];
+      }
+      {
+        id = 2;
+        type = "timeseries";
+        title = "Memory Free %";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 0;
+          y = 8;
+        };
+        fieldConfig = {
+          defaults = {
+            unit = "percent";
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "(node_memory_MemAvailable_bytes{job=~\"nodes|synology-nodes\"} / node_memory_MemTotal_bytes{job=~\"nodes|synology-nodes\"}) * 100";
+            legendFormat = "{{instance}}";
+            refId = "A";
+          }
+          {
+            expr = "100 * (memAvailReal{job=\"synology-snmp-memory\"} / memTotalReal{job=\"synology-snmp-memory\"})";
+            legendFormat = "{{instance}}";
+            refId = "B";
+          }
+        ];
+      }
+      {
+        id = 3;
+        type = "timeseries";
+        title = "Memory Free";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 12;
+          y = 8;
+        };
+        fieldConfig = {
+          defaults = {
+            unit = "bytes";
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "node_memory_MemAvailable_bytes{job=~\"nodes|synology-nodes\"}";
+            legendFormat = "{{instance}}";
+            refId = "A";
+          }
+          {
+            expr = "memAvailReal{job=\"synology-snmp-memory\"} * 1024";
+            legendFormat = "{{instance}}";
+            refId = "B";
+          }
+        ];
+      }
+      {
+        id = 4;
+        type = "timeseries";
+        title = "Disk Usage %";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 24;
+          x = 0;
+          y = 16;
+        };
+        fieldConfig = {
+          defaults = {
+            unit = "percent";
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "100 * (1 - (node_filesystem_avail_bytes{job=~\"nodes|synology-nodes\",fstype!~\"tmpfs|overlay|devtmpfs|squashfs\",mountpoint!~\"/run/.*|/sys/.*|/proc/.*|/dev/.*|/var/lib/docker/.*\"} / node_filesystem_size_bytes{job=~\"nodes|synology-nodes\",fstype!~\"tmpfs|overlay|devtmpfs|squashfs\",mountpoint!~\"/run/.*|/sys/.*|/proc/.*|/dev/.*|/var/lib/docker/.*\"}))";
+            legendFormat = "{{instance}} {{mountpoint}}";
+            refId = "A";
+          }
+          {
+            expr = "100 * (hrStorageUsed{job=\"synology-snmp-storage\",hrStorageDescr=~\"/volume.*\"} / hrStorageSize{job=\"synology-snmp-storage\",hrStorageDescr=~\"/volume.*\"})";
+            legendFormat = "{{instance}} {{hrStorageDescr}}";
+            refId = "B";
+          }
+        ];
+      }
+      {
+        id = 5;
+        type = "timeseries";
+        title = "Disk Free";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 0;
+          y = 24;
+        };
+        fieldConfig = {
+          defaults = {
+            unit = "bytes";
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "node_filesystem_avail_bytes{job=~\"nodes|synology-nodes\",fstype!~\"tmpfs|overlay|devtmpfs|squashfs\",mountpoint!~\"/run/.*|/sys/.*|/proc/.*|/dev/.*|/var/lib/docker/.*\"}";
+            legendFormat = "{{instance}} {{mountpoint}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 6;
+        type = "timeseries";
+        title = "Disk Used";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 12;
+          x = 12;
+          y = 24;
+        };
+        fieldConfig = {
+          defaults = {
+            unit = "bytes";
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "node_filesystem_size_bytes{job=~\"nodes|synology-nodes\",fstype!~\"tmpfs|overlay|devtmpfs|squashfs\",mountpoint!~\"/run/.*|/sys/.*|/proc/.*|/dev/.*|/var/lib/docker/.*\"} - node_filesystem_avail_bytes{job=~\"nodes|synology-nodes\",fstype!~\"tmpfs|overlay|devtmpfs|squashfs\",mountpoint!~\"/run/.*|/sys/.*|/proc/.*|/dev/.*|/var/lib/docker/.*\"}";
+            legendFormat = "{{instance}} {{mountpoint}}";
+            refId = "A";
+          }
+        ];
+      }
+      {
+        id = 7;
+        type = "timeseries";
+        title = "Temperature";
+        datasource = {
+          type = "prometheus";
+          uid = "prometheus";
+        };
+        gridPos = {
+          h = 8;
+          w = 24;
+          x = 0;
+          y = 32;
+        };
+        fieldConfig = {
+          defaults = {
+            unit = "celsius";
+          };
+          overrides = [];
+        };
+        targets = [
+          {
+            expr = "max by (instance) (node_hwmon_temp_celsius{job=~\"nodes|synology-nodes\"})";
+            legendFormat = "{{instance}}";
+            refId = "A";
+          }
+          {
+            expr = "max by (instance) (temperature{job=\"synology-snmp\"})";
+            legendFormat = "{{instance}} system";
+            refId = "B";
+          }
+          {
+            expr = "max by (instance) (diskTemperature{job=\"synology-snmp\"})";
+            legendFormat = "{{instance}} disk";
+            refId = "C";
+          }
+        ];
+      }
+    ];
+  };
 }
