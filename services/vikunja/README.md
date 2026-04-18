@@ -22,6 +22,17 @@ This module deploys Vikunja behind Traefik using a checked-in Docker Compose fil
 - `services.vikunjaCompose.dataDir`
 - `services.vikunjaCompose.enableRegistration`
 - `services.vikunjaCompose.auth.local.enable`
+- `services.vikunjaCompose.mailer.enable`
+- `services.vikunjaCompose.mailer.host`
+- `services.vikunjaCompose.mailer.port`
+- `services.vikunjaCompose.mailer.authType`
+- `services.vikunjaCompose.mailer.username`
+- `services.vikunjaCompose.mailer.passwordFile`
+- `services.vikunjaCompose.mailer.skipTlsVerify`
+- `services.vikunjaCompose.mailer.forceSsl`
+- `services.vikunjaCompose.mailer.fromEmail`
+- `services.vikunjaCompose.mailer.queueLength`
+- `services.vikunjaCompose.mailer.queueTimeout`
 - `services.vikunjaCompose.auth.openid.enable`
 - `services.vikunjaCompose.auth.openid.providerKey`
 - `services.vikunjaCompose.auth.openid.name`
@@ -52,6 +63,9 @@ This module deploys Vikunja behind Traefik using a checked-in Docker Compose fil
 - In Postgres mode:
   - `VIKUNJA_DATABASE_TYPE=postgres`
   - DB password is read from runtime secret file via `/run/secrets/vikunja.env`
+- In mailer mode:
+  - SMTP settings are provided via `VIKUNJA_MAILER_*` variables.
+  - SMTP password (when configured) is read from runtime secret file via `/run/secrets/vikunja-mailer.env`.
 - Uploaded files are stored under `/app/vikunja/files`.
 - The module sets `HOME` and `XDG_CACHE_HOME` into the writable data path so the container does not try to write under `/.cache`.
 - The host data directory is prepared as owner `1000:0` before startup to match the container user.
@@ -81,6 +95,14 @@ services.vikunjaCompose = {
       passwordFile = "/run/secrets/vikunja-db-password";
       sslMode = "disable";
     };
+  };
+
+  mailer = {
+    enable = true;
+    host = "smtp-relay.${config.lab.domain}";
+    port = 2525;
+    fromEmail = "noreply@internal.example";
+    skipTlsVerify = true;
   };
 };
 ```

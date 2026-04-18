@@ -50,6 +50,76 @@ in {
       };
     };
 
+    mailer = {
+      enable = lib.mkOption {
+        type = lib.types.bool;
+        default = false;
+        description = "Enable SMTP email delivery for Vikunja notifications and reminders.";
+      };
+
+      host = lib.mkOption {
+        type = lib.types.str;
+        default = "smtp.internal.example";
+        description = "SMTP server host used by Vikunja.";
+      };
+
+      port = lib.mkOption {
+        type = lib.types.port;
+        default = 587;
+        description = "SMTP server port.";
+      };
+
+      authType = lib.mkOption {
+        type = lib.types.enum [ "plain" "login" "cram-md5" ];
+        default = "plain";
+        description = "SMTP auth type expected by the server.";
+      };
+
+      username = lib.mkOption {
+        type = lib.types.str;
+        default = "";
+        description = "SMTP username (leave empty when relay does not require auth).";
+      };
+
+      passwordFile = runtimeSecrets.mkSecretFileOption {
+        description = ''
+          Absolute path to a runtime-provisioned file containing only the SMTP
+          password on a single line. Set together with `mailer.username`.
+        '';
+        example = "/run/secrets/vikunja-mailer-password";
+      };
+
+      skipTlsVerify = lib.mkOption {
+        type = lib.types.bool;
+        default = false;
+        description = "Skip SMTP TLS certificate verification.";
+      };
+
+      forceSsl = lib.mkOption {
+        type = lib.types.bool;
+        default = false;
+        description = "Force SSL/TLS instead of STARTTLS.";
+      };
+
+      fromEmail = lib.mkOption {
+        type = lib.types.str;
+        default = "mail@vikunja";
+        description = "Default From address for emails sent by Vikunja.";
+      };
+
+      queueLength = lib.mkOption {
+        type = lib.types.ints.positive;
+        default = 100;
+        description = "Maximum queued emails in Vikunja.";
+      };
+
+      queueTimeout = lib.mkOption {
+        type = lib.types.ints.positive;
+        default = 30;
+        description = "SMTP connection timeout in seconds.";
+      };
+    };
+
     auth = {
       local.enable = lib.mkOption {
         type = lib.types.bool;

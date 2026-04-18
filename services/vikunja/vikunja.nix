@@ -91,6 +91,14 @@ in {
         message = "services.vikunjaCompose.database.postgres.user must not contain whitespace.";
       }
       {
+        assertion = !cfg.mailer.enable || builtins.match "^[^[:space:]]+$" cfg.mailer.host != null;
+        message = "services.vikunjaCompose.mailer.host must not contain whitespace when mailer is enabled.";
+      }
+      {
+        assertion = (cfg.mailer.username == "") == (cfg.mailer.passwordFile == null);
+        message = "Set both services.vikunjaCompose.mailer.username and services.vikunjaCompose.mailer.passwordFile together, or leave both unset.";
+      }
+      {
         assertion = !cfg.auth.openid.enable || cfg.auth.openid.clientIdFile != null;
         message = "services.vikunjaCompose.auth.openid.clientIdFile must be set when OpenID auth is enabled.";
       }
@@ -164,12 +172,35 @@ in {
           }"
           "VIKUNJA_DATA_DIR=${cfg.dataDir}"
           "VIKUNJA_DATABASE_ENV_FILE=/run/secrets/${serviceName}.env"
+          "VIKUNJA_MAILER_ENV_FILE=/run/secrets/${serviceName}-mailer.env"
           "VIKUNJA_DATABASE_TYPE=${cfg.database.type}"
           "VIKUNJA_DATABASE_PATH=${cfg.database.sqlite.path}"
           "VIKUNJA_DATABASE_HOST=${cfg.database.postgres.host}:${toString cfg.database.postgres.port}"
           "VIKUNJA_DATABASE_DATABASE=${cfg.database.postgres.name}"
           "VIKUNJA_DATABASE_USER=${cfg.database.postgres.user}"
           "VIKUNJA_DATABASE_SSLMODE=${cfg.database.postgres.sslMode}"
+          "VIKUNJA_MAILER_ENABLED=${
+            if cfg.mailer.enable
+            then "true"
+            else "false"
+          }"
+          "VIKUNJA_MAILER_HOST=${cfg.mailer.host}"
+          "VIKUNJA_MAILER_PORT=${toString cfg.mailer.port}"
+          "VIKUNJA_MAILER_AUTHTYPE=${cfg.mailer.authType}"
+          "VIKUNJA_MAILER_USERNAME=${cfg.mailer.username}"
+          "VIKUNJA_MAILER_SKIPTLSVERIFY=${
+            if cfg.mailer.skipTlsVerify
+            then "true"
+            else "false"
+          }"
+          "VIKUNJA_MAILER_FORCESSL=${
+            if cfg.mailer.forceSsl
+            then "true"
+            else "false"
+          }"
+          "VIKUNJA_MAILER_FROMEMAIL=${cfg.mailer.fromEmail}"
+          "VIKUNJA_MAILER_QUEUELENGTH=${toString cfg.mailer.queueLength}"
+          "VIKUNJA_MAILER_QUEUETIMEOUT=${toString cfg.mailer.queueTimeout}"
           "VIKUNJA_AUTH_OPENID_ENABLED=${
             if cfg.auth.openid.enable
             then "true"
@@ -193,9 +224,10 @@ in {
             "${pkgs.runtimeShell} -c 'mkdir -p ${cfg.dataDir} && chown 1000:0 ${cfg.dataDir} && chmod 0750 ${cfg.dataDir}'"
             "${pkgs.runtimeShell} -c 'test -s ${composeDir}/docker-compose.yml'"
             "${pkgs.runtimeShell} -c 'test -s ${composeDir}/config.yml'"
+            "${pkgs.runtimeShell} -c 'install -d -m 0700 /run/secrets'"
           ]
           ++ lib.optionals (cfg.database.type == "sqlite") [
-            "${pkgs.runtimeShell} -c 'install -d -m 0700 /run/secrets; : > /run/secrets/${serviceName}.env; chmod 0600 /run/secrets/${serviceName}.env'"
+            "${pkgs.runtimeShell} -c ': > /run/secrets/${serviceName}.env; chmod 0600 /run/secrets/${serviceName}.env'"
           ]
           ++ lib.optionals (cfg.database.type == "postgres") [
             (runtimeSecretEnv.mkRuntimeSecretEnvExecStartPre {
@@ -203,6 +235,16 @@ in {
               secretFile = cfg.database.postgres.passwordFile;
               envVar = "VIKUNJA_DATABASE_PASSWORD";
             })
+          ]
+          ++ lib.optionals (cfg.mailer.passwordFile != null) [
+            (runtimeSecretEnv.mkRuntimeSecretEnvExecStartPre {
+              name = "${serviceName}-mailer";
+              secretFile = cfg.mailer.passwordFile;
+              envVar = "VIKUNJA_MAILER_PASSWORD";
+            })
+          ]
+          ++ lib.optionals (cfg.mailer.passwordFile == null) [
+            "${pkgs.runtimeShell} -c ': > /run/secrets/${serviceName}-mailer.env; chmod 0600 /run/secrets/${serviceName}-mailer.env'"
           ]
           ++ lib.optionals cfg.auth.openid.enable [
             "${pkgs.runtimeShell} -c 'install -d -m 0700 -o 1000 -g 0 ${cfg.dataDir}/.secrets'"
