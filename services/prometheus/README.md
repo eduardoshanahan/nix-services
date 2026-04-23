@@ -21,6 +21,9 @@ The module ships a baseline `homelab-core` rule group:
 - `NodeLowMemory`: available memory below 10% for 10 minutes.
 - `NodeLowDiskRoot`: root filesystem free space below 15% for 15 minutes.
 - `TraefikHigh5xxRate`: sustained Traefik 5xx responses above 0.1/sec for 10 minutes.
+- `AppServiceHighLatencyP95`: p95 Traefik service latency above 2s for 15
+  minutes, but only when service traffic is above 0.1 requests/sec so
+  low-volume services do not flap on a handful of slow requests.
 - `PostgresExporterDatabaseDown`: `pg_up == 0` for 3 minutes.
 - `RedisExporterDatabaseDown`: `redis_up == 0` for 3 minutes.
 - `MysqlExporterDatabaseDown`: `mysql_up == 0` for 3 minutes.
