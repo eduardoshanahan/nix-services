@@ -81,6 +81,8 @@
     targets,
     scheme,
     tlsInsecureSkipVerify ? false,
+    scrapeInterval ? null,
+    scrapeTimeout ? null,
     dropUpMetric ? false,
   }:
     lib.optionals (targets != []) (
@@ -88,6 +90,14 @@
         "  - job_name: \"${name}\""
         "    scheme: ${scheme}"
         "    metrics_path: ${metricsPath}"
+      ]
+      ++ lib.optionals (scrapeInterval != null) [
+        "    scrape_interval: ${scrapeInterval}"
+      ]
+      ++ lib.optionals (scrapeTimeout != null) [
+        "    scrape_timeout: ${scrapeTimeout}"
+      ]
+      ++ [
         "    static_configs:"
         "      - targets:"
       ]
@@ -115,6 +125,8 @@
       targets = job.targets;
       scheme = job.scheme;
       tlsInsecureSkipVerify = job.tlsInsecureSkipVerify;
+      scrapeInterval = job.scrapeInterval;
+      scrapeTimeout = job.scrapeTimeout;
       dropUpMetric = job.dropUpMetric;
     }
   ) cfg.scrape.extraStaticJobs;

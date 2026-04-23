@@ -467,6 +467,20 @@
               description = "Whether Prometheus should skip TLS verification for this scrape job.";
             };
 
+            scrapeInterval = lib.mkOption {
+              type = lib.types.nullOr lib.types.str;
+              default = null;
+              example = "60s";
+              description = "Scrape interval for this job. When null, the global scrape_interval applies.";
+            };
+
+            scrapeTimeout = lib.mkOption {
+              type = lib.types.nullOr lib.types.str;
+              default = null;
+              example = "30s";
+              description = "Scrape timeout for this job. When null, the global scrape_timeout applies.";
+            };
+
             dropUpMetric = lib.mkOption {
               type = lib.types.bool;
               default = false;
