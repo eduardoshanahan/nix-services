@@ -162,6 +162,8 @@ services.prometheusCompose = {
         targets = [ "minio.internal.example:443" ];
         scheme = "https";
         metricsPath = "/minio/v2/metrics/cluster";
+        scrapeInterval = "60s";
+        scrapeTimeout = "30s";
       }
     ];
   };
@@ -169,3 +171,7 @@ services.prometheusCompose = {
   tls = true;
 };
 ```
+
+`scrape.extraStaticJobs` also supports optional per-job `scrapeInterval` and
+`scrapeTimeout` overrides. Use them for slower HTTPS-backed exporters or
+metrics paths that should not inherit the global `15s` / `10s` cadence.
