@@ -3,6 +3,7 @@ services:
     image: pihole/pihole:2026.04.0
     container_name: ${PIHOLE_CONTAINER_NAME}
     restart: unless-stopped
+    shm_size: ${PIHOLE_SHM_SIZE}
 
     ports:
       - "53:53/tcp"

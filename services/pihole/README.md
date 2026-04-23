@@ -18,6 +18,7 @@ This module deploys Pi-hole DNS + admin UI using a checked-in Docker Compose fil
 - `services.pihole.hostname`
 - `services.pihole.timezone`
 - `services.pihole.network`
+- `services.pihole.shmSize`
 - `services.pihole.webPasswordFile`
 - `services.pihole.tls`
 
@@ -29,6 +30,7 @@ This module deploys Pi-hole DNS + admin UI using a checked-in Docker Compose fil
 
 - DNS is exposed on host port `53/tcp` and `53/udp`.
 - UI is exposed through Traefik labels (no host bind for ports `80/443`).
+- Default container shared memory is `256m` to avoid Pi-hole FTL pressure on busy resolvers.
 
 ## Image pinning strategy
 
@@ -40,6 +42,7 @@ This module deploys Pi-hole DNS + admin UI using a checked-in Docker Compose fil
 services.pihole = {
   enable = true;
   hostname = "pihole.${config.lab.domain}";
+  shmSize = "256m";
   tls = true;
   webPasswordFile = "/run/secrets/pihole-web-password";
 };

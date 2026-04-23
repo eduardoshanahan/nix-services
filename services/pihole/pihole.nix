@@ -69,6 +69,17 @@ in {
       description = "External Docker network name used by Traefik and downstream services.";
     };
 
+    shmSize = lib.mkOption {
+      type = lib.types.str;
+      default = "256m";
+      description = ''
+        Shared memory size passed to the Pi-hole container.
+
+        Pi-hole FTL can exhaust Docker's default `/dev/shm` allocation on busy
+        resolvers, causing healthcheck and DNS timeouts.
+      '';
+    };
+
     webPasswordFile = runtimeSecrets.mkSecretFileOption {
       description = ''
         Absolute path to a runtime-provisioned file containing the Pi-hole web UI password.
@@ -115,6 +126,7 @@ in {
           "PIHOLE_HOSTNAME=${cfg.hostname}"
           "PIHOLE_ENTRYPOINTS=${if cfg.tls then "websecure" else "web"}"
           "PIHOLE_TLS=${if cfg.tls then "true" else "false"}"
+          "PIHOLE_SHM_SIZE=${cfg.shmSize}"
           "TZ=${cfg.timezone}"
         ];
 
