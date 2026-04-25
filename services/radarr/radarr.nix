@@ -243,6 +243,36 @@ in {
         config.environment.etc."${serviceName}/docker-compose.yml".source
       ];
 
+      environment = {
+        RADARR_CONTAINER_NAME = cfg.containerName;
+        RADARR_IMAGE_REPOSITORY = cfg.image.repository;
+        RADARR_IMAGE_TAG = cfg.image.tag;
+        RADARR_NETWORK = cfg.network;
+        RADARR_HOST = cfg.hostname;
+        RADARR_ENTRYPOINTS =
+          if cfg.tls
+          then "websecure"
+          else "web";
+        RADARR_TLS =
+          if cfg.tls
+          then "true"
+          else "false";
+        RADARR_DATA_DIR = cfg.dataDir;
+        RADARR_MEDIA_DIR =
+          if cfg.mediaDir == null
+          then ""
+          else cfg.mediaDir;
+        RADARR_MEDIA_MOUNT_PATH = cfg.mediaMountPath;
+        RADARR_DOWNLOADS_DIR =
+          if cfg.downloadsDir == null
+          then ""
+          else cfg.downloadsDir;
+        RADARR_DOWNLOADS_MOUNT_PATH = cfg.downloadsMountPath;
+        RADARR_PUID = toString cfg.uid;
+        RADARR_PGID = toString cfg.gid;
+        TZ = cfg.timezone;
+      };
+
       serviceConfig = {
         Type = "oneshot";
         RemainAfterExit = true;
@@ -250,40 +280,6 @@ in {
         TimeoutStartSec = 900;
         Restart = "on-failure";
         RestartSec = 10;
-
-        Environment = [
-          "RADARR_CONTAINER_NAME=${cfg.containerName}"
-          "RADARR_IMAGE_REPOSITORY=${cfg.image.repository}"
-          "RADARR_IMAGE_TAG=${cfg.image.tag}"
-          "RADARR_NETWORK=${cfg.network}"
-          "RADARR_HOST=${cfg.hostname}"
-          "RADARR_ENTRYPOINTS=${
-            if cfg.tls
-            then "websecure"
-            else "web"
-          }"
-          "RADARR_TLS=${
-            if cfg.tls
-            then "true"
-            else "false"
-          }"
-          "RADARR_DATA_DIR=${cfg.dataDir}"
-          "RADARR_MEDIA_DIR=${
-            if cfg.mediaDir == null
-            then ""
-            else cfg.mediaDir
-          }"
-          "RADARR_MEDIA_MOUNT_PATH=${cfg.mediaMountPath}"
-          "RADARR_DOWNLOADS_DIR=${
-            if cfg.downloadsDir == null
-            then ""
-            else cfg.downloadsDir
-          }"
-          "RADARR_DOWNLOADS_MOUNT_PATH=${cfg.downloadsMountPath}"
-          "RADARR_PUID=${toString cfg.uid}"
-          "RADARR_PGID=${toString cfg.gid}"
-          "TZ=${cfg.timezone}"
-        ];
 
         ExecStartPre = [
           "${pkgs.runtimeShell} -c 'mkdir -p ${lib.escapeShellArg cfg.dataDir} && chown ${toString cfg.uid}:${toString cfg.gid} ${lib.escapeShellArg cfg.dataDir} && chmod 0750 ${lib.escapeShellArg cfg.dataDir}'"

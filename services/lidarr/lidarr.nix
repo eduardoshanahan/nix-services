@@ -243,6 +243,36 @@ in {
         config.environment.etc."${serviceName}/docker-compose.yml".source
       ];
 
+      environment = {
+        LIDARR_CONTAINER_NAME = cfg.containerName;
+        LIDARR_IMAGE_REPOSITORY = cfg.image.repository;
+        LIDARR_IMAGE_TAG = cfg.image.tag;
+        LIDARR_NETWORK = cfg.network;
+        LIDARR_HOST = cfg.hostname;
+        LIDARR_ENTRYPOINTS =
+          if cfg.tls
+          then "websecure"
+          else "web";
+        LIDARR_TLS =
+          if cfg.tls
+          then "true"
+          else "false";
+        LIDARR_DATA_DIR = cfg.dataDir;
+        LIDARR_MEDIA_DIR =
+          if cfg.mediaDir == null
+          then ""
+          else cfg.mediaDir;
+        LIDARR_MEDIA_MOUNT_PATH = cfg.mediaMountPath;
+        LIDARR_DOWNLOADS_DIR =
+          if cfg.downloadsDir == null
+          then ""
+          else cfg.downloadsDir;
+        LIDARR_DOWNLOADS_MOUNT_PATH = cfg.downloadsMountPath;
+        LIDARR_PUID = toString cfg.uid;
+        LIDARR_PGID = toString cfg.gid;
+        TZ = cfg.timezone;
+      };
+
       serviceConfig = {
         Type = "oneshot";
         RemainAfterExit = true;
@@ -250,24 +280,6 @@ in {
         TimeoutStartSec = 900;
         Restart = "on-failure";
         RestartSec = 10;
-
-        Environment = [
-          "LIDARR_CONTAINER_NAME=${cfg.containerName}"
-          "LIDARR_IMAGE_REPOSITORY=${cfg.image.repository}"
-          "LIDARR_IMAGE_TAG=${cfg.image.tag}"
-          "LIDARR_NETWORK=${cfg.network}"
-          "LIDARR_HOST=${cfg.hostname}"
-          "LIDARR_ENTRYPOINTS=${if cfg.tls then "websecure" else "web"}"
-          "LIDARR_TLS=${if cfg.tls then "true" else "false"}"
-          "LIDARR_DATA_DIR=${cfg.dataDir}"
-          "LIDARR_MEDIA_DIR=${if cfg.mediaDir == null then "" else cfg.mediaDir}"
-          "LIDARR_MEDIA_MOUNT_PATH=${cfg.mediaMountPath}"
-          "LIDARR_DOWNLOADS_DIR=${if cfg.downloadsDir == null then "" else cfg.downloadsDir}"
-          "LIDARR_DOWNLOADS_MOUNT_PATH=${cfg.downloadsMountPath}"
-          "LIDARR_PUID=${toString cfg.uid}"
-          "LIDARR_PGID=${toString cfg.gid}"
-          "TZ=${cfg.timezone}"
-        ];
 
         ExecStartPre = [
           "${pkgs.runtimeShell} -c 'mkdir -p ${lib.escapeShellArg cfg.dataDir} && chown ${toString cfg.uid}:${toString cfg.gid} ${lib.escapeShellArg cfg.dataDir} && chmod 0750 ${lib.escapeShellArg cfg.dataDir}'"

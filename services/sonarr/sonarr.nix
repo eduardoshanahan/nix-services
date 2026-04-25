@@ -243,6 +243,36 @@ in {
         config.environment.etc."${serviceName}/docker-compose.yml".source
       ];
 
+      environment = {
+        SONARR_CONTAINER_NAME = cfg.containerName;
+        SONARR_IMAGE_REPOSITORY = cfg.image.repository;
+        SONARR_IMAGE_TAG = cfg.image.tag;
+        SONARR_NETWORK = cfg.network;
+        SONARR_HOST = cfg.hostname;
+        SONARR_ENTRYPOINTS =
+          if cfg.tls
+          then "websecure"
+          else "web";
+        SONARR_TLS =
+          if cfg.tls
+          then "true"
+          else "false";
+        SONARR_DATA_DIR = cfg.dataDir;
+        SONARR_MEDIA_DIR =
+          if cfg.mediaDir == null
+          then ""
+          else cfg.mediaDir;
+        SONARR_MEDIA_MOUNT_PATH = cfg.mediaMountPath;
+        SONARR_DOWNLOADS_DIR =
+          if cfg.downloadsDir == null
+          then ""
+          else cfg.downloadsDir;
+        SONARR_DOWNLOADS_MOUNT_PATH = cfg.downloadsMountPath;
+        SONARR_PUID = toString cfg.uid;
+        SONARR_PGID = toString cfg.gid;
+        TZ = cfg.timezone;
+      };
+
       serviceConfig = {
         Type = "oneshot";
         RemainAfterExit = true;
@@ -250,24 +280,6 @@ in {
         TimeoutStartSec = 900;
         Restart = "on-failure";
         RestartSec = 10;
-
-        Environment = [
-          "SONARR_CONTAINER_NAME=${cfg.containerName}"
-          "SONARR_IMAGE_REPOSITORY=${cfg.image.repository}"
-          "SONARR_IMAGE_TAG=${cfg.image.tag}"
-          "SONARR_NETWORK=${cfg.network}"
-          "SONARR_HOST=${cfg.hostname}"
-          "SONARR_ENTRYPOINTS=${if cfg.tls then "websecure" else "web"}"
-          "SONARR_TLS=${if cfg.tls then "true" else "false"}"
-          "SONARR_DATA_DIR=${cfg.dataDir}"
-          "SONARR_MEDIA_DIR=${if cfg.mediaDir == null then "" else cfg.mediaDir}"
-          "SONARR_MEDIA_MOUNT_PATH=${cfg.mediaMountPath}"
-          "SONARR_DOWNLOADS_DIR=${if cfg.downloadsDir == null then "" else cfg.downloadsDir}"
-          "SONARR_DOWNLOADS_MOUNT_PATH=${cfg.downloadsMountPath}"
-          "SONARR_PUID=${toString cfg.uid}"
-          "SONARR_PGID=${toString cfg.gid}"
-          "TZ=${cfg.timezone}"
-        ];
 
         ExecStartPre = [
           "${pkgs.runtimeShell} -c 'mkdir -p ${lib.escapeShellArg cfg.dataDir} && chown ${toString cfg.uid}:${toString cfg.gid} ${lib.escapeShellArg cfg.dataDir} && chmod 0750 ${lib.escapeShellArg cfg.dataDir}'"
