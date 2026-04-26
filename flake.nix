@@ -180,6 +180,7 @@ EOF
         n8nComposeModule = import ./services/n8n/n8n.nix;
         homarrModule = import ./services/homarr/homarr.nix;
         seerrModule = import ./services/seerr/seerr.nix;
+        ankiSyncComposeModule = import ./services/anki-sync/anki-sync.nix;
         calibreWebAutomatedComposeModule = import ./services/calibre-web-automated/calibre-web-automated.nix;
         lazylibrarianComposeModule = import ./services/lazylibrarian/lazylibrarian.nix;
         lidarrComposeModule = import ./services/lidarr/lidarr.nix;
@@ -229,6 +230,7 @@ EOF
           n8nCompose = n8nComposeModule;
           homarr = homarrModule;
           seerr = seerrModule;
+          ankiSyncCompose = ankiSyncComposeModule;
           calibreWebAutomatedCompose = calibreWebAutomatedComposeModule;
           lazylibrarianCompose = lazylibrarianComposeModule;
           lidarrCompose = lidarrComposeModule;
@@ -279,6 +281,7 @@ EOF
           n8nCompose = n8nComposeModule;
           homarr = homarrModule;
           seerr = seerrModule;
+          ankiSyncCompose = ankiSyncComposeModule;
           calibreWebAutomatedCompose = calibreWebAutomatedComposeModule;
           lazylibrarianCompose = lazylibrarianComposeModule;
           lidarrCompose = lidarrComposeModule;

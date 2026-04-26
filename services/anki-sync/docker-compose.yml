@@ -1,0 +1,47 @@
+services:
+  anki-sync:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        ANKI_VERSION: ${ANKI_SYNC_VERSION}
+    image: anki-sync-local:${ANKI_SYNC_VERSION}
+    container_name: ${ANKI_SYNC_CONTAINER_NAME}
+    restart: unless-stopped
+    init: true
+
+    expose:
+      - "8080"
+
+    env_file:
+      - "${ANKI_SYNC_RUNTIME_ENV_FILE}"
+
+    environment:
+      - TZ=${TZ}
+      - PUID=${ANKI_SYNC_PUID}
+      - PGID=${ANKI_SYNC_PGID}
+
+    volumes:
+      - "${ANKI_SYNC_DATA_DIR}:/anki_data:rw"
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=${ANKI_SYNC_NETWORK}"
+      - "traefik.http.routers.anki-sync.rule=Host(`${ANKI_SYNC_HOSTNAME}`)"
+      - "traefik.http.services.anki-sync.loadbalancer.server.port=8080"
+      - "traefik.http.routers.anki-sync.entrypoints=${ANKI_SYNC_ENTRYPOINTS}"
+      - "traefik.http.routers.anki-sync.tls=${ANKI_SYNC_TLS}"
+
+    networks:
+      - traefik
+
+networks:
+  traefik:
+    external: true
+    name: ${ANKI_SYNC_NETWORK}
