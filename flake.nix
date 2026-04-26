@@ -188,6 +188,7 @@ EOF
         prowlarrComposeModule = import ./services/prowlarr/prowlarr.nix;
         sonarrComposeModule = import ./services/sonarr/sonarr.nix;
         umamiComposeModule = import ./services/umami/umami.nix;
+        daysuntilComposeModule = import ./services/daysuntil/daysuntil.nix;
       in {
         nixosModules = {
           traefikCompose = traefikModule;
@@ -238,6 +239,7 @@ EOF
           prowlarrCompose = prowlarrComposeModule;
           sonarrCompose = sonarrComposeModule;
           umamiCompose = umamiComposeModule;
+          daysuntilCompose = daysuntilComposeModule;
         };
 
         services = {
@@ -288,6 +290,8 @@ EOF
           radarrCompose = radarrComposeModule;
           prowlarrCompose = prowlarrComposeModule;
           sonarrCompose = sonarrComposeModule;
+          umamiCompose = umamiComposeModule;
+          daysuntilCompose = daysuntilComposeModule;
         };
       }
     );

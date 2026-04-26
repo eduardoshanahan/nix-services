@@ -1,0 +1,48 @@
+services:
+  daysuntil:
+    image: ${DAYSUNTIL_IMAGE}
+    container_name: ${DAYSUNTIL_CONTAINER_NAME}
+    restart: unless-stopped
+    init: true
+    mem_limit: 256m
+    pids_limit: 64
+    cpus: "0.5"
+
+    expose:
+      - "8080"
+
+    environment:
+      - TZ
+      - DB_PATH=/data/daysuntil.db
+
+    volumes:
+      - ${DAYSUNTIL_DATA_DIR}:/data
+
+    healthcheck:
+      test: ["CMD-SHELL", "wget --spider -q http://127.0.0.1:8080/ || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 8
+      start_period: 20s
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=${DAYSUNTIL_NETWORK}"
+      - "traefik.http.routers.daysuntil.rule=Host(`${DAYSUNTIL_HOSTNAME}`)"
+      - "traefik.http.services.daysuntil.loadbalancer.server.port=8080"
+      - "traefik.http.routers.daysuntil.entrypoints=${DAYSUNTIL_ENTRYPOINTS}"
+      - "traefik.http.routers.daysuntil.tls=${DAYSUNTIL_TLS}"
+
+    networks:
+      - traefik
+
+networks:
+  traefik:
+    external: true
+    name: ${DAYSUNTIL_NETWORK}
