@@ -110,7 +110,7 @@
   composeText = ''
         services:
           traefik:
-            image: traefik:v3.6.13
+            image: traefik:v3.7.0
             container_name: ''${TRAEFIK_CONTAINER_NAME}
             restart: unless-stopped
 
