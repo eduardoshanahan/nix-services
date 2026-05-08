@@ -91,6 +91,29 @@ in {
     };
 
     tls = lib.mkEnableOption "TLS on the Pi-hole Traefik router";
+
+    image = {
+      repository = lib.mkOption {
+        type = lib.types.str;
+        default = "pihole/pihole";
+        description = "Container image repository.";
+      };
+
+      tag = lib.mkOption {
+        type = lib.types.str;
+        default = "2026.04.1";
+        description = "Container image tag.";
+      };
+
+      allowMutableTag = lib.mkOption {
+        type = lib.types.bool;
+        default = false;
+        description = ''
+          Allow mutable tags such as `latest`. Keep disabled to enforce pinned
+          image tags by default.
+        '';
+      };
+    };
   };
 
   config = lib.mkIf cfg.enable {
@@ -98,6 +121,18 @@ in {
       {
         assertion = cfg.webPasswordFile != null;
         message = "services.pihole.webPasswordFile must be set when enabling Pi-hole.";
+      }
+      {
+        assertion = builtins.match "^[^[:space:]]+$" cfg.image.repository != null;
+        message = "services.pihole.image.repository must not contain whitespace.";
+      }
+      {
+        assertion = builtins.match "^[^[:space:]]+$" cfg.image.tag != null;
+        message = "services.pihole.image.tag must not contain whitespace.";
+      }
+      {
+        assertion = cfg.image.allowMutableTag || cfg.image.tag != "latest";
+        message = "services.pihole.image.tag must be pinned (not `latest`) unless services.pihole.image.allowMutableTag = true.";
       }
     ];
     virtualisation.docker.enable = true;
@@ -128,6 +163,8 @@ in {
           "PIHOLE_TLS=${if cfg.tls then "true" else "false"}"
           "PIHOLE_SHM_SIZE=${cfg.shmSize}"
           "TZ=${cfg.timezone}"
+          "PIHOLE_IMAGE_REPOSITORY=${cfg.image.repository}"
+          "PIHOLE_IMAGE_TAG=${cfg.image.tag}"
         ];
 
         ExecStartPre = [

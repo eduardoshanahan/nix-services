@@ -83,6 +83,18 @@ in {
         assertion = !acmeEnabled || cfg.acme.cloudflareApiTokenFile != null;
         message = "services.traefik.acme.cloudflareApiTokenFile must be set when ACME is enabled.";
       }
+      {
+        assertion = builtins.match "^[^[:space:]]+$" cfg.image.repository != null;
+        message = "services.traefikCompose.image.repository must not contain whitespace.";
+      }
+      {
+        assertion = builtins.match "^[^[:space:]]+$" cfg.image.tag != null;
+        message = "services.traefikCompose.image.tag must not contain whitespace.";
+      }
+      {
+        assertion = cfg.image.allowMutableTag || cfg.image.tag != "latest";
+        message = "services.traefikCompose.image.tag must be pinned (not `latest`) unless services.traefikCompose.image.allowMutableTag = true.";
+      }
     ];
 
     virtualisation.docker.enable = true;
@@ -115,6 +127,8 @@ in {
             "TRAEFIK_CONTAINER_NAME=${cfg.containerName}"
             "TRAEFIK_NETWORK=${cfg.network}"
             "TRAEFIK_ACME_ENV_FILE=${if acmeEnabled then acmeEnvFile else "/dev/null"}"
+            "TRAEFIK_IMAGE_REPOSITORY=${cfg.image.repository}"
+            "TRAEFIK_IMAGE_TAG=${cfg.image.tag}"
           ]
           ++ runtimeSecrets.mkSecretFileEnvVar {
             envVar = "TRAEFIK_ENV_FILE";

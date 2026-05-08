@@ -103,5 +103,28 @@ in {
       };
     };
 
+    image = {
+      repository = lib.mkOption {
+        type = lib.types.str;
+        default = "traefik";
+        description = "Container image repository.";
+      };
+
+      tag = lib.mkOption {
+        type = lib.types.str;
+        default = "v3.7.0";
+        description = "Container image tag.";
+      };
+
+      allowMutableTag = lib.mkOption {
+        type = lib.types.bool;
+        default = false;
+        description = ''
+          Allow mutable tags such as `latest`. Keep disabled to enforce pinned
+          image tags by default.
+        '';
+      };
+    };
+
   };
 }

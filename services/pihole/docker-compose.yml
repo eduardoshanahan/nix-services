@@ -1,6 +1,6 @@
 services:
   pihole:
-    image: pihole/pihole:2026.04.1
+    image: ${PIHOLE_IMAGE_REPOSITORY}:${PIHOLE_IMAGE_TAG}
     container_name: ${PIHOLE_CONTAINER_NAME}
     restart: unless-stopped
     shm_size: ${PIHOLE_SHM_SIZE}
