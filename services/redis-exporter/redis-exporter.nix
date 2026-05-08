@@ -73,7 +73,7 @@ in {
 
       tag = lib.mkOption {
         type = lib.types.str;
-        default = "v1.82.0";
+        default = "v1.83.0";
         description = "Container image tag.";
       };
     };
