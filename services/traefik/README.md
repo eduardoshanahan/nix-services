@@ -18,6 +18,18 @@ This module deploys Traefik as the ingress service.
 - `services/traefik/docker-compose.yml`: checked-in reference snapshot (not the
   active runtime source).
 
+## Image pinning
+
+The container image is controlled via options:
+
+- `services.traefikCompose.image.repository` — default `"traefik"`
+- `services.traefikCompose.image.tag` — default `"v3.7.0"`
+- `services.traefikCompose.image.allowMutableTag` — default `false`
+
+These are injected as `TRAEFIK_IMAGE_REPOSITORY` and `TRAEFIK_IMAGE_TAG` env
+vars into the systemd unit and consumed by the generated compose file via
+`${TRAEFIK_IMAGE_REPOSITORY}:${TRAEFIK_IMAGE_TAG}`.
+
 ## Why Traefik differs from most services
 
 Most services in this repository use checked-in compose files and generate

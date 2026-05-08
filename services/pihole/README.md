@@ -21,6 +21,9 @@ This module deploys Pi-hole DNS + admin UI using a checked-in Docker Compose fil
 - `services.pihole.shmSize`
 - `services.pihole.webPasswordFile`
 - `services.pihole.tls`
+- `services.pihole.image.repository`
+- `services.pihole.image.tag`
+- `services.pihole.image.allowMutableTag`
 
 ## Runtime secret contract
 
@@ -34,7 +37,9 @@ This module deploys Pi-hole DNS + admin UI using a checked-in Docker Compose fil
 
 ## Image pinning strategy
 
-- Default image is `pihole/pihole:2026.04.0`.
+Default image is `pihole/pihole:2026.04.1`. Override per host via
+`services.pihole.image.tag`. Mutable tags (e.g. `latest`) require
+`services.pihole.image.allowMutableTag = true`.
 
 ## Example
 
