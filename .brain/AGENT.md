@@ -175,6 +175,29 @@ Common service shapes in this repo:
   full host rebuild, and verify on the live host that the fix still works after
   the rebuild.
 
+### Nix Compose Template Escaping
+
+When building a compose file as a Nix `''...''` heredoc (indented string), use
+`''${VAR}` to pass a literal `${VAR}` through to Docker Compose for runtime
+expansion. Plain `${VAR}` inside a Nix string is Nix interpolation and will fail
+at eval time if `VAR` is not a Nix binding.
+
+Example (render.nix):
+
+```nix
+composeText = ''
+  services:
+    myapp:
+      image: ''${MYAPP_IMAGE_REPOSITORY}:''${MYAPP_IMAGE_TAG}
+'';
+```
+
+### Service-Specific Notes
+
+- **pihole**: all `services.pihole` options are defined inline in
+  `services/pihole/pihole.nix` — there is no separate `options.nix`. Add new
+  options directly there.
+
 ### Implementation Patterns To Preserve
 
 Most modules in this repo follow this pattern:
