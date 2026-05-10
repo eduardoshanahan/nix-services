@@ -156,7 +156,7 @@ Common service shapes in this repo:
 
 ### Dev Shell And Git
 
-- Run `nix run .#session-preflight` before meaningful implementation work.
+- Run `brainctl preflight "<task>"` before meaningful implementation work.
 - Prefer running Git commands from `nix develop`.
 - At the start of a session, enter `nix develop`, run `git fetch origin`, then
   `git pull --rebase origin main`, and review `git status --short --branch`

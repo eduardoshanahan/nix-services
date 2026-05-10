@@ -78,12 +78,13 @@ Before commit/push, run the sanitization checklist in:
 
 ## Session Pre-Flight
 
-Before meaningful implementation work, run:
+Before meaningful implementation work, use the canonical brain workflow:
 
-`nix run .#session-preflight`
+`brainctl preflight "<task>"`
 
-This verifies core local docs plus KB index availability from `../hhlab-wiki`
-and points at the relevant KB entries for `nix-services`.
+This is the current source of prior investigations, continuity notes, and
+cross-project context. The older repo-local `session-preflight` helper and
+`../hhlab-wiki` lookup flow are obsolete and no longer used.
 
 ## diagrams.net Startup Behavior
 
