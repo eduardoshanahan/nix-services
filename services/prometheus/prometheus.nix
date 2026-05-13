@@ -98,6 +98,7 @@ in {
           }"
           "PROMETHEUS_DATA_DIR=${cfg.dataDir}"
           "PROMETHEUS_RETENTION_TIME=${cfg.retentionTime}"
+          "PROMETHEUS_RETENTION_SIZE=${cfg.retentionSize}"
           "PROMETHEUS_EXTERNAL_URL=${externalUrl}"
           "TZ=${cfg.timezone}"
         ];

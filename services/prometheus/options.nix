@@ -37,6 +37,17 @@
       description = "Prometheus TSDB retention time (for example `30d`).";
     };
 
+    retentionSize = lib.mkOption {
+      type = lib.types.str;
+      default = "0";
+      example = "20GB";
+      description = ''
+        Prometheus TSDB retention size limit. Oldest blocks are removed when
+        storage exceeds this value. Supported units: B, KB, MB, GB, TB, PB,
+        EB. `0` (default) means no size limit.
+      '';
+    };
+
     image = {
       repository = lib.mkOption {
         type = lib.types.str;
