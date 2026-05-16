@@ -113,6 +113,11 @@ in {
 
     tls = lib.mkEnableOption "TLS on the Woodpecker Traefik router";
 
+    grpcHostname = lib.mkOption {
+      type = lib.types.str;
+      description = "Dedicated hostname for the agent gRPC endpoint (routed to port 9000 via h2c).";
+    };
+
     openRegistration = lib.mkOption {
       type = lib.types.bool;
       default = false;
@@ -307,6 +312,10 @@ in {
         message = "services.woodpeckerCompose.hostname must be a valid DNS hostname.";
       }
       {
+        assertion = builtins.match hostnameRegex cfg.grpcHostname != null;
+        message = "services.woodpeckerCompose.grpcHostname must be a valid DNS hostname.";
+      }
+      {
         assertion = builtins.match networkRegex cfg.network != null;
         message = "services.woodpeckerCompose.network may only contain letters, numbers, `.`, `_`, and `-`.";
       }
@@ -409,6 +418,7 @@ in {
           "WOODPECKER_AGENT_BACKEND_DOCKER_VOLUMES=${lib.concatStringsSep "," cfg.agent.backendDockerVolumes}"
           "WOODPECKER_NETWORK=${cfg.network}"
           "WOODPECKER_HOSTNAME=${cfg.hostname}"
+          "WOODPECKER_GRPC_HOSTNAME=${cfg.grpcHostname}"
           "WOODPECKER_HOST_URL=${if cfg.tls then "https" else "http"}://${cfg.hostname}"
           "WOODPECKER_ENTRYPOINTS=${if cfg.tls then "websecure" else "web"}"
           "WOODPECKER_TLS=${if cfg.tls then "true" else "false"}"
