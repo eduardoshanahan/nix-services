@@ -115,7 +115,7 @@ in {
 
     grpcHostname = lib.mkOption {
       type = lib.types.str;
-      description = "Dedicated hostname for the agent gRPC endpoint (routed to port 9000 via h2c).";
+      description = "Dedicated hostname for the agent gRPC endpoint (Traefik TCP router → port 9000).";
     };
 
     openRegistration = lib.mkOption {

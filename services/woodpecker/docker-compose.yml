@@ -35,16 +35,19 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=${WOODPECKER_NETWORK}"
+      # HTTP router: web UI on port 8000
       - "traefik.http.routers.woodpecker.rule=Host(`${WOODPECKER_HOSTNAME}`)"
       - "traefik.http.routers.woodpecker.entrypoints=${WOODPECKER_ENTRYPOINTS}"
       - "traefik.http.routers.woodpecker.tls=${WOODPECKER_TLS}"
+      - "traefik.http.routers.woodpecker.service=woodpecker"
       - "traefik.http.services.woodpecker.loadbalancer.server.port=8000"
-      - "traefik.http.routers.woodpecker-grpc.rule=Host(`${WOODPECKER_GRPC_HOSTNAME}`)"
-      - "traefik.http.routers.woodpecker-grpc.entrypoints=${WOODPECKER_ENTRYPOINTS}"
-      - "traefik.http.routers.woodpecker-grpc.tls=${WOODPECKER_TLS}"
-      - "traefik.http.routers.woodpecker-grpc.service=woodpecker-grpc"
-      - "traefik.http.services.woodpecker-grpc.loadbalancer.server.port=9000"
-      - "traefik.http.services.woodpecker-grpc.loadbalancer.server.scheme=h2c"
+      # TCP router: gRPC agent endpoint on port 9000
+      # Using TCP (not HTTP) so Traefik forwards raw bytes and does not
+      # buffer the gRPC request stream, which causes DeadlineExceeded.
+      - "traefik.tcp.routers.woodpecker-grpc.rule=HostSNI(`${WOODPECKER_GRPC_HOSTNAME}`)"
+      - "traefik.tcp.routers.woodpecker-grpc.entrypoints=${WOODPECKER_ENTRYPOINTS}"
+      - "traefik.tcp.routers.woodpecker-grpc.tls=true"
+      - "traefik.tcp.services.woodpecker-grpc.loadbalancer.server.port=9000"
 
     networks:
       - traefik
