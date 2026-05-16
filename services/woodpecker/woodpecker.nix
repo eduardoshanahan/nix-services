@@ -153,13 +153,13 @@ in {
 
         tag = lib.mkOption {
           type = lib.types.str;
-          default = "latest";
+          default = "v3.14.0";
           description = "Container image tag for the Woodpecker server.";
         };
 
         allowMutableTag = lib.mkOption {
           type = lib.types.bool;
-          default = true;
+          default = false;
           description = "Allow mutable tags such as `latest`.";
         };
       };

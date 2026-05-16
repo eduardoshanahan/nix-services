@@ -109,13 +109,13 @@ in {
 
       tag = lib.mkOption {
         type = lib.types.str;
-        default = "latest";
+        default = "3.1.0.4875-ls27";
         description = "Container image tag.";
       };
 
       allowMutableTag = lib.mkOption {
         type = lib.types.bool;
-        default = true;
+        default = false;
         description = "Allow mutable tags such as `latest`.";
       };
     };
