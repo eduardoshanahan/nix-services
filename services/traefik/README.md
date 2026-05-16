@@ -23,7 +23,7 @@ This module deploys Traefik as the ingress service.
 The container image is controlled via options:
 
 - `services.traefikCompose.image.repository` — default `"traefik"`
-- `services.traefikCompose.image.tag` — default `"v3.7.0"`
+- `services.traefikCompose.image.tag` — default `"v3.7.1"`
 - `services.traefikCompose.image.allowMutableTag` — default `false`
 
 These are injected as `TRAEFIK_IMAGE_REPOSITORY` and `TRAEFIK_IMAGE_TAG` env
