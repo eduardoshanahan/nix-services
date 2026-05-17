@@ -116,16 +116,16 @@ in {
 
       tag = lib.mkOption {
         type = lib.types.str;
-        default = "postgresql-latest";
+        default = "postgresql-3.1.0";
         description = "Container image tag.";
       };
 
       allowMutableTag = lib.mkOption {
         type = lib.types.bool;
-        default = true;
+        default = false;
         description = ''
           Allow mutable tags such as `latest` or `postgresql-latest`.
-          Enabled by default for Umami to track latest releases.
+          Set to true only when intentionally tracking a floating tag.
         '';
       };
     };
