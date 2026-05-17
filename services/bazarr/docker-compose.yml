@@ -1,0 +1,47 @@
+services:
+  bazarr:
+    image: ${BAZARR_IMAGE_REPOSITORY}:${BAZARR_IMAGE_TAG}
+    container_name: ${BAZARR_CONTAINER_NAME}
+    restart: unless-stopped
+    mem_limit: 512m
+    pids_limit: 256
+    cpus: "1.0"
+
+    expose:
+      - "6767"
+
+    environment:
+      - TZ=${TZ}
+      - PUID=${BAZARR_PUID}
+      - PGID=${BAZARR_PGID}
+      - UMASK=002
+      - SSL_CERT_FILE=/etc/ssl/certs/ca-certificates-with-homelab.pem
+      - CURL_CA_BUNDLE=/etc/ssl/certs/ca-certificates-with-homelab.pem
+
+    volumes:
+      - "${BAZARR_DATA_DIR}:/config"
+      - "${BAZARR_TV_DIR}:${BAZARR_TV_MOUNT_PATH}"
+      - "${BAZARR_MOVIES_DIR}:${BAZARR_MOVIES_MOUNT_PATH}"
+      - "/etc/ssl/certs/ca-certificates-with-homelab.pem:/etc/ssl/certs/ca-certificates-with-homelab.pem:ro"
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=${BAZARR_NETWORK}"
+      - "traefik.http.routers.bazarr.rule=Host(`${BAZARR_HOST}`)"
+      - "traefik.http.services.bazarr.loadbalancer.server.port=6767"
+      - "traefik.http.routers.bazarr.entrypoints=${BAZARR_ENTRYPOINTS}"
+      - "traefik.http.routers.bazarr.tls=${BAZARR_TLS}"
+
+    networks:
+      - traefik
+
+networks:
+  traefik:
+    external: true
+    name: ${BAZARR_NETWORK}

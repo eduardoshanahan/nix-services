@@ -114,6 +114,7 @@
         sonarrComposeModule = import ./services/sonarr/sonarr.nix;
         umamiComposeModule = import ./services/umami/umami.nix;
         daysuntilComposeModule = import ./services/daysuntil/daysuntil.nix;
+        bazarrComposeModule = import ./services/bazarr/bazarr.nix;
       in {
         nixosModules = {
           traefikCompose = traefikModule;
@@ -165,6 +166,7 @@
           sonarrCompose = sonarrComposeModule;
           umamiCompose = umamiComposeModule;
           daysuntilCompose = daysuntilComposeModule;
+          bazarrCompose = bazarrComposeModule;
         };
 
         services = {
@@ -217,6 +219,7 @@
           sonarrCompose = sonarrComposeModule;
           umamiCompose = umamiComposeModule;
           daysuntilCompose = daysuntilComposeModule;
+          bazarrCompose = bazarrComposeModule;
         };
       }
     );
