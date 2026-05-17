@@ -116,7 +116,7 @@ in {
 
       tag = lib.mkOption {
         type = lib.types.str;
-        default = "postgresql-3.1.0";
+        default = "postgresql-v2.16";
         description = "Container image tag.";
       };
 
