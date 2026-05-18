@@ -98,13 +98,13 @@ in {
 
       tag = lib.mkOption {
         type = lib.types.str;
-        default = "latest";
+        default = "2026.5.17-d7e8b7cd1";
         description = "Container image tag.";
       };
 
       digest = lib.mkOption {
         type = lib.types.nullOr lib.types.str;
-        default = "sha256:754a07a64e926a1fc0a8a30cd7a07d08278188f0ef6143e38ad0b22ea8599c55";
+        default = null;
         description = ''
           Optional immutable digest pin (for example `sha256:...`). When set,
           the module uses `repository@digest` form and ignores

@@ -40,6 +40,11 @@ If routed through Traefik, also check the configured hostname:
 curl -skI https://<fossflow-hostname>/
 ```
 
+## Image pinning
+
+- Default tag: `master-b69fc2e` (`stnsmith/fossflow`). No digest pin — tag is a commit SHA and is immutable.
+- `latest` is blocked unless `services.fossflowCompose.image.allowMutableTag = true`.
+
 ## Notes
 
 - The module uses a persistent host directory, not a runtime-generated

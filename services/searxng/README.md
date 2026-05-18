@@ -38,6 +38,11 @@ If routed through Traefik, also check the configured hostname:
 curl -skI https://<searxng-hostname>/
 ```
 
+## Image pinning
+
+- Default tag: `2026.5.17-d7e8b7cd1` (`searxng/searxng`). No digest pin — tag is date+commit and is immutable.
+- `latest` is blocked unless `services.searxngCompose.image.allowMutableTag = true`.
+
 ## Notes
 
 - The service uses persistent host directories for config and cache, not a
