@@ -27,7 +27,7 @@ This module deploys Excalidraw behind Traefik using a checked-in Docker Compose 
 
 ## Image pinning
 
-- Default tag: `sha-4bfc5bb` (`excalidraw/excalidraw`). No digest pin — tag is a commit SHA and is immutable.
+- Default digest: `sha256:0faa2324...` (arm64 build of `latest`). SHA tags (`sha-*`) are amd64-only — must use digest pinning for arm64 hosts.
 - Preferred: set `services.excalidraw.image.digest` to an immutable digest.
 - If using tags, keep `services.excalidraw.image.allowMutableTag = false` and use a fixed tag.
 - `latest` is blocked unless `services.excalidraw.image.allowMutableTag = true`.
