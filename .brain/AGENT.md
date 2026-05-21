@@ -1,6 +1,6 @@
 # Agent Instructions — nix-services (public)
 
-This file extends the global instructions at `~/Programming/brain/.brain/AGENT.md`.
+This file extends the global instructions at `~/Programming/hhlab/brain/.brain/AGENT.md`.
 
 ---
 
