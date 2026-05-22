@@ -98,6 +98,12 @@ in {
             then "true"
             else "false"
           }"
+          "DAYSUNTIL_BASE_URL=https://${cfg.hostname}"
+          "DAYSUNTIL_COOKIE_SECURE=${
+            if cfg.tls
+            then "true"
+            else "false"
+          }"
           "TZ=${cfg.timezone}"
         ];
 

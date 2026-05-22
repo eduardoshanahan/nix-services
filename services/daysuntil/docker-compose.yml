@@ -14,6 +14,8 @@ services:
     environment:
       - TZ
       - DB_PATH=/data/daysuntil.db
+      - BASE_URL=${DAYSUNTIL_BASE_URL}
+      - COOKIE_SECURE=${DAYSUNTIL_COOKIE_SECURE}
 
     volumes:
       - ${DAYSUNTIL_DATA_DIR}:/data
