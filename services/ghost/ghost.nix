@@ -47,6 +47,22 @@
       description = "Persistent host path used for Ghost content.";
     };
 
+    themeDir = lib.mkOption {
+      type = lib.types.nullOr lib.types.path;
+      default = null;
+      description = ''
+        Path to a Ghost theme directory. When set, the theme is copied into
+        <dataDir>/themes/<themeName>/ before Ghost starts, and the service
+        restarts automatically when the path changes in the Nix store.
+      '';
+    };
+
+    themeName = lib.mkOption {
+      type = lib.types.str;
+      default = "meso-robots";
+      description = "Subdirectory name under content/themes/ for the injected theme.";
+    };
+
     image = {
       repository = lib.mkOption {
         type = lib.types.str;
@@ -160,6 +176,8 @@
     timezone = cfg.timezone;
     network = cfg.network;
     dataDir = cfg.dataDir;
+    themeDir = cfg.themeDir;
+    themeName = cfg.themeName;
     image = cfg.image;
     database = cfg.database;
     mail = cfg.mail;
@@ -255,6 +273,21 @@
 
       chmod 0600 "$tmp"
       mv -f "$tmp" "$runtime_env_file"
+    '';
+
+  mkInjectTheme = name: instance:
+    pkgs.writeShellScript "ghost-${name}-inject-theme" ''
+      set -euo pipefail
+
+      theme_src=${lib.escapeShellArg (toString instance.themeDir)}
+      theme_dst=${lib.escapeShellArg "${instance.dataDir}/themes/${instance.themeName}"}
+
+      mkdir -p "$(dirname "$theme_dst")"
+      rm -rf "$theme_dst"
+      cp -r "$theme_src" "$theme_dst"
+      find "$theme_dst" -type d -exec chmod 755 {} \;
+      find "$theme_dst" -type f -exec chmod 644 {} \;
+      chown -R 1000:1000 "$theme_dst"
     '';
 
   mkWaitForHealthy = name: instance:
@@ -379,6 +412,22 @@ in {
       type = lib.types.str;
       default = "/var/lib/ghost";
       description = "Persistent host path used for Ghost content.";
+    };
+
+    themeDir = lib.mkOption {
+      type = lib.types.nullOr lib.types.path;
+      default = null;
+      description = ''
+        Path to a Ghost theme directory. When set, the theme is copied into
+        <dataDir>/themes/<themeName>/ before Ghost starts, and the service
+        restarts automatically when the path changes in the Nix store.
+      '';
+    };
+
+    themeName = lib.mkOption {
+      type = lib.types.str;
+      default = "meso-robots";
+      description = "Subdirectory name under content/themes/ for the injected theme.";
     };
 
     image = {
@@ -527,7 +576,7 @@ in {
             wants = ["network-online.target"];
             restartTriggers = [
               config.environment.etc."${composeEtcKey}".source
-            ];
+            ] ++ lib.optional (instance.themeDir != null) (toString instance.themeDir);
             startLimitBurst = 3;
             startLimitIntervalSec = 300;
 
@@ -572,7 +621,7 @@ in {
                 (mkWriteRuntimeEnv name instance)
                 "${pkgs.runtimeShell} -c '${dockerBin} compose config >/dev/null'"
                 "${pkgs.runtimeShell} -c '${dockerBin} network inspect ${instance.network} >/dev/null 2>&1 || ${dockerBin} network create ${instance.network}'"
-              ];
+              ] ++ lib.optional (instance.themeDir != null) (mkInjectTheme name instance);
 
               ExecStart = "${dockerBin} compose up -d";
               ExecStartPost = mkWaitForHealthy name instance;
